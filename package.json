@@ -1,0 +1,11 @@
+{
+    "name": "next-gen-ecommerce-root",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"yarn --cwd backend dev\" \"yarn --cwd frontend dev\"",
+        "install:all": "yarn --cwd backend install && yarn --cwd frontend install"
+    },
+    "devDependencies": {
+        "concurrently": "^9.1.0"
+    }
+}
