@@ -2,10 +2,14 @@ import { Router } from "express";
 import Product from "../models/Product.js";
 import authRoutes from "./auth.js";
 import cartRoutes from "./cart.js";
+import faqRoutes from "./faqRoutes.js";
+import orderRoutes from "./orders.js";
 
 const router = Router();
 router.use("/cart", cartRoutes);
 router.use("/auth", authRoutes);
+router.use("/faqs", faqRoutes);
+router.use("/orders", orderRoutes);
 
 router.get("/products", async (req, res) => {
   try {

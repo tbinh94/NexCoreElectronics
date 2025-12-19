@@ -84,4 +84,18 @@ router.delete("/:userId/:productId", async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 })
+
+router.delete("/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const cart = await Cart.findOne({ userId });
+        if (!cart) return res.status(404).json({ message: "Cart not found" });
+        cart.products = [];
+        await cart.save();
+        res.json(cart);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+})
 export default router;
