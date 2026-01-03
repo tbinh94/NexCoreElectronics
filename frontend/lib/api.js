@@ -1,26 +1,46 @@
-export async function fetchProducts(filters = {}) {
-    const url = "http://localhost:5000/api/products";
-    const params = new URLSearchParams();
-    if (filters.limit) params.set("limit", filters.limit.toString());
-    if (filters.page) params.set("page", filters.page.toString());
-    if (filters.category) params.set("category", filters.category.toString());
-    if (filters.brand) params.set("brand", filters.brand.toString());
-    if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());
-    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice.toString());
-    if (filters.sort) params.set("sort", filters.sort.toString());
-
-    const response = await fetch(`${url}?${params.toString()}`);
-    if (!response.ok) {
-        throw new Error("Failed to fetch products");
-    }
-    return response.json();
-}
+const API_URL = "http://127.0.0.1:5000/api";
 
 export async function fetchFilters() {
-    const url = "http://localhost:5000/api/products/filters";
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) {
-        throw new Error("Failed to fetch filters");
+    try {
+        const res = await fetch(`${API_URL}/products/filters`, {
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to fetch filters');
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error('Error fetching filters:', error);
+        return { brands: [], categories: [] };
     }
-    return response.json();
+}
+
+export async function fetchProducts(params = {}) {
+    try {
+        const searchParams = new URLSearchParams();
+
+        if (params.page) searchParams.set('page', params.page);
+        if (params.limit) searchParams.set('limit', params.limit);
+        if (params.category) searchParams.set('category', params.category);
+        if (params.brand) searchParams.set('brand', params.brand);
+        if (params.minPrice) searchParams.set('minPrice', params.minPrice);
+        if (params.maxPrice) searchParams.set('maxPrice', params.maxPrice);
+        if (params.sort) searchParams.set('sort', params.sort);
+        if (params.search) searchParams.set('search', params.search);
+
+        const res = await fetch(`${API_URL}/products?${searchParams.toString()}`, {
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to fetch products');
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return { products: [], pagination: {} };
+    }
 }

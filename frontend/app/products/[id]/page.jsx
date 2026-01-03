@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import ProductImageGallery from "@/components/products/ProductImageGallery";
 import ProductDescription from "@/components/products/ProductDescription";
+import ReviewSection from "@/components/products/ReviewSection";
 import { formatPrice } from "@/lib/utils";
 
 export default async function ProductPage({ params }) {
@@ -84,6 +85,8 @@ export default async function ProductPage({ params }) {
             </div>
 
             <ProductDescription product={product} />
+
+            <ReviewSection productId={product._id} />
         </Container>
     );
 }

@@ -4,16 +4,18 @@ import authRoutes from "./auth.js";
 import cartRoutes from "./cart.js";
 import faqRoutes from "./faqRoutes.js";
 import orderRoutes from "./orders.js";
+import reviewRoutes from "./reviewRoutes.js";
 
 const router = Router();
 router.use("/cart", cartRoutes);
 router.use("/auth", authRoutes);
 router.use("/faqs", faqRoutes);
 router.use("/orders", orderRoutes);
+router.use("/reviews", reviewRoutes);
 
 router.get("/products", async (req, res) => {
   try {
-    const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort } = req.query;
+    const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search } = req.query;
     const limitNum = Number(limit);
     const pageNum = Number(page);
     const skip = (pageNum - 1) * limitNum;
@@ -25,6 +27,8 @@ router.get("/products", async (req, res) => {
     if (minPrice) filter.price = { ...filter.price, $gte: Number(minPrice) };
     if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
 
+    if (search)
+      filter.name = { $regex: search, $options: 'i' };
     // Create query with filters
     const productsQuery = Product.find(filter);
 

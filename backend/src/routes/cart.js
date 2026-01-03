@@ -15,7 +15,7 @@ router.post("/add", async (req, res) => {
             await newCart.save();
             res.json(newCart);
         } else {
-            const productIndex = cart.products.findIndex((product) => product.productId === productId);
+            const productIndex = cart.products.findIndex((product) => product.productId.toString() === productId);
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += 1;
             } else {

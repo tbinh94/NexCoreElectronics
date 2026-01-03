@@ -19,6 +19,7 @@ export default function FilterSidebar({ category, brand, minPrice, maxPrice }) {
         minPrice: searchParams.get('minPrice') || '',
         maxPrice: searchParams.get('maxPrice') || '',
         sort: searchParams.get('sort') || '',
+        search: searchParams.get('search') || '',
     });
 
     useEffect(() => {
@@ -30,13 +31,14 @@ export default function FilterSidebar({ category, brand, minPrice, maxPrice }) {
     }, [filters]);
 
     const resetFilters = () => {
-        setFilters({
+        setFilters(prev => ({
             category: "",
             brand: "",
             minPrice: "",
             maxPrice: "",
-            sort: ""
-        })
+            sort: "",
+            search: prev.search
+        }))
     }
     const handleFilterChange = (key, value) => {
         const finalValue = value === "all" ? "" : value;

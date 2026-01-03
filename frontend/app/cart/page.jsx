@@ -259,8 +259,8 @@ export default function CartPage() {
                         <p className="text-3xl font-bold text-red-600">{formattedTotalPrice}</p>
                     </div>
                     {/* <ModalCheckout amount={totalPrice} /> */}
-                    <Button onClick={() => router.push("/checkout")} className="w-full cursor-pointer">
-                        Checkout
+                    <Button onClick={() => router.push("/checkout")} className="w-24 cursor-pointer">
+                        Thanh toán
                     </Button>
                 </div>
             </div>
