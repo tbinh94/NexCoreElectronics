@@ -1,4 +1,4 @@
-'use client';
+import CategoryNavBar from "@/components/layout/CategoryNavBar";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
@@ -7,98 +7,113 @@ import { Search } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import SearchForm from "@/components/search/SearchForm";
+import SearchWithSuggestions from "@/components/search/SearchWithSuggestions";
 import { useState } from "react";
 
-export default function Header() {
+export default function Header({ categories }) {
     const { user, logout } = useAuth();
     const { cartCount } = useCart();
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-950 dark:border-gray-800">
-            <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                {/* Logo */}
-                <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    NextGenShop
-                </Link>
+        <header className="sticky top-0 z-50 w-full shadow-md">
+            {/* Top Main Header - Primary Color Background */}
+            <div className="bg-primary text-primary-foreground w-full py-3">
+                <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-8">
+                    {/* Logo */}
+                    <Link href="/" className="text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity shrink-0">
+                        NextGenShop
+                    </Link>
 
-                {/* Navigation */}
-                <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700 dark:text-gray-200">
-                    <Link href="/products" className="hover:text-blue-600 transition-colors">
-                        Sản phẩm
-                    </Link>
-                    <Link href="/about" className="hover:text-blue-600 transition-colors">
-                        Giới thiệu
-                    </Link>
-                    <Link href="/contact" className="hover:text-blue-600 transition-colors">
-                        Liên hệ
-                    </Link>
-                </nav>
-
-                {/* Actions (Cart, Login) */}
-                <div className="flex items-center gap-4">
-                    {/* Mobile Search - Slide from Right */}
-                    <div className="md:hidden">
-                        <Sheet open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
-                            <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Search className="h-5 w-5" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="right" className="w-full sm:w-[400px]">
-                                <SheetHeader>
-                                    <SheetTitle>Tìm kiếm</SheetTitle>
-                                </SheetHeader>
-                                <SearchForm onSearchSubmit={() => setMobileSearchOpen(false)} />
-                            </SheetContent>
-                        </Sheet>
+                    {/* Search Bar - Center & Prominent */}
+                    <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+                        <SearchWithSuggestions />
                     </div>
 
-                    {/* Desktop Search - Slide from Top */}
-                    <div className="hidden md:block">
-                        <Sheet open={desktopSearchOpen} onOpenChange={setDesktopSearchOpen}>
-                            <SheetTrigger asChild>
-                                <Button className="cursor-pointer" variant="ghost" size="icon">
-                                    <Search className="h-5 w-5" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="top" className="h-[300px]"> {/* Chiều cao tùy chỉnh */}
-                                <div className="container mx-auto">
+                    {/* Actions (Cart, Login) */}
+                    <div className="flex items-center gap-6 shrink-0">
+                        {/* Mobile Search Trigger */}
+                        <div className="md:hidden">
+                            <Sheet open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
+                                <SheetTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                                        <Search className="h-6 w-6" />
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="top" className="w-full">
                                     <SheetHeader>
-                                        <SheetTitle className="text-center text-2xl">Tìm kiếm sản phẩm</SheetTitle>
+                                        <SheetTitle>Tìm kiếm</SheetTitle>
                                     </SheetHeader>
-                                    <SearchForm onSearchSubmit={() => setDesktopSearchOpen(false)} />
-                                </div>
-                            </SheetContent>
-                        </Sheet>
-                    </div>
-                    <Link href="/cart" className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
-                        🛒 <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
-                            {cartCount}
-                        </span>
-                    </Link>
+                                    <SearchForm onSearchSubmit={() => setMobileSearchOpen(false)} />
+                                </SheetContent>
+                            </Sheet>
+                        </div>
 
-                    {user ? (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button className="cursor-pointer" variant="outline">Xin chào, {user.name}</Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem>
-                                    <Link href="/profile" className="w-full">Trang cá nhân</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Link href="/orders" className="w-full">Đơn hàng</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={logout}>Đăng xuất</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    ) : (
-                        <Link href="/login">Đăng nhập</Link>
-                    )}
+                        {/* Cart */}
+                        <Link href="/cart" className="relative group flex flex-col items-center justify-center text-white hover:text-white/90">
+                            <div className="relative p-1">
+                                <span className="text-2xl">🛒</span>
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-1 -right-2 h-5 w-5 rounded-full bg-red-500 text-[11px] font-bold text-white flex items-center justify-center border-2 border-primary">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-xs font-medium mt-1 hidden sm:block">Giỏ hàng</span>
+                        </Link>
+
+                        {/* User Account */}
+                        {user ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <div className="flex items-center gap-2 cursor-pointer hover:opacity-90 text-white">
+                                        <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold border border-white/30">
+                                            {user.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="flex flex-col text-left hidden sm:block">
+                                            <span className="text-xs opacity-80">Xin chào,</span>
+                                            <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>
+                                        </div>
+                                    </div>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/profile" className="w-full cursor-pointer">Trang cá nhân</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/orders" className="w-full cursor-pointer">Đơn hàng của tôi</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 focus:text-red-600">
+                                        Đăng xuất
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <div className="flex items-center gap-3 text-sm font-medium text-white">
+                                <Link href="/login" className="hover:opacity-80">Đăng nhập</Link>
+                                <span className="h-4 w-px bg-white/30"></span>
+                                <Link href="/register" className="hover:opacity-80">Đăng ký</Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {/* Secondary Navigation Bar - White Background */}
+            <CategoryNavBar categories={categories} />
+
+            {/* Desktop Search Modal (Hidden by default) */}
+            <Sheet open={desktopSearchOpen} onOpenChange={setDesktopSearchOpen}>
+                <SheetContent side="top" className="h-[300px]">
+                    <div className="container mx-auto">
+                        <SheetHeader>
+                            <SheetTitle className="text-center text-2xl">Tìm kiếm sản phẩm</SheetTitle>
+                        </SheetHeader>
+                        <SearchForm onSearchSubmit={() => setDesktopSearchOpen(false)} />
+                    </div>
+                </SheetContent>
+            </Sheet>
         </header>
     );
 }

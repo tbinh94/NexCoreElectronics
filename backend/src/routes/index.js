@@ -5,6 +5,8 @@ import cartRoutes from "./cart.js";
 import faqRoutes from "./faqRoutes.js";
 import orderRoutes from "./orders.js";
 import reviewRoutes from "./reviewRoutes.js";
+import adminRoutes from "./admin.js";
+import uploadRoutes from "./upload.js";
 
 const router = Router();
 router.use("/cart", cartRoutes);
@@ -12,10 +14,12 @@ router.use("/auth", authRoutes);
 router.use("/faqs", faqRoutes);
 router.use("/orders", orderRoutes);
 router.use("/reviews", reviewRoutes);
+router.use("/admin", adminRoutes);
+router.use("/upload", uploadRoutes);
 
 router.get("/products", async (req, res) => {
   try {
-    const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search } = req.query;
+    const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search, promotion } = req.query;
     const limitNum = Number(limit);
     const pageNum = Number(page);
     const skip = (pageNum - 1) * limitNum;
@@ -26,6 +30,9 @@ router.get("/products", async (req, res) => {
     if (brand) filter.brand = brand;
     if (minPrice) filter.price = { ...filter.price, $gte: Number(minPrice) };
     if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
+    if (promotion === 'true') {
+      filter.originalPrice = { $exists: true, $ne: null };
+    }
 
     if (search)
       filter.name = { $regex: search, $options: 'i' };

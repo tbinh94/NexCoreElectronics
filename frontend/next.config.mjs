@@ -14,6 +14,18 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "img.vietqr.io",
             },
+            {
+                protocol: "https",
+                hostname: "img.hungmobile.vn",
+            },
+            {
+                protocol: "https",
+                hostname: "placehold.co",
+            },
+            {
+                protocol: "https",
+                hostname: "logo.clearbit.com",
+            },
         ],
     },
     turbopack: {

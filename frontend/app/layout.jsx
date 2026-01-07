@@ -1,7 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import MainLayoutWrapper from "@/components/layout/MainLayoutWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/context/CartContext";
@@ -19,19 +18,21 @@ export const viewport = {
     userScalable: false,
 };
 
-export default function RootLayout({
+import { fetchFilters } from "@/lib/api";
+
+export default async function RootLayout({
     children,
 }) {
+    const filters = await fetchFilters();
+
     return (
         <html lang="en">
             <body className={`${inter.className} overflow-x-hidden`}>
                 <AuthProvider>
                     <CartProvider>
-                        <div className="flex min-h-screen flex-col">
-                            <Header />
-                            <main className="flex-1">{children}</main>
-                            <Footer />
-                        </div>
+                        <MainLayoutWrapper categories={filters.categories}>
+                            {children}
+                        </MainLayoutWrapper>
                         <Toaster />
                     </CartProvider>
                 </AuthProvider>
