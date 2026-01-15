@@ -66,8 +66,14 @@ export const AuthProvider = ({ children }) => {
         router.push("/login");
     };
 
+    const updateUser = (updatedUserData) => {
+        console.log("Updating user data:", updatedUserData);
+        setUser(updatedUserData);
+        localStorage.setItem("user", JSON.stringify(updatedUserData));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, loading, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

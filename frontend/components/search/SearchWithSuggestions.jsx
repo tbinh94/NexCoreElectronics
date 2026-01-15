@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X, Loader2, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export default function SearchWithSuggestions() {
     const [query, setQuery] = useState("");
@@ -13,6 +14,7 @@ export default function SearchWithSuggestions() {
     const [loading, setLoading] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const wrapperRef = useRef(null);
+    const fileInputRef = useRef(null);
     const router = useRouter();
 
     // Debounce search
@@ -43,7 +45,8 @@ export default function SearchWithSuggestions() {
         setLoading(true);
         try {
             // Fetch top 5 matching products
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products?search=${encodeURIComponent(searchTerm)}&limit=5`);
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
+            const res = await fetch(`${apiUrl}/products?search=${encodeURIComponent(searchTerm)}&limit=5`);
             if (res.ok) {
                 const data = await res.json();
                 setSuggestions(data.products || []);
@@ -60,7 +63,7 @@ export default function SearchWithSuggestions() {
         e.preventDefault();
         if (query.trim()) {
             setShowSuggestions(false);
-            router.push(`/search?q=${encodeURIComponent(query)}`);
+            router.push(`/search?search=${encodeURIComponent(query)}`);
         }
     };
 
@@ -68,6 +71,43 @@ export default function SearchWithSuggestions() {
         setQuery("");
         setSuggestions([]);
         setShowSuggestions(false);
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setLoading(true);
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
+            const res = await fetch(`${apiUrl}/products/search-image`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.searchQuery) {
+                    toast.success(`Đã nhận diện: ${data.searchQuery}`);
+                    setQuery(data.searchQuery);
+                    router.push(`/search?search=${encodeURIComponent(data.searchQuery)}`);
+                } else {
+                    toast.error("Không nhận diện được sản phẩm nào.");
+                }
+            } else {
+                toast.error("Lỗi khi tìm kiếm bằng hình ảnh.");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Lỗi kết nối server.");
+        } finally {
+            setLoading(false);
+            // Reset input
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
     };
 
     return (
@@ -81,25 +121,47 @@ export default function SearchWithSuggestions() {
                         if (suggestions.length > 0) setShowSuggestions(true);
                     }}
                     placeholder="Tìm kiếm sản phẩm..."
-                    className="w-full h-10 pl-4 pr-12 rounded-l-md border-none focus:ring-2 focus:ring-primary/50 text-black bg-white outline-none shadow-sm"
+                    className="w-full h-10 pl-4 pr-24 rounded-l-md border-none focus:ring-2 focus:ring-primary/50 text-black bg-white outline-none shadow-sm"
                 />
 
-                {query && (
-                    <button
-                        type="button"
-                        onClick={clearSearch}
-                        className="absolute right-14 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
-                )}
+                {/* Image Search Input */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                />
 
-                <Button
-                    type="submit"
-                    className="h-10 rounded-l-none rounded-r-md bg-white/10 hover:bg-white/20 border-l border-gray-200 text-white px-6 cursor-pointer"
-                >
-                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
-                </Button>
+                <div className="absolute right-0 top-0 h-full flex items-center">
+                    {query && (
+                        <button
+                            type="button"
+                            onClick={clearSearch}
+                            className="mr-2 text-gray-400 hover:text-gray-600"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    )}
+
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 mr-1 hover:bg-gray-100 text-gray-500 rounded-full"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={loading}
+                        title="Tìm kiếm bằng hình ảnh"
+                    >
+                        <Camera className="h-5 w-5" />
+                    </Button>
+
+                    <Button
+                        type="submit"
+                        className="h-10 rounded-l-none rounded-r-md bg-white/10 hover:bg-white/20 border-l border-gray-200 text-white px-6 cursor-pointer"
+                    >
+                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
+                    </Button>
+                </div>
             </form>
 
             {/* Suggestions Dropdown */}

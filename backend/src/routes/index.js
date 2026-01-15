@@ -1,5 +1,6 @@
 import { Router } from "express";
-import Product from "../models/Product.js";
+import multer from "multer";
+import path from "path";
 import authRoutes from "./auth.js";
 import cartRoutes from "./cart.js";
 import faqRoutes from "./faqRoutes.js";
@@ -7,8 +8,23 @@ import orderRoutes from "./orders.js";
 import reviewRoutes from "./reviewRoutes.js";
 import adminRoutes from "./admin.js";
 import uploadRoutes from "./upload.js";
+import chatbotRoutes from "./chatbot.js";
+import aiRoutes from "./ai.js";
+import { getProducts, getProductFilters, getProductById, searchByImage } from "../controllers/productController.js";
 
 const router = Router();
+
+// Configure Multer for Image Search
+const storage = multer.diskStorage({
+    destination(req, file, cb) {
+        cb(null, "uploads/");
+    },
+    filename(req, file, cb) {
+        cb(null, `search-${Date.now()}${path.extname(file.originalname)}`);
+    },
+});
+const upload = multer({ storage });
+
 router.use("/cart", cartRoutes);
 router.use("/auth", authRoutes);
 router.use("/faqs", faqRoutes);
@@ -16,90 +32,12 @@ router.use("/orders", orderRoutes);
 router.use("/reviews", reviewRoutes);
 router.use("/admin", adminRoutes);
 router.use("/upload", uploadRoutes);
+router.use("/chat", chatbotRoutes);
+router.use("/ai", aiRoutes);
 
-router.get("/products", async (req, res) => {
-  try {
-    const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search, promotion } = req.query;
-    const limitNum = Number(limit);
-    const pageNum = Number(page);
-    const skip = (pageNum - 1) * limitNum;
-
-    // Build filter object
-    const filter = {};
-    if (category) filter.category = category;
-    if (brand) filter.brand = brand;
-    if (minPrice) filter.price = { ...filter.price, $gte: Number(minPrice) };
-    if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
-    if (promotion === 'true') {
-      filter.originalPrice = { $exists: true, $ne: null };
-    }
-
-    if (search)
-      filter.name = { $regex: search, $options: 'i' };
-    // Create query with filters
-    const productsQuery = Product.find(filter);
-
-    // Apply sorting
-    if (sort) {
-      if (sort === 'price_asc') {
-        productsQuery.sort({ price: 1 });
-      } else if (sort === 'price_desc') {
-        productsQuery.sort({ price: -1 });
-      } else if (sort === 'newest') {
-        productsQuery.sort({ createdAt: -1 });
-      }
-    }
-
-    // Apply pagination
-    productsQuery.skip(skip).limit(limitNum);
-
-    // Execute query and count total
-    const [products, total] = await Promise.all([
-      productsQuery.exec(),
-      Product.countDocuments(filter)
-    ]);
-
-    const totalPages = Math.ceil(total / limitNum);
-
-    res.json({
-      products,
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        totalPages,
-        totalProducts: total
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-});
-
-router.get("/products/filters", async (req, res) => {
-  try {
-    const categories = await Product.distinct("category");
-    const brands = await Product.distinct("brand");
-    res.json({ categories, brands });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-});
-
-router.get("/products/:id", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ message: "Product not found" })
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" })
-  }
-})
-
-
+router.get("/products", getProducts);
+router.get("/products/filters", getProductFilters);
+router.get("/products/:id", getProductById);
+router.post("/products/search-image", upload.single("image"), searchByImage);
 
 export default router;

@@ -14,7 +14,7 @@ const app = express();
 
 // CORS cho phép frontend gọi API
 app.use(cors({
-  origin: "http://localhost:3000", // frontend dev server
+  origin: ["http://localhost:3000", "http://127.0.0.1:3000"], // frontend dev server
   credentials: true,
 }));
 

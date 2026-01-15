@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import SearchForm from "@/components/search/SearchForm";
 import SearchWithSuggestions from "@/components/search/SearchWithSuggestions";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Header({ categories }) {
     const { user, logout } = useAuth();
@@ -68,9 +69,20 @@ export default function Header({ categories }) {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <div className="flex items-center gap-2 cursor-pointer hover:opacity-90 text-white">
-                                        <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold border border-white/30">
-                                            {user.name.charAt(0).toUpperCase()}
-                                        </div>
+                                        {user.avatar ? (
+                                            <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/30">
+                                                <Image
+                                                    src={user.avatar}
+                                                    alt={user.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold border border-white/30">
+                                                {user.name.charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
                                         <div className="flex flex-col text-left hidden sm:block">
                                             <span className="text-xs opacity-80">Xin chào,</span>
                                             <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>

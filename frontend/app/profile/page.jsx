@@ -1,20 +1,98 @@
 'use client';
 import { useAuth } from "@/context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, Calendar, LogOut, ShoppingBag, ShieldCheck } from "lucide-react";
+import { User, Mail, Calendar, LogOut, ShoppingBag, ShieldCheck, Camera, Edit2, Save, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import Image from "next/image";
 
 export default function ProfilePage() {
-    const { user, logout, loading } = useAuth();
+    const { user, logout, loading, updateUser } = useAuth();
     const router = useRouter();
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [newName, setNewName] = useState("");
+    const [previewAvatar, setPreviewAvatar] = useState(null);
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [saving, setSaving] = useState(false);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (!loading && !user) {
             router.push("/login");
+        } else if (user) {
+            setNewName(user.name);
+            setPreviewAvatar(user.avatar);
         }
     }, [user, loading, router]);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setAvatarFile(file);
+            setPreviewAvatar(URL.createObjectURL(file));
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        setSaving(true);
+        try {
+            let avatarUrl = user.avatar;
+
+            // 1. Upload new avatar if selected
+            if (avatarFile) {
+                const formData = new FormData();
+                formData.append("image", avatarFile);
+
+                const uploadRes = await fetch(`/api/upload`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!uploadRes.ok) throw new Error("Failed to upload avatar");
+
+                const uploadData = await uploadRes.json();
+                avatarUrl = uploadData.image;
+            }
+
+            // 2. Update profile
+            const token = localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null;
+
+            const res = await fetch(`/api/auth/profile`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: newName,
+                    avatar: avatarUrl
+                })
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                console.error("Update profile failed:", res.status, errorData);
+                throw new Error(errorData.message || `Failed to update profile (${res.status})`);
+            }
+
+            const updatedUser = await res.json();
+
+            // 3. Update local state
+            updateUser(updatedUser);
+            setIsEditing(false);
+            toast.success("Cập nhật hồ sơ thành công!");
+
+        } catch (error) {
+            console.error(error);
+            toast.error("Có lỗi xảy ra khi cập nhật hồ sơ.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     if (loading || !user) {
         return (
@@ -32,25 +110,92 @@ export default function ProfilePage() {
                     <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600"></div>
                     <div className="px-8 pb-8">
                         <div className="relative flex justify-between items-end -mt-12 mb-6">
-                            <div className="flex items-end">
-                                <div className="h-24 w-24 rounded-full ring-4 ring-white bg-white flex items-center justify-center shadow-lg">
-                                    <div className="h-20 w-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold">
-                                        {user.name?.charAt(0).toUpperCase()}
-                                    </div>
+                            <div className="flex items-end relative group">
+                                <div className="h-24 w-24 rounded-full ring-4 ring-white bg-white flex items-center justify-center shadow-lg overflow-hidden relative">
+                                    {previewAvatar || user.avatar ? (
+                                        <Image
+                                            src={previewAvatar || user.avatar}
+                                            alt={user.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="h-full w-full bg-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold">
+                                            {user.name?.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+
+                                    {isEditing && (
+                                        <div
+                                            className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <Camera className="text-white w-8 h-8" />
+                                        </div>
+                                    )}
                                 </div>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
                             </div>
-                            <Button
-                                onClick={logout}
-                                variant="outline"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                            >
-                                <LogOut className="w-4 h-4 mr-2" />
-                                Đăng xuất
-                            </Button>
+
+                            <div className="flex gap-2">
+                                {isEditing ? (
+                                    <>
+                                        <Button
+                                            onClick={() => setIsEditing(false)}
+                                            variant="ghost"
+                                            className="text-gray-600"
+                                            disabled={saving}
+                                        >
+                                            <X className="w-4 h-4 mr-2" /> Hủy
+                                        </Button>
+                                        <Button
+                                            onClick={handleSaveProfile}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                                            disabled={saving}
+                                        >
+                                            {saving ? "Đang lưu..." : <><Save className="w-4 h-4 mr-2" /> Lưu</>}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            onClick={() => setIsEditing(true)}
+                                            variant="outline"
+                                            className="border-gray-200"
+                                        >
+                                            <Edit2 className="w-4 h-4 mr-2" />
+                                            Chỉnh sửa
+                                        </Button>
+                                        <Button
+                                            onClick={logout}
+                                            variant="outline"
+                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                        >
+                                            <LogOut className="w-4 h-4 mr-2" />
+                                            Đăng xuất
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
                         </div>
 
                         <div className="space-y-1">
-                            <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
+                            {isEditing ? (
+                                <Input
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    className="text-2xl font-bold text-gray-900 h-10 w-full max-w-sm"
+                                />
+                            ) : (
+                                <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
+                            )}
+
                             <p className="text-gray-500 flex items-center gap-2">
                                 <ShieldCheck className="w-4 h-4 text-green-500" />
                                 {user.isAdmin ? 'Quản trị viên' : 'Thành viên'}
@@ -119,8 +264,6 @@ export default function ProfilePage() {
                                     <span className="text-gray-400 group-hover:text-blue-500">→</span>
                                 </div>
                             </Link>
-
-                            {/* Add more actions here if needed */}
                         </div>
                     </div>
                 </div>

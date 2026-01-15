@@ -20,6 +20,8 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 export default function AddProductPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiTone, setAiTone] = useState("professional");
     const [formData, setFormData] = useState({
         name: "",
         price: "",
@@ -57,6 +59,44 @@ export default function AddProductPage() {
 
     const handleSelectChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleGenerateContent = async () => {
+        if (!formData.name) {
+            toast.error("Vui lòng nhập tên sản phẩm trước khi tạo nội dung");
+            return;
+        }
+
+        setAiLoading(true);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/ai/generate-description`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productName: formData.name,
+                    productSpecs: formData.specs,
+                    tone: aiTone
+                }),
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setFormData(prev => ({
+                    ...prev,
+                    description: data.shortDescription,
+                    detailedDescription: data.detailedDescription,
+                    highlights: data.highlights.join('\n')
+                }));
+                toast.success("Đã tạo nội dung tự động thành công!");
+            } else {
+                toast.error("Không thể tạo nội dung. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Lỗi kết nối đến server AI");
+        } finally {
+            setAiLoading(false);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -196,6 +236,40 @@ export default function AddProductPage() {
                                     placeholder="Hoặc nhập link ảnh trực tiếp"
                                     className="mt-2"
                                 />
+                            </div>
+
+                            {/* AI Content Generation Section */}
+                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-semibold text-blue-800 flex items-center gap-2">
+                                        ✨ AI Content Generator
+                                    </h3>
+                                    <div className="flex items-center gap-2">
+                                        <Select value={aiTone} onValueChange={setAiTone}>
+                                            <SelectTrigger className="w-[140px] h-8 text-xs bg-white">
+                                                <SelectValue placeholder="Tone" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="professional">Chuyên nghiệp</SelectItem>
+                                                <SelectItem value="youthful">Trẻ trung</SelectItem>
+                                                <SelectItem value="premium">Cao cấp</SelectItem>
+                                                <SelectItem value="technical">Kỹ thuật</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={handleGenerateContent}
+                                            disabled={aiLoading}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white h-8 text-xs"
+                                        >
+                                            {aiLoading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : "Tạo nội dung"}
+                                        </Button>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-blue-600">
+                                    Nhập tên sản phẩm và thông số kỹ thuật, sau đó nhấn nút để AI tự động viết mô tả và đặc điểm nổi bật.
+                                </p>
                             </div>
 
                             <div className="grid gap-2">

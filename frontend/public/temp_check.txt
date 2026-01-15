@@ -1,0 +1,2 @@
+// This is a placeholder file to ensure the directory exists and we can write to it.
+// The actual image copy command is running in the background.

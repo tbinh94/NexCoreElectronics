@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Star, User } from 'lucide-react';
+import { Star, User, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -13,6 +13,10 @@ export default function ReviewSection({ productId }) {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+
+    // AI Summary State
+    const [summary, setSummary] = useState(null);
+    const [summarizing, setSummarizing] = useState(false);
 
     useEffect(() => {
         fetchReviews();
@@ -28,6 +32,23 @@ export default function ReviewSection({ productId }) {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSummarize = async () => {
+        setSummarizing(true);
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/ai/summarize-reviews`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId }),
+            });
+            const data = await res.json();
+            setSummary(data);
+        } catch (error) {
+            console.error("Failed to summarize", error);
+        } finally {
+            setSummarizing(false);
         }
     };
 
@@ -64,6 +85,7 @@ export default function ReviewSection({ productId }) {
             setComment('');
             setRating(5);
             fetchReviews(); // Refresh reviews
+            setSummary(null); // Reset summary when new review added
         } catch (err) {
             setError(err.message);
         } finally {
@@ -73,7 +95,69 @@ export default function ReviewSection({ productId }) {
 
     return (
         <div className="mt-16 border-t pt-10">
-            <h2 className="text-2xl font-bold mb-6">Đánh giá sản phẩm ({reviews.length})</h2>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Đánh giá sản phẩm ({reviews.length})</h2>
+                {reviews.length > 0 && !summary && (
+                    <Button
+                        variant="outline"
+                        onClick={handleSummarize}
+                        disabled={summarizing}
+                        className="gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                        <Sparkles size={16} />
+                        {summarizing ? "Đang phân tích..." : "Tóm tắt đánh giá bằng AI"}
+                    </Button>
+                )}
+            </div>
+
+            {/* AI Summary Card */}
+            {summary && (
+                <div className="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Sparkles className="text-blue-600" size={20} />
+                        <h3 className="text-lg font-bold text-blue-900">AI Tổng hợp đánh giá</h3>
+                    </div>
+
+                    {summary.message ? (
+                        <p className="text-gray-600">{summary.message}</p>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="bg-white/60 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-green-700 flex items-center gap-2 mb-2">
+                                        <ThumbsUp size={16} /> Ưu điểm
+                                    </h4>
+                                    <ul className="space-y-1">
+                                        {summary.pros?.map((pro, idx) => (
+                                            <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                                                <span className="text-green-500 mt-1">•</span>
+                                                {pro}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="bg-white/60 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-red-700 flex items-center gap-2 mb-2">
+                                        <ThumbsDown size={16} /> Nhược điểm
+                                    </h4>
+                                    <ul className="space-y-1">
+                                        {summary.cons?.map((con, idx) => (
+                                            <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                                                <span className="text-red-500 mt-1">•</span>
+                                                {con}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="bg-white/80 p-4 rounded-lg border-l-4 border-blue-500">
+                                <h4 className="font-semibold text-blue-800 mb-1">Kết luận</h4>
+                                <p className="text-gray-700 text-sm italic">"{summary.verdict}"</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {/* Review List */}

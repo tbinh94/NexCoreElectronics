@@ -4,6 +4,7 @@ import MainLayoutWrapper from "@/components/layout/MainLayoutWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/context/CartContext";
+import ChatBot from "@/components/features/ChatBot";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -33,6 +34,7 @@ export default async function RootLayout({
                         <MainLayoutWrapper categories={filters.categories}>
                             {children}
                         </MainLayoutWrapper>
+                        <ChatBot />
                         <Toaster />
                     </CartProvider>
                 </AuthProvider>
