@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,9 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 
 export default function AddProductPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const defaultCategory = searchParams.get('category') || "";
+
     const [loading, setLoading] = useState(false);
     const [aiLoading, setAiLoading] = useState(false);
     const [aiTone, setAiTone] = useState("professional");
@@ -29,7 +32,7 @@ export default function AddProductPage() {
         detailedDescription: "",
         highlights: "",
         image: "",
-        category: "",
+        category: defaultCategory,
         brand: "",
         countInStock: "",
         specs: {
@@ -43,6 +46,22 @@ export default function AddProductPage() {
             weight: "",
         }
     });
+
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('/api/categories');
+                const data = await res.json();
+                setCategories(data);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+                toast.error("Failed to load categories");
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -169,15 +188,16 @@ export default function AddProductPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="category">Danh mục</Label>
-                                    <Select onValueChange={(val) => handleSelectChange("category", val)}>
+                                    <Select value={formData.category} onValueChange={(val) => handleSelectChange("category", val)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Chọn danh mục" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Phone">Điện thoại</SelectItem>
-                                            <SelectItem value="Laptop">Laptop</SelectItem>
-                                            <SelectItem value="Tablet">Máy tính bảng</SelectItem>
-                                            <SelectItem value="Accessories">Phụ kiện</SelectItem>
+                                            {categories.map((cat) => (
+                                                <SelectItem key={cat._id} value={cat.name}>
+                                                    {cat.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>

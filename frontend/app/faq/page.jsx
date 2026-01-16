@@ -17,9 +17,9 @@ export default function FAQPage() {
         fetchFaqs();
     }, []);
     return (
-        <div className="bg-white">
+        <div className="bg-white dark:bg-background">
             {/* Header */}
-            <div className="bg-gray-900 py-24 sm:py-32">
+            <div className="bg-gray-900 dark:bg-gray-950 py-24 sm:py-32">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
                         <h2 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">Câu hỏi thường gặp</h2>
@@ -33,7 +33,7 @@ export default function FAQPage() {
                             </div>
                             <input
                                 type="text"
-                                className="block w-full rounded-md border-0 bg-white/10 py-3 pl-10 pr-3 text-white shadow-sm ring-1 ring-inset ring-white/20 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 bg-white/10 dark:bg-white/5 py-3 pl-10 pr-3 text-white shadow-sm ring-1 ring-inset ring-white/20 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                 placeholder="Tìm kiếm câu hỏi..."
                             />
                         </div>
@@ -43,18 +43,18 @@ export default function FAQPage() {
 
             {/* FAQ Content */}
             <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8">
-                <div className="mx-auto max-w-4xl divide-y divide-gray-900/10">
-                    <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">Chủ đề phổ biến</h2>
-                    <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">
+                <div className="mx-auto max-w-4xl divide-y divide-gray-900/10 dark:divide-white/10">
+                    <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900 dark:text-white">Chủ đề phổ biến</h2>
+                    <dl className="mt-10 space-y-6 divide-y divide-gray-900/10 dark:divide-white/10">
                         {faqs.map((faq) => (
                             <div key={faq._id} className="pt-6">
                                 <dt>
-                                    <div className="flex w-full items-start justify-between text-left text-gray-900">
+                                    <div className="flex w-full items-start justify-between text-left text-gray-900 dark:text-white">
                                         <span className="text-base font-semibold leading-7">{faq.question}</span>
                                     </div>
                                 </dt>
                                 <dd className="mt-2 pr-12">
-                                    <p className="text-base leading-7 text-gray-600">{faq.answer}</p>
+                                    <p className="text-base leading-7 text-gray-600 dark:text-gray-300">{faq.answer}</p>
                                 </dd>
                             </div>
                         ))}
@@ -63,8 +63,8 @@ export default function FAQPage() {
 
                 {/* Still have questions? */}
                 <div className="mx-auto mt-16 max-w-2xl text-center">
-                    <h3 className="text-xl font-semibold tracking-tight text-gray-900">Vẫn còn thắc mắc?</h3>
-                    <p className="mt-4 text-base leading-7 text-gray-600">
+                    <h3 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">Vẫn còn thắc mắc?</h3>
+                    <p className="mt-4 text-base leading-7 text-gray-600 dark:text-gray-300">
                         Nếu bạn không tìm thấy câu trả lời mình cần, đừng ngần ngại liên hệ với chúng tôi.
                     </p>
                     <div className="mt-6">
@@ -78,4 +78,4 @@ export default function FAQPage() {
 
         </div>
     );
-}   
+}

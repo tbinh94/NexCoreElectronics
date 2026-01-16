@@ -10,6 +10,7 @@ import SearchForm from "@/components/search/SearchForm";
 import SearchWithSuggestions from "@/components/search/SearchWithSuggestions";
 import { useState } from "react";
 import Image from "next/image";
+import { ModeToggle } from "@/components/layout/ModeToggle";
 
 export default function Header({ categories }) {
     const { user, logout } = useAuth();
@@ -50,6 +51,9 @@ export default function Header({ categories }) {
                                 </SheetContent>
                             </Sheet>
                         </div>
+
+                        {/* Theme Toggle */}
+                        <ModeToggle />
 
                         {/* Cart */}
                         <Link href="/cart" className="relative group flex flex-col items-center justify-center text-white hover:text-white/90">

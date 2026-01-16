@@ -3,7 +3,7 @@ import AdminHeader from "@/components/admin/AdminHeader";
 
 export default function AdminLayout({ children }) {
     return (
-        <div className="min-h-screen bg-gray-50/50 flex">
+        <div className="min-h-screen bg-gray-50/50 dark:bg-background flex">
             {/* Sidebar - Hidden on mobile, handled via Sheet usually, but simple for now */}
             <aside className="hidden md:block fixed inset-y-0 left-0 z-40">
                 <AdminSidebar />

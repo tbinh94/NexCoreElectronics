@@ -40,11 +40,15 @@ export function CartProvider({ children }) {
                 },
                 body: JSON.stringify({ productId, userId: user._id, }),
             });
-            if (!res.ok) throw new Error("Failed to add to cart");
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to add to cart");
+            }
             await fetchCart();
         }
         catch (error) {
             console.error("Error adding to cart:", error);
+            throw error;
         }
         finally {
             setLoading(false);

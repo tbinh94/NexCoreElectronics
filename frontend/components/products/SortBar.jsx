@@ -30,8 +30,8 @@ export default function SortBar() {
                     className={`
             px-3 py-1.5 text-sm rounded-none cursor-pointer transition bg-transparent hover:bg-transparent
             ${currentSort === value
-                            ? "text-blue-700"
-                            : "text-gray-700"}
+                            ? "text-blue-700 dark:text-blue-400 font-semibold"
+                            : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"}
           `}
                 >
                     {label}

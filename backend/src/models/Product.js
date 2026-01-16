@@ -64,10 +64,6 @@ const productSchema = new mongoose.Schema(
             weight: { type: String },
             os: { type: String },
         },
-        category: {
-            type: String,
-            required: true,
-        },
         brand: {
             type: String,
             required: true,

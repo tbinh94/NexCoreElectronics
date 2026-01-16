@@ -18,7 +18,7 @@ export default function AddToCartButton({ productId }) {
         }
         e.preventDefault();
         try {
-            addToCart(productId); // must use _id
+            await addToCart(productId); // must use _id
             toast.success("Thêm vào giỏ hàng thành công");
         }
         catch (error) {

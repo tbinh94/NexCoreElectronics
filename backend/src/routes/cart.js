@@ -2,13 +2,26 @@ import { Router } from "express";
 const router = Router();
 import Product from "../models/Product.js";
 import Cart from "../models/Cart.js";
-import authRoutes from "./auth.js";
-
-router.use("/auth", authRoutes);
+import mongoose from "mongoose";
 
 router.post("/add", async (req, res) => {
     try {
         const { userId, productId } = req.body;
+
+        if (!userId || !productId) {
+            return res.status(400).json({ message: "Missing userId or productId" });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ message: "Invalid productId" });
+        }
+
+        // Check if product exists
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
         let cart = await Cart.findOne({ userId });
         if (!cart) {
             const newCart = new Cart({ userId, products: [{ productId, quantity: 1 }] });
@@ -25,8 +38,8 @@ router.post("/add", async (req, res) => {
             res.json(cart);
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error("Error adding to cart:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 });
 

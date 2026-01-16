@@ -1,6 +1,23 @@
+'use client';
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Footer() {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('/api/categories');
+                const data = await res.json();
+                setCategories(data.slice(0, 8));
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
     return (
         <footer className="border-t bg-gray-50 dark:bg-gray-950 dark:border-gray-800">
             <div className="container mx-auto px-4 py-12">
@@ -20,8 +37,13 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                             <li><Link href="/products" className="hover:text-blue-600">Tất cả sản phẩm</Link></li>
-                            <li><Link href="/category/phones" className="hover:text-blue-600">Điện thoại</Link></li>
-                            <li><Link href="/category/laptops" className="hover:text-blue-600">Laptop</Link></li>
+                            {categories.map((cat) => (
+                                <li key={cat._id}>
+                                    <Link href={`/products?category=${cat.name}`} className="hover:text-blue-600">
+                                        {cat.name}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 

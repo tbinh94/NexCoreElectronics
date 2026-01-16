@@ -57,9 +57,9 @@ export default function FilterSidebar({ category, brand, minPrice, maxPrice }) {
     }
 
     return (
-        <div className="flex flex-col gap-y-4 bg-white focus:ring-2 focus:ring-black p-4 rounded-lg shadow-md">
+        <div className="flex flex-col gap-y-4 bg-white dark:bg-card focus:ring-2 focus:ring-black p-4 rounded-lg shadow-md border dark:border-border">
             <div className="space-y-2">
-                <p className="text-sm font-semibold">Danh mục</p>
+                <p className="text-sm font-semibold dark:text-gray-200">Danh mục</p>
                 <Select value={filters.category || "all"} onValueChange={(value) => handleFilterChange('category', value)}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Danh mục" />
@@ -78,7 +78,7 @@ export default function FilterSidebar({ category, brand, minPrice, maxPrice }) {
             </div>
             <Separator />
             <div className="space-y-2">
-                <p className="text-sm font-semibold">Thương hiệu</p>
+                <p className="text-sm font-semibold dark:text-gray-200">Thương hiệu</p>
                 <Select value={filters.brand || "all"} onValueChange={(value) => handleFilterChange('brand', value)}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Thương hiệu" />
@@ -97,14 +97,14 @@ export default function FilterSidebar({ category, brand, minPrice, maxPrice }) {
             </div>
             <Separator />
             <div className="flex flex-wrap gap-2">
-                <p className="text-sm font-semibold">Khoảng giá</p>
+                <p className="text-sm font-semibold dark:text-gray-200">Khoảng giá</p>
                 <Input placeholder="Giá tối thiểu" type="number" min="0" value={filters.minPrice} onChange={(e) => handlePriceChange('minPrice', e.target.value)} />
                 <Separator />
                 <Input placeholder="Giá tối đa" type="number" min="0" value={filters.maxPrice} onChange={(e) => handlePriceChange('maxPrice', e.target.value)} />
             </div>
             <Separator />
             <div className="flex justify-end">
-                <Button className="bg-gray-300 hover:bg-gray-600 hover:text-white" variant="outline" onClick={() => resetFilters()}>Reset</Button>
+                <Button className="bg-gray-300 hover:bg-gray-600 hover:text-white dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600" variant="outline" onClick={() => resetFilters()}>Reset</Button>
             </div>
         </div>
     )

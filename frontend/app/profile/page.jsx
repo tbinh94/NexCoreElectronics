@@ -103,15 +103,15 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-background py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto space-y-8">
                 {/* Header Section */}
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-card rounded-2xl shadow-sm overflow-hidden border dark:border-border">
                     <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600"></div>
                     <div className="px-8 pb-8">
                         <div className="relative flex justify-between items-end -mt-12 mb-6">
                             <div className="flex items-end relative group">
-                                <div className="h-24 w-24 rounded-full ring-4 ring-white bg-white flex items-center justify-center shadow-lg overflow-hidden relative">
+                                <div className="h-24 w-24 rounded-full ring-4 ring-white dark:ring-card bg-white dark:bg-card flex items-center justify-center shadow-lg overflow-hidden relative">
                                     {previewAvatar || user.avatar ? (
                                         <Image
                                             src={previewAvatar || user.avatar}
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                                             className="object-cover"
                                         />
                                     ) : (
-                                        <div className="h-full w-full bg-blue-100 flex items-center justify-center text-blue-600 text-3xl font-bold">
+                                        <div className="h-full w-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-3xl font-bold">
                                             {user.name?.charAt(0).toUpperCase()}
                                         </div>
                                     )}
@@ -149,7 +149,7 @@ export default function ProfilePage() {
                                         <Button
                                             onClick={() => setIsEditing(false)}
                                             variant="ghost"
-                                            className="text-gray-600"
+                                            className="text-gray-600 dark:text-gray-300"
                                             disabled={saving}
                                         >
                                             <X className="w-4 h-4 mr-2" /> Hủy
@@ -167,7 +167,7 @@ export default function ProfilePage() {
                                         <Button
                                             onClick={() => setIsEditing(true)}
                                             variant="outline"
-                                            className="border-gray-200"
+                                            className="border-gray-200 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
                                         >
                                             <Edit2 className="w-4 h-4 mr-2" />
                                             Chỉnh sửa
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                                         <Button
                                             onClick={logout}
                                             variant="outline"
-                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200 dark:border-red-900"
                                         >
                                             <LogOut className="w-4 h-4 mr-2" />
                                             Đăng xuất
@@ -190,13 +190,13 @@ export default function ProfilePage() {
                                 <Input
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
-                                    className="text-2xl font-bold text-gray-900 h-10 w-full max-w-sm"
+                                    className="text-2xl font-bold text-gray-900 dark:text-white h-10 w-full max-w-sm"
                                 />
                             ) : (
-                                <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
                             )}
 
-                            <p className="text-gray-500 flex items-center gap-2">
+                            <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                                 <ShieldCheck className="w-4 h-4 text-green-500" />
                                 {user.isAdmin ? 'Quản trị viên' : 'Thành viên'}
                             </p>
@@ -207,37 +207,37 @@ export default function ProfilePage() {
                 {/* Info Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Personal Info */}
-                    <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 border-b pb-4">Thông tin cá nhân</h2>
+                    <div className="bg-white dark:bg-card rounded-xl shadow-sm p-6 space-y-6 border dark:border-border">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white border-b dark:border-gray-800 pb-4">Thông tin cá nhân</h2>
 
                         <div className="space-y-4">
                             <div className="flex items-start gap-3">
-                                <div className="p-2 bg-gray-100 rounded-lg">
-                                    <User className="w-5 h-5 text-gray-600" />
+                                <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                                    <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Họ và tên</p>
-                                    <p className="font-medium text-gray-900">{user.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Họ và tên</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <div className="p-2 bg-gray-100 rounded-lg">
-                                    <Mail className="w-5 h-5 text-gray-600" />
+                                <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                                    <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Email</p>
-                                    <p className="font-medium text-gray-900">{user.email}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{user.email}</p>
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <div className="p-2 bg-gray-100 rounded-lg">
-                                    <Calendar className="w-5 h-5 text-gray-600" />
+                                <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                                    <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Ngày tham gia</p>
-                                    <p className="font-medium text-gray-900">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Ngày tham gia</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">
                                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
                                     </p>
                                 </div>
@@ -246,19 +246,19 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-                        <h2 className="text-lg font-semibold text-gray-900 border-b pb-4">Hoạt động</h2>
+                    <div className="bg-white dark:bg-card rounded-xl shadow-sm p-6 space-y-6 border dark:border-border">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white border-b dark:border-gray-800 pb-4">Hoạt động</h2>
 
                         <div className="space-y-4">
                             <Link href="/orders" className="block group">
-                                <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all">
+                                <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all">
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-200 transition-colors">
+                                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
                                             <ShoppingBag className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-900">Đơn hàng của tôi</p>
-                                            <p className="text-sm text-gray-500">Xem lịch sử mua hàng</p>
+                                            <p className="font-medium text-gray-900 dark:text-gray-100">Đơn hàng của tôi</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">Xem lịch sử mua hàng</p>
                                         </div>
                                     </div>
                                     <span className="text-gray-400 group-hover:text-blue-500">→</span>

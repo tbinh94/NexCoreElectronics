@@ -4,6 +4,7 @@ import MainLayoutWrapper from "@/components/layout/MainLayoutWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/context/CartContext";
+import { ThemeProvider } from "@/components/theme-provider";
 import ChatBot from "@/components/features/ChatBot";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,17 +28,24 @@ export default async function RootLayout({
     const filters = await fetchFilters();
 
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body className={`${inter.className} overflow-x-hidden`}>
-                <AuthProvider>
-                    <CartProvider>
-                        <MainLayoutWrapper categories={filters.categories}>
-                            {children}
-                        </MainLayoutWrapper>
-                        <ChatBot />
-                        <Toaster />
-                    </CartProvider>
-                </AuthProvider>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <AuthProvider>
+                        <CartProvider>
+                            <MainLayoutWrapper categories={filters.categories}>
+                                {children}
+                            </MainLayoutWrapper>
+                            <ChatBot />
+                            <Toaster />
+                        </CartProvider>
+                    </AuthProvider>
+                </ThemeProvider>
             </body>
         </html>
     );

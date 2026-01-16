@@ -10,6 +10,7 @@ import adminRoutes from "./admin.js";
 import uploadRoutes from "./upload.js";
 import chatbotRoutes from "./chatbot.js";
 import aiRoutes from "./ai.js";
+import categoryRoutes from "./categoryRoutes.js";
 import { getProducts, getProductFilters, getProductById, searchByImage } from "../controllers/productController.js";
 
 const router = Router();
@@ -34,6 +35,7 @@ router.use("/admin", adminRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/chat", chatbotRoutes);
 router.use("/ai", aiRoutes);
+router.use("/categories", categoryRoutes);
 
 router.get("/products", getProducts);
 router.get("/products/filters", getProductFilters);

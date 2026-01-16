@@ -24,6 +24,14 @@ export default function AdminDashboard() {
                 }
             } catch (error) {
                 console.error("Failed to fetch admin stats", error);
+                // Fallback to zeros if fetch fails, to avoid crashing
+                setStats({
+                    revenue: 0,
+                    orders: 0,
+                    products: 0,
+                    customers: 0,
+                    recentOrders: []
+                });
             } finally {
                 setLoading(false);
             }
@@ -74,27 +82,27 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-                <p className="text-gray-500 mt-2">Chào mừng trở lại! Đây là tổng quan cửa hàng của bạn hôm nay.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h1>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">Chào mừng trở lại! Đây là tổng quan cửa hàng của bạn hôm nay.</p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, index) => (
-                    <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow">
+                    <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-card">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-500">
+                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                 {stat.title}
                             </CardTitle>
-                            <div className={`p-2 rounded-lg ${stat.bg}`}>
+                            <div className={`p-2 rounded-lg ${stat.bg} dark:bg-opacity-20`}>
                                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
                                 <TrendingUp className="h-3 w-3 text-green-500" />
-                                <span className="text-green-600 font-medium">{stat.change}</span> so với tháng trước
+                                <span className="text-green-600 dark:text-green-400 font-medium">{stat.change}</span> so với tháng trước
                             </p>
                         </CardContent>
                     </Card>
@@ -103,41 +111,41 @@ export default function AdminDashboard() {
 
             {/* Recent Activity Section */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border-none shadow-sm">
+                <Card className="col-span-4 border-none shadow-sm dark:bg-card">
                     <CardHeader>
-                        <CardTitle>Biểu đồ doanh thu</CardTitle>
+                        <CardTitle className="dark:text-white">Biểu đồ doanh thu</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[200px] flex items-center justify-center text-gray-400 bg-gray-50 rounded-md border border-dashed">
+                        <div className="h-[200px] flex items-center justify-center text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-md border border-dashed dark:border-gray-700">
                             Biểu đồ sẽ được tích hợp tại đây
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="col-span-3 border-none shadow-sm">
+                <Card className="col-span-3 border-none shadow-sm dark:bg-card">
                     <CardHeader>
-                        <CardTitle>Đơn hàng gần đây</CardTitle>
+                        <CardTitle className="dark:text-white">Đơn hàng gần đây</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
                             {stats.recentOrders.length > 0 ? (
                                 stats.recentOrders.map((order) => (
-                                    <div key={order._id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                                    <div key={order._id} className="flex items-center justify-between border-b dark:border-gray-700 pb-4 last:border-0 last:pb-0">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">
+                                            <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300">
                                                 {order.userId?.name ? order.userId.name.charAt(0).toUpperCase() : 'K'}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium">{order.userId?.name || 'Khách lẻ'}</p>
-                                                <p className="text-xs text-gray-500">vừa đặt đơn hàng</p>
+                                                <p className="text-sm font-medium dark:text-white">{order.userId?.name || 'Khách lẻ'}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">vừa đặt đơn hàng</p>
                                             </div>
                                         </div>
-                                        <div className="text-sm font-medium text-green-600">
+                                        <div className="text-sm font-medium text-green-600 dark:text-green-400">
                                             +{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-sm text-gray-500">Chưa có đơn hàng nào.</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Chưa có đơn hàng nào.</p>
                             )}
                         </div>
                     </CardContent>
