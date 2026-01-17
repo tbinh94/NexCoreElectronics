@@ -49,10 +49,10 @@ export default function HeroBanner() {
     );
 
     return (
-        <section className="w-full py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-[500px]">
+        <section className="w-100 md:w-full py-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-125">
                 {/* Main Slider (Left - 2/3 width) */}
-                <div className="lg:col-span-2 h-[300px] lg:h-full rounded-2xl overflow-hidden shadow-lg relative group">
+                <div className="lg:col-span-2 h-75 lg:h-full rounded-2xl overflow-hidden shadow-lg relative group">
                     <Carousel
                         plugins={[plugin.current]}
                         className="w-full h-full"
@@ -73,7 +73,7 @@ export default function HeroBanner() {
                                         />
 
                                         {/* Content Overlay */}
-                                        <div className="absolute inset-0 flex flex-col justify-center items-start p-8 md:p-16 text-white z-10 bg-gradient-to-r from-black/60 to-transparent">
+                                        <div className="absolute inset-0 flex flex-col justify-center items-start p-8 md:p-16 text-white z-10 bg-linear-to-r from-black/60 to-transparent">
                                             <h2 className="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight animate-in slide-in-from-left duration-500">
                                                 {slide.title}
                                             </h2>
@@ -103,7 +103,7 @@ export default function HeroBanner() {
                 <div className="hidden lg:flex flex-col gap-4 h-full">
                     {/* Top Side Banner */}
                     <div className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
-                        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-500"></div>
+                        <div className="absolute inset-0 bg-linear-to-r from-orange-400 to-red-500"></div>
                         <Image
                             src="/banner_flash_sale.png"
                             alt="Flash Sale"
@@ -122,7 +122,7 @@ export default function HeroBanner() {
 
                     {/* Bottom Side Banner */}
                     <div className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-black"></div>
+                        <div className="absolute inset-0 bg-linear-to-br from-slate-800 to-black"></div>
                         <Image
                             src="/banner_vip.png"
                             alt="Premium Service"

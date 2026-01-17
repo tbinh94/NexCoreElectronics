@@ -17,13 +17,13 @@ export default function CategoryGrid({ categories }) {
 
     return (
         <section className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start md:items-center justify-between">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">Danh mục nổi bật</h2>
                 <Link href="/products" className="text-sm font-medium text-primary hover:underline">
                     Xem tất cả
                 </Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-100 left-0 md:w-full">
                 {categories.map((category) => {
                     const Icon = categoryIcons[category] || categoryIcons["Default"];
                     return (

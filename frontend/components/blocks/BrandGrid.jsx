@@ -81,7 +81,7 @@ export default function BrandGrid({ brands }) {
     return (
         <section className="space-y-6 py-8 border-t border-gray-100 dark:border-gray-800">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Thương hiệu Laptop hàng đầu</h2>
+                <h2 className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Thương hiệu Laptop hàng đầu</h2>
                 <Link href="/products" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
                     Xem tất cả &rarr;
                 </Link>

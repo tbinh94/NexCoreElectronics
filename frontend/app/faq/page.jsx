@@ -53,8 +53,8 @@ export default function FAQPage() {
                                         <span className="text-base font-semibold leading-7">{faq.question}</span>
                                     </div>
                                 </dt>
-                                <dd className="mt-2 pr-12">
-                                    <p className="text-base leading-7 text-gray-600 dark:text-gray-300">{faq.answer}</p>
+                                <dd className="mt-2 md:pr-12">
+                                    <p className="text-base leading-7 text-gray-600 dark:text-gray-300 text-justify">{faq.answer}</p>
                                 </dd>
                             </div>
                         ))}

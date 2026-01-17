@@ -48,13 +48,13 @@ const testimonials = [
 
 export default function Testimonials() {
     return (
-        <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl">
+        <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl w-100 md:w-full">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center text-center mb-10">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                         Khách hàng nói gì về chúng tôi?
                     </h2>
-                    <p className="mt-4 text-gray-500 dark:text-gray-400 max-w-[700px]">
+                    <p className="mt-4 text-gray-500 dark:text-gray-400 max-w-175">
                         Sự hài lòng của khách hàng là động lực để chúng tôi không ngừng nỗ lực và phát triển.
                     </p>
                 </div>

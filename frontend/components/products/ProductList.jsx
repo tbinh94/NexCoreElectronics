@@ -15,15 +15,15 @@ export default function ProductList({ products }) {
         )
     }
     return (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="w-100 md:w-full grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
                 <div
                     className='group flex bg-white dark:bg-card shadow-sm hover:shadow-xl transition-shadow duration-300 rounded-xl flex-col gap-y-4 h-full overflow-hidden border border-gray-100 dark:border-border'
                     key={product._id}
                 >
-                    <div className='p-4 flex-1 flex flex-col'>
+                    <div className='p-3 md:p-4 flex-1 flex flex-col'>
                         {/* Phần Ảnh Sản Phẩm */}
-                        <Link href={`/products/${product._id}`} className="aspect-[4/3] w-full relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-4 block">
+                        <Link href={`/products/${product._id}`} className="aspect-4/3 w-full relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-4 block">
                             <Image
                                 src={product.image}
                                 alt={product.name}

@@ -22,7 +22,7 @@ export default function SortBar() {
     };
 
     return (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-col md:flex-wrap ">
             {sortOptions.map(({ label, value }) => (
                 <Button
                     key={value}

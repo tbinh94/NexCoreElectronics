@@ -82,7 +82,7 @@ export default function ChatBot() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://localhost:5000/api/chat", {
+            const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -203,7 +203,7 @@ export default function ChatBot() {
                                                         <div className="flex gap-3 overflow-x-auto pb-4 -mx-1 px-1 snap-x scrollbar-none">
                                                             {products.map((product, pIndex) => {
                                                                 const imageUrl = product.image && product.image.startsWith('/uploads')
-                                                                    ? `http://localhost:5000${product.image}`
+                                                                    ? product.image
                                                                     : (product.image || "/placeholder.svg");
 
                                                                 return (

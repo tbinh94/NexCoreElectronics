@@ -50,13 +50,13 @@ export default async function ProductsPage({
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar */}
-                    <div className="w-full lg:w-64 flex-shrink-0">
+                    <div className="w-full lg:w-64 shrink-0">
                         <FilterSidebar category={categories} brand={brands} />
                     </div>
 
                     {/* Main Content */}
                     <div className="flex-1">
-                        <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm">
+                        <div className="flex justify-between items-center mb-6 gap-4 bg-white p-4 rounded-lg shadow-sm">
                             <p className="text-sm text-gray-500 font-medium">Hiển thị {products.length} sản phẩm</p>
                             <SortOptions />
                         </div>

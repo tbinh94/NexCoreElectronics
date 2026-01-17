@@ -129,15 +129,24 @@ export default function CheckoutPage() {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="paymentMethod">Phương thức thanh toán</Label>
-                            <Select onValueChange={handleSelectChange} defaultValue={formData.paymentMethod}>
-                                <SelectTrigger>
+                            <Select
+                                onValueChange={handleSelectChange}
+                                defaultValue={formData.paymentMethod}
+                            >
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Chọn phương thức" />
                                 </SelectTrigger>
+
                                 <SelectContent>
-                                    <SelectItem value="cash">Thanh toán khi nhận hàng (COD)</SelectItem>
-                                    <SelectItem value="transfer">Chuyển khoản ngân hàng (QR)</SelectItem>
+                                    <SelectItem value="cash">
+                                        Thanh toán khi nhận hàng (COD)
+                                    </SelectItem>
+                                    <SelectItem value="transfer">
+                                        Chuyển khoản ngân hàng (QR)
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
+
                         </div>
 
                         <Button type="submit" className="w-full mt-6 text-lg">

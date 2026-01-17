@@ -194,10 +194,68 @@ export default function CartPage() {
                         key={item._id}
                         className="bg-white dark:bg-card border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
                     >
-                        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-                            {/* Image & Info */}
+                        {/* Mobile Layout */}
+                        <div className="md:hidden">
+                            {/* Row 1: Image + Name (left) | Quantity Controls (right) */}
+                            <div className="flex items-start justify-between gap-3 mb-3">
+                                <div className="flex gap-3 flex-1 min-w-0">
+                                    <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                        <Image
+                                            src={item.productId.image}
+                                            alt={item.productId.name}
+                                            width={80}
+                                            height={80}
+                                            className="object-cover w-full h-full"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col justify-center min-w-0">
+                                        <h3 className="font-semibold text-base line-clamp-2 dark:text-white">
+                                            {item.productId.name}
+                                        </h3>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                                            {formatPrice(item.productId.price)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1 shrink-0">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                        onClick={() => updateQuantity(item.productId._id, item.quantity - 1)}
+                                        disabled={item.quantity <= 1}
+                                    >
+                                        <Minus className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                    </Button>
+                                    <span className="w-8 text-center font-medium dark:text-white text-sm">
+                                        {item.quantity}
+                                    </span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                        onClick={() => updateQuantity(item.productId._id, item.quantity + 1)}
+                                    >
+                                        <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    </Button>
+                                </div>
+                            </div>
+                            {/* Row 2: Price (left) | Remove Button (right) */}
+                            <div className="flex items-center justify-between">
+                                <p className="font-bold text-lg text-red-600 dark:text-red-400">
+                                    {formatPrice(item.productId.price * item.quantity)}
+                                </p>
+                                <RemoveItemButton
+                                    productId={item.productId._id}
+                                    removeItem={removeItem}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex flex-col md:flex-row gap-4 items-start md:items-center">
                             <div className="flex gap-4 flex-1 min-w-0">
-                                <div className="w-24 h-24 aspect-[4/3] flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                <div className="w-24 h-24 aspect-4/3 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                                     <Image
                                         src={item.productId.image}
                                         alt={item.productId.name}
@@ -211,8 +269,6 @@ export default function CartPage() {
                                     <p className="text-gray-500 dark:text-gray-400 text-sm">{formatPrice(item.productId.price)}</p>
                                 </div>
                             </div>
-
-                            {/* Quantity Controls */}
                             <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
                                 <Button
                                     variant="ghost"
@@ -233,19 +289,17 @@ export default function CartPage() {
                                     <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
                                 </Button>
                             </div>
-
-                            {/* Price */}
-                            <div className="text-right min-w-[120px]">
-                                <p className="font-bold text-lg text-red-600 dark:text-red-400">
-                                    {formatPrice(item.productId.price * item.quantity)}
-                                </p>
+                            <div className="flex justify-between items-center gap-4">
+                                <div className="text-right min-w-30">
+                                    <p className="font-bold text-lg text-red-600 dark:text-red-400">
+                                        {formatPrice(item.productId.price * item.quantity)}
+                                    </p>
+                                </div>
+                                <RemoveItemButton
+                                    productId={item.productId._id}
+                                    removeItem={removeItem}
+                                />
                             </div>
-
-                            {/* Remove Button */}
-                            <RemoveItemButton
-                                productId={item.productId._id}
-                                removeItem={removeItem}
-                            />
                         </div>
                     </div>
                 ))}
@@ -258,7 +312,6 @@ export default function CartPage() {
                         <p className="text-gray-600 dark:text-gray-400 text-sm mb-1">Tổng tiền</p>
                         <p className="text-3xl font-bold text-red-600 dark:text-red-400">{formattedTotalPrice}</p>
                     </div>
-                    {/* <ModalCheckout amount={totalPrice} /> */}
                     <Button onClick={() => router.push("/checkout")} className="w-24 cursor-pointer">
                         Thanh toán
                     </Button>
