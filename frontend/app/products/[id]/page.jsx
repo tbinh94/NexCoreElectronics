@@ -24,9 +24,9 @@ export default async function ProductPage({ params }) {
     return (
         <Container className="max-w-7xl py-10">
             <div className="mb-8 px-4 sm:px-0">
-                <h1 className="font-extrabold text-4xl lg:text-5xl tracking-tight text-gray-900">{product.name}</h1>
+                <h1 className="font-extrabold text-4xl lg:text-5xl tracking-tight text-gray-900 dark:text-white">{product.name}</h1>
                 <div className="flex flex-wrap items-center gap-4 mt-2">
-                    <p className="text-lg text-gray-600 max-w-2xl">{product.description}</p>
+                    <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl">{product.description}</p>
                     {product.is_new_product && (
                         <span className="font-bold text-sm bg-red-600 text-white px-3 py-1 rounded-full shadow-md uppercase">
                             Mới
@@ -37,7 +37,7 @@ export default async function ProductPage({ params }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 px-4 sm:px-0">
                 {/* Left Column: Image Gallery */}
-                <div className="rounded-xl overflow-hidden shadow-2xl bg-white p-4">
+                <div className="rounded-xl overflow-hidden shadow-2xl bg-white dark:bg-gray-800 p-4">
                     <ProductImageGallery
                         mainImage={product.image}
                         productName={product.name}
@@ -46,14 +46,14 @@ export default async function ProductPage({ params }) {
 
                 {/* Right Column: Product Details */}
                 <div className="space-y-6">
-                    <div className="border-b pb-4">
+                    <div className="border-b dark:border-gray-700 pb-4">
                         <Button
                             variant="ghost"
-                            className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 p-0 h-auto"
+                            className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 p-0 h-auto"
                         >
                             {product.category}
                         </Button>
-                        <div className="flex items-center mt-2 space-x-2 text-gray-700">
+                        <div className="flex items-center mt-2 space-x-2 text-gray-700 dark:text-gray-300">
                             <div className="flex items-center text-amber-500">
                                 <Star className="w-5 h-5 fill-amber-500" />
                                 <span className="ml-1 font-bold text-base">{product.rating}</span>
@@ -65,10 +65,10 @@ export default async function ProductPage({ params }) {
 
                     {/* Price Section */}
                     <div className="space-y-2">
-                        <p className="text-3xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900 dark:text-white">
                             {formattedPrice}
                         </p>
-                        <p className={`text-base font-medium ${isInStock ? 'text-green-600' : 'text-red-600'}`}>
+                        <p className={`text-base font-medium ${isInStock ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                             Tình trạng: {isInStock ? 'Còn hàng' : 'Hết hàng'} ({product.countInStock} sản phẩm)
                         </p>
                     </div>

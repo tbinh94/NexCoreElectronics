@@ -34,7 +34,8 @@ export default function ProductsPage() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/products`);
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/admin/products`);
             if (res.ok) {
                 const data = await res.json();
                 setProducts(data);
@@ -53,7 +54,8 @@ export default function ProductsPage() {
     const handleDelete = async () => {
         if (!deleteId) return;
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/products/${deleteId}`, {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/admin/products/${deleteId}`, {
                 method: "DELETE",
             });
             if (res.ok) {
@@ -71,7 +73,8 @@ export default function ProductsPage() {
 
     const toggleStatus = async (id, currentStatus) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/products/${id}`, {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/admin/products/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ isActive: !currentStatus }),

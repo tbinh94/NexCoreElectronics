@@ -1,4 +1,5 @@
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api`;
+console.log('API_URL configured as:', API_URL);
 
 export async function fetchFilters() {
     try {
@@ -12,7 +13,7 @@ export async function fetchFilters() {
 
         return res.json();
     } catch (error) {
-        console.error('Error fetching filters:', error);
+        console.error(`Error fetching filters from ${API_URL}/products/filters:`, error);
         return { brands: [], categories: [] };
     }
 }
@@ -40,7 +41,7 @@ export async function fetchProducts(params = {}) {
 
         return res.json();
     } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error(`Error fetching products from ${API_URL}/products:`, error);
         return { products: [], pagination: {} };
     }
 }
@@ -57,7 +58,7 @@ export async function fetchProductById(id) {
 
         return res.json();
     } catch (error) {
-        console.error(`Error fetching product ${id}:`, error);
+        console.error(`Error fetching product ${id} from ${API_URL}/products/${id}:`, error);
         return null;
     }
 }
