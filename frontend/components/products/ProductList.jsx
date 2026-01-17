@@ -46,7 +46,7 @@ export default function ProductList({ products }) {
                         </div>
 
                         {/* Phần Giá & Nút Mua */}
-                        <div className='flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-800 mt-auto'>
+                        <div className='flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-800 mt-auto gap-4'>
                             <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
                                 {formatPrice(product.price)}
                             </p>

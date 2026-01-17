@@ -31,15 +31,13 @@ export default function AddToCartButton({ productId }) {
     return (
         <Button
             size="sm"
-            className="bg-black text-white hover:bg-gray-800 transition-colors md:rounded-full w-24 md:w-10 h-10 p-0 flex items-center justify-center shrink-0"
+            className="bg-black text-white hover:bg-gray-800 transition-colors h-10 w-10 rounded-full p-0 md:w-auto md:px-4 md:rounded-lg shrink-0"
             title="Thêm vào giỏ"
             onClick={handleAddToCart}
             disabled={loading}
         >
-            <div className="flex flex-col">
-                <p className='flex md:hidden'>Thêm vào giỏ</p>
-                <p className='hidden md:flex'><ShoppingCart className="h-8 w-8" /></p>
-            </div>
+            <ShoppingCart className="h-5 w-5 md:mr-2" />
+            <span className="hidden md:inline font-medium">Thêm vào giỏ</span>
         </Button>
     );
 
