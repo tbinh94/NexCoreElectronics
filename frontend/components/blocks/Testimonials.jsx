@@ -48,7 +48,7 @@ const testimonials = [
 
 export default function Testimonials() {
     return (
-        <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl w-100 md:w-full">
+        <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center text-center mb-10">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -77,8 +77,8 @@ export default function Testimonials() {
                                                     <Star
                                                         key={i}
                                                         className={`w-4 h-4 ${i < testimonial.rating
-                                                                ? "text-yellow-400 fill-yellow-400"
-                                                                : "text-gray-300"
+                                                            ? "text-yellow-400 fill-yellow-400"
+                                                            : "text-gray-300"
                                                             }`}
                                                     />
                                                 ))}
