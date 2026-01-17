@@ -3,7 +3,7 @@ const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/a
 export async function fetchFilters() {
     try {
         const res = await fetch(`${API_URL}/products/filters`, {
-            cache: 'no-store'
+            next: { revalidate: 3600 } // Cache for 1 hour
         });
 
         if (!res.ok) {
@@ -31,7 +31,7 @@ export async function fetchProducts(params = {}) {
         if (params.search) searchParams.set('search', params.search);
 
         const res = await fetch(`${API_URL}/products?${searchParams.toString()}`, {
-            cache: 'no-store'
+            next: { revalidate: 60 } // Cache for 1 minute
         });
 
         if (!res.ok) {
@@ -42,5 +42,22 @@ export async function fetchProducts(params = {}) {
     } catch (error) {
         console.error('Error fetching products:', error);
         return { products: [], pagination: {} };
+    }
+}
+
+export async function fetchProductById(id) {
+    try {
+        const res = await fetch(`${API_URL}/products/${id}`, {
+            next: { revalidate: 60 }
+        });
+
+        if (!res.ok) {
+            return null;
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error(`Error fetching product ${id}:`, error);
+        return null;
     }
 }

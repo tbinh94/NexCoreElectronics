@@ -7,16 +7,15 @@ import ProductImageGallery from "@/components/products/ProductImageGallery";
 import ProductDescription from "@/components/products/ProductDescription";
 import ReviewSection from "@/components/products/ReviewSection";
 import { formatPrice } from "@/lib/utils";
+import { fetchProductById } from "@/lib/api";
 
 export default async function ProductPage({ params }) {
     const { id } = await params;
-    const productData = await fetch(`http://localhost:5000/api/products/${id}`, { cache: 'no-store' });
+    const product = await fetchProductById(id);
 
-    if (!productData.ok) {
+    if (!product) {
         notFound();
     }
-
-    const product = await productData.json();
 
     const formattedPrice = formatPrice(product.price);
 
