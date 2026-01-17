@@ -50,6 +50,9 @@ export default function ProductList({ products }) {
                             <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
                                 {formatPrice(product.price)}
                             </p>
+                            <div className="hidden sm:block flex-1">
+                                <AddToCartButton productId={product._id} />
+                            </div>
                         </div>
                     </div>
                 </div>
