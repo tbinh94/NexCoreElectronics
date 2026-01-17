@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export default function PromotionBanner() {
     return (
-        <div className="relative w-100 md:w-full overflow-hidden rounded-3xl bg-linear-to-r from-violet-600 to-indigo-600 px-6 py-12 shadow-2xl sm:px-12 sm:py-16 lg:px-16">
+        <div className="relative w-full overflow-hidden rounded-3xl bg-linear-to-r from-violet-600 to-indigo-600 px-6 py-12 shadow-2xl sm:px-12 sm:py-16 lg:px-16">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
                 <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
