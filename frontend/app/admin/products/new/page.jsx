@@ -17,7 +17,9 @@ import {
 import { toast } from "sonner";
 import { ChevronLeft, Loader2 } from "lucide-react";
 
-export default function AddProductPage() {
+import { Suspense } from "react";
+
+function AddProductContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const defaultCategory = searchParams.get('category') || "";
@@ -360,5 +362,13 @@ export default function AddProductPage() {
                 </div>
             </form>
         </div>
+    );
+}
+
+export default function AddProductPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AddProductContent />
+        </Suspense>
     );
 }
