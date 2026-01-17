@@ -6,6 +6,7 @@
         "backend"
     ],
     "scripts": {
+        "build": "yarn --cwd backend install",
         "start": "yarn --cwd backend start",
         "dev": "concurrently \"yarn --cwd backend dev\" \"yarn --cwd frontend dev\"",
         "install:all": "yarn --cwd backend install && yarn --cwd frontend install"
