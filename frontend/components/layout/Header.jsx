@@ -27,7 +27,7 @@ export default function Header({ categories }) {
             <div className="bg-primary text-primary-foreground w-full py-3">
                 <Container className="flex h-16 items-center justify-between gap-8">
                     {/* Logo */}
-                    <Link href="/" className="text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity shrink-0">
+                    <Link href="/" className="text-xl md:text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity shrink-0">
                         NextGenShop
                     </Link>
 
@@ -37,7 +37,7 @@ export default function Header({ categories }) {
                     </div>
 
                     {/* Actions (Cart, Login) */}
-                    <div className="flex items-center gap-6 shrink-0">
+                    <div className="flex items-center gap-2 md:gap-6 shrink-0">
                         {/* Mobile Search Trigger */}
                         <div className="md:hidden">
                             <Sheet open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
