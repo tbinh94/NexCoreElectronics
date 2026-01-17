@@ -49,7 +49,11 @@ export default function HeroBanner() {
     );
 
     return (
+<<<<<<< HEAD
         <section className="py-4">
+=======
+        <section className="w-full py-4">
+>>>>>>> 716989d380ce87292e9f473f050d9ef05d49e9b1
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-125">
                 {/* Main Slider (Left - 2/3 width) */}
                 <div className="lg:col-span-2 h-75 lg:h-full rounded-2xl overflow-hidden shadow-lg relative group">

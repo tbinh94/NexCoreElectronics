@@ -15,7 +15,11 @@ export default function ProductList({ products }) {
         )
     }
     return (
+<<<<<<< HEAD
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+=======
+        <div className="w-full grid grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+>>>>>>> 716989d380ce87292e9f473f050d9ef05d49e9b1
             {products.map((product) => (
                 <div
                     className='group flex bg-white dark:bg-card shadow-sm hover:shadow-xl transition-shadow duration-300 rounded-xl flex-col gap-y-4 h-full overflow-hidden border border-gray-100 dark:border-border'
