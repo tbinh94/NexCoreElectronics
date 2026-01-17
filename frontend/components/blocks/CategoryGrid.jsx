@@ -23,7 +23,7 @@ export default function CategoryGrid({ categories }) {
                     Xem tất cả
                 </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full left-0">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full left-0">
                 {categories.map((category) => {
                     const Icon = categoryIcons[category] || categoryIcons["Default"];
                     return (
