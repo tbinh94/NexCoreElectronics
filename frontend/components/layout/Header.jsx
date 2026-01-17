@@ -11,6 +11,9 @@ import SearchWithSuggestions from "@/components/search/SearchWithSuggestions";
 import { useState } from "react";
 import Image from "next/image";
 import { ModeToggle } from "@/components/layout/ModeToggle";
+import MobileMenu from "@/components/layout/MobileMenu";
+
+import Container from "@/components/ui/container";
 
 export default function Header({ categories }) {
     const { user, logout } = useAuth();
@@ -22,7 +25,7 @@ export default function Header({ categories }) {
         <header className="sticky top-0 z-50 w-full shadow-md">
             {/* Top Main Header - Primary Color Background */}
             <div className="bg-primary text-primary-foreground w-full py-3">
-                <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-8">
+                <Container className="flex h-16 items-center justify-between gap-8">
                     {/* Logo */}
                     <Link href="/" className="text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity shrink-0">
                         NextGenShop
@@ -52,8 +55,10 @@ export default function Header({ categories }) {
                             </Sheet>
                         </div>
 
-                        {/* Theme Toggle */}
-                        <ModeToggle />
+                        {/* Theme Toggle - Desktop Only */}
+                        <div className="hidden md:flex">
+                            <ModeToggle />
+                        </div>
 
                         {/* Cart */}
                         <Link href="/cart" className="relative group flex flex-col items-center justify-center text-white hover:text-white/90">
@@ -68,52 +73,57 @@ export default function Header({ categories }) {
                             <span className="text-xs font-medium mt-1 hidden sm:block">Giỏ hàng</span>
                         </Link>
 
-                        {/* User Account */}
-                        {user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <div className="flex items-center gap-2 cursor-pointer hover:opacity-90 text-white">
-                                        {user.avatar ? (
-                                            <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/30">
-                                                <Image
-                                                    src={user.avatar}
-                                                    alt={user.name}
-                                                    fill
-                                                    className="object-cover"
-                                                />
+                        {/* User Account - Desktop Only */}
+                        <div className="hidden md:flex items-center">
+                            {user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <div className="flex items-center gap-2 cursor-pointer hover:opacity-90 text-white">
+                                            {user.avatar ? (
+                                                <div className="relative h-8 w-8 rounded-full overflow-hidden border border-white/30">
+                                                    <Image
+                                                        src={user.avatar}
+                                                        alt={user.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold border border-white/30">
+                                                    {user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                            <div className="flex flex-col text-left hidden sm:block">
+                                                <span className="text-xs opacity-80">Xin chào,</span>
+                                                <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>
                                             </div>
-                                        ) : (
-                                            <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold border border-white/30">
-                                                {user.name.charAt(0).toUpperCase()}
-                                            </div>
-                                        )}
-                                        <div className="flex flex-col text-left hidden sm:block">
-                                            <span className="text-xs opacity-80">Xin chào,</span>
-                                            <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>
                                         </div>
-                                    </div>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/profile" className="w-full cursor-pointer">Trang cá nhân</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/orders" className="w-full cursor-pointer">Đơn hàng của tôi</Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 focus:text-red-600">
-                                        Đăng xuất
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <div className="flex items-center gap-3 text-sm font-medium text-white">
-                                <Link href="/login" className="hover:opacity-80">Đăng nhập</Link>
-                                <span className="h-4 w-px bg-white/30"></span>
-                                <Link href="/register" className="hover:opacity-80">Đăng ký</Link>
-                            </div>
-                        )}
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/profile" className="w-full cursor-pointer">Trang cá nhân</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/orders" className="w-full cursor-pointer">Đơn hàng của tôi</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 focus:text-red-600">
+                                            Đăng xuất
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <div className="flex items-center gap-3 text-sm font-medium text-white">
+                                    <Link href="/login" className="hover:opacity-80">Đăng nhập</Link>
+                                    <span className="h-4 w-px bg-white/30"></span>
+                                    <Link href="/register" className="hover:opacity-80">Đăng ký</Link>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mobile Menu Trigger */}
+                        <MobileMenu categories={categories} user={user} logout={logout} />
                     </div>
-                </div>
+                </Container>
             </div>
 
             {/* Secondary Navigation Bar - White Background */}
@@ -122,14 +132,14 @@ export default function Header({ categories }) {
             {/* Desktop Search Modal (Hidden by default) */}
             <Sheet open={desktopSearchOpen} onOpenChange={setDesktopSearchOpen}>
                 <SheetContent side="top" className="h-[300px]">
-                    <div className="container mx-auto">
+                    <Container>
                         <SheetHeader>
                             <SheetTitle className="text-center text-2xl">Tìm kiếm sản phẩm</SheetTitle>
                         </SheetHeader>
                         <SearchForm onSearchSubmit={() => setDesktopSearchOpen(false)} />
-                    </div>
+                    </Container>
                 </SheetContent>
             </Sheet>
-        </header>
+        </header >
     );
 }

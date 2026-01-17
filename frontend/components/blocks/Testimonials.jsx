@@ -48,11 +48,7 @@ const testimonials = [
 
 export default function Testimonials() {
     return (
-<<<<<<< HEAD
-        <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl">
-=======
         <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl w-full">
->>>>>>> 716989d380ce87292e9f473f050d9ef05d49e9b1
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center text-center mb-10">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">

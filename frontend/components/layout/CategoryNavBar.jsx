@@ -16,11 +16,12 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import Container from "@/components/ui/container";
 
 export default function CategoryNavBar({ categories = [] }) {
     return (
         <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 hidden md:block">
-            <div className="container mx-auto px-6">
+            <Container>
                 <div className="flex items-center h-14 gap-4">
                     {/* Left Side - Categories Dropdown (Fixed) */}
                     <div className="flex items-center gap-4 shrink-0">
@@ -139,7 +140,7 @@ export default function CategoryNavBar({ categories = [] }) {
                         </Link>
                     </div>
                 </div>
-            </div>
+            </Container>
         </div>
     );
 }

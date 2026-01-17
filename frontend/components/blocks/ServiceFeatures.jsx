@@ -25,11 +25,7 @@ export default function ServiceFeatures() {
     ];
 
     return (
-<<<<<<< HEAD
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-=======
         <div className="w-full grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
->>>>>>> 716989d380ce87292e9f473f050d9ef05d49e9b1
             {features.map((feature, index) => (
                 <div key={index} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
                     <div className="p-3 rounded-full bg-primary/10 text-primary shrink-0">
