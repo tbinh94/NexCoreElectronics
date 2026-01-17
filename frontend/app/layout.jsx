@@ -20,6 +20,8 @@ export const viewport = {
     userScalable: false,
 };
 
+export const dynamic = 'force-dynamic';
+
 import { fetchFilters } from "@/lib/api";
 
 export default async function RootLayout({
