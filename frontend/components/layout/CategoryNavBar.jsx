@@ -7,6 +7,10 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,13 +22,32 @@ import {
 } from "@/components/ui/carousel";
 import Container from "@/components/ui/container";
 
+const CATEGORY_GROUPS = [
+    {
+        title: "Gaming",
+        items: ["Gaming Laptop", "Gaming Handheld", "Gaming Gear", "Console"]
+    },
+    {
+        title: "Laptop & PC",
+        items: ["Ultrabook", "Macbook", "Workstation", "PC Văn Phòng"]
+    },
+    {
+        title: "Phụ kiện",
+        items: ["Chuột", "Bàn phím", "Tai nghe", "Màn hình", "Loa"]
+    },
+    {
+        title: "Linh kiện",
+        items: ["CPU", "RAM", "SSD", "VGA", "Mainboard"]
+    }
+];
+
 export default function CategoryNavBar({ categories = [] }) {
     return (
-        <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 hidden md:block">
+        <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 block">
             <Container>
                 <div className="flex items-center h-14 gap-4">
-                    {/* Left Side - Categories Dropdown (Fixed) */}
-                    <div className="flex items-center gap-4 shrink-0">
+                    {/* Left Side - Categories Dropdown (Fixed - Desktop Only) */}
+                    <div className="hidden md:flex items-center gap-4 shrink-0">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
@@ -36,29 +59,45 @@ export default function CategoryNavBar({ categories = [] }) {
                                     <ChevronDown className="h-4 w-4 ml-2 opacity-60" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-64 p-2 shadow-lg border border-gray-200 dark:border-gray-800" align="start">
-                                {categories.map((category) => (
-                                    <DropdownMenuItem
-                                        key={category}
-                                        asChild
-                                        className="cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-150"
-                                    >
-                                        <Link
-                                            href={`/products?category=${category}`}
-                                            className="w-full py-2.5 px-3 font-medium text-sm text-gray-700 dark:text-gray-300"
-                                        >
-                                            {category}
-                                        </Link>
-                                    </DropdownMenuItem>
+                            <DropdownMenuContent className="w-56 p-1 shadow-lg border border-gray-200 dark:border-gray-800" align="start">
+                                {CATEGORY_GROUPS.map((group) => (
+                                    <DropdownMenuSub key={group.title}>
+                                        <DropdownMenuSubTrigger className="font-medium cursor-pointer py-2">
+                                            {group.title}
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuSubContent className="w-48">
+                                            {group.items.map((item) => (
+                                                <DropdownMenuItem
+                                                    key={item}
+                                                    asChild
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Link
+                                                        href={`/products?category=${encodeURIComponent(item)}`}
+                                                        className="w-full font-medium text-sm"
+                                                    >
+                                                        {item}
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuSub>
                                 ))}
+
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/products" className="w-full font-semibold text-blue-600 justify-center flex py-2 cursor-pointer">
+                                        Xem tất cả
+                                    </Link>
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
 
                         <div className="w-px h-6 bg-gray-200 dark:bg-gray-800" />
                     </div>
 
-                    {/* Middle - Scrollable Navigation Links */}
-                    <div className="relative flex-1 min-w-0 px-8">
+                    {/* Middle - Scrollable Navigation Links (Visible on Mobile) */}
+                    <div className="relative flex-1 min-w-0 px-0 md:px-8">
                         <Carousel
                             opts={{
                                 align: "start",
@@ -116,13 +155,13 @@ export default function CategoryNavBar({ categories = [] }) {
                                     </CarouselItem>
                                 ))}
                             </CarouselContent>
-                            <CarouselPrevious className="left-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm border-none shadow-sm h-8 w-8 disabled:hidden" />
-                            <CarouselNext className="right-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm border-none shadow-sm h-8 w-8 disabled:hidden" />
+                            <CarouselPrevious className="left-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm border-none shadow-sm h-8 w-8 disabled:hidden hidden md:flex" />
+                            <CarouselNext className="right-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm border-none shadow-sm h-8 w-8 disabled:hidden hidden md:flex" />
                         </Carousel>
                     </div>
 
-                    {/* Right Side - Support Links (Fixed) */}
-                    <div className="flex items-center gap-6 shrink-0">
+                    {/* Right Side - Support Links (Fixed - Desktop Only) */}
+                    <div className="hidden md:flex items-center gap-6 shrink-0">
                         <Link
                             href="/orders"
                             className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 group"

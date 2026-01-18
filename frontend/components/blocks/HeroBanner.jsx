@@ -19,7 +19,7 @@ const slides = [
         image: "/bannerPC.png", // Fallback or actual image
         title: "Siêu Sale Mùa Hè",
         subtitle: "Giảm giá lên đến 50% cho các sản phẩm công nghệ hot nhất năm nay.",
-        cta: "Săn Deal Ngay",
+        cta: "Khám phá deal hôm nay",
         link: "/products?promotion=true",
         bgClass: "bg-gradient-to-r from-blue-900 to-blue-600"
     },
@@ -28,7 +28,7 @@ const slides = [
         image: "/banner_green.png",
         title: "Công Nghệ Xanh",
         subtitle: "Các dòng Laptop tiết kiệm điện, thân thiện môi trường.",
-        cta: "Khám phá",
+        cta: "Khám phá ngay",
         link: "/products?category=Ultrabook",
         bgClass: "bg-gradient-to-r from-emerald-800 to-emerald-500"
     },

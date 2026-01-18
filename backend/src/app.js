@@ -15,7 +15,6 @@ const app = express();
 // CORS cho phép frontend gọi API
 app.use(cors({
   origin: "*", // Allow all origins for now to fix deployment issues
-  credentials: true,
 }));
 
 app.use(express.json());

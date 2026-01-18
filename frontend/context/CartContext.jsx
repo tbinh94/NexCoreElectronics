@@ -41,8 +41,17 @@ export function CartProvider({ children }) {
                 body: JSON.stringify({ productId, userId: user._id, }),
             });
             if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.message || "Failed to add to cart");
+                let errorMessage = "Failed to add to cart";
+                try {
+                    const errorData = await res.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (jsonError) {
+                    // If response is not JSON, read as text
+                    const errorText = await res.text();
+                    console.error("Non-JSON error response:", res.status, errorText);
+                    errorMessage = `Server Error (${res.status}): ${errorText}`;
+                }
+                throw new Error(errorMessage);
             }
             await fetchCart();
         }

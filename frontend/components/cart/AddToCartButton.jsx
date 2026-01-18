@@ -6,19 +6,20 @@ import { toast } from "sonner"
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
-export default function AddToCartButton({ productId }) {
+export default function AddToCartButton({ productId, className, children, showIcon = true }) {
     const { addToCart } = useCart();
     const [loading, setLoading] = useState(false);
     const { user } = useAuth();
-    // console.log("Adding to cart:", { productId, user });
+
     const handleAddToCart = async (e) => {
         if (!user) {
             toast.warning("Bạn cần đăng nhập để thêm vào giỏ hàng");
             return;
         }
         e.preventDefault();
+        setLoading(true);
         try {
-            await addToCart(productId); // must use _id
+            await addToCart(productId);
             toast.success("Thêm vào giỏ hàng thành công");
         }
         catch (error) {
@@ -31,14 +32,18 @@ export default function AddToCartButton({ productId }) {
     return (
         <Button
             size="sm"
-            className="bg-black text-white hover:bg-gray-800 transition-colors h-10 w-10 rounded-full p-0 md:w-auto md:px-4 md:rounded-lg shrink-0"
+            className={`bg-black text-white hover:bg-gray-800 transition-colors h-10 rounded-lg px-4 shrink-0 ${className || ""}`}
             title="Thêm vào giỏ"
             onClick={handleAddToCart}
             disabled={loading}
         >
-            <ShoppingCart className="h-5 w-5 md:mr-2" />
-            <span className="hidden md:inline font-medium">Thêm vào giỏ</span>
+            {children ? children : (
+                <>
+                    {showIcon && <ShoppingCart className="h-5 w-5 mr-2" />}
+                    <span className="font-medium">Thêm vào giỏ</span>
+                </>
+            )}
         </Button>
     );
-
 }
+

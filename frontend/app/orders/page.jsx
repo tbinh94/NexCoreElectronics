@@ -5,7 +5,7 @@ import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import OrderDetail from "@/components/orders/OrderDetail";
-import { Calendar, Phone, MapPin, Package, CreditCard, ShoppingBag } from 'lucide-react';
+import { Calendar, Phone, MapPin, Package, CreditCard, ShoppingBag, Truck } from 'lucide-react';
 import { LocateFixed } from 'lucide-react';
 
 const getStatusConfig = (status) => {
@@ -136,6 +136,18 @@ export default function Orders() {
                                                                 })}
                                                             </span>
                                                         </div>
+                                                        {order.estimatedDeliveryDate && (
+                                                            <div className="flex items-center gap-2 text-sm text-blue-600 mt-1">
+                                                                <Truck size={14} strokeWidth={2} />
+                                                                <span>
+                                                                    Dự kiến giao: {new Date(order.estimatedDeliveryDate).toLocaleDateString('vi-VN', {
+                                                                        day: 'numeric',
+                                                                        month: 'numeric',
+                                                                        year: 'numeric'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="text-left sm:text-right flex-shrink-0">
                                                         <p className="font-bold text-xl sm:text-2xl text-red-600 whitespace-nowrap mb-1.5">
@@ -196,6 +208,7 @@ export default function Orders() {
                                                                     <LocateFixed size={13} className="text-gray-400 flex-shrink-0" strokeWidth={2} />
                                                                     <span className="text-xs leading-relaxed line-clamp-2 text-gray-500" title={order.shippingAddress?.address}>
                                                                         {order.shippingAddress?.address}
+                                                                        {order.shippingAddress?.city && `, ${order.shippingAddress.city}`}
                                                                     </span>
                                                                 </div>
 

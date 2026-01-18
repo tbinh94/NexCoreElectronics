@@ -142,16 +142,20 @@ router.get("/orders", async (req, res) => {
 // PUT /api/admin/orders/:id/status - Update order status
 router.put("/orders/:id/status", async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id);
-        if (order) {
-            order.status = req.body.status;
-            const updatedOrder = await order.save();
+        const updatedOrder = await Order.findByIdAndUpdate(
+            req.params.id,
+            { status: req.body.status },
+            { new: true }
+        );
+
+        if (updatedOrder) {
             res.json(updatedOrder);
         } else {
             res.status(404).json({ message: "Order not found" });
         }
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        console.error("Update Order Status Error:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 });
 

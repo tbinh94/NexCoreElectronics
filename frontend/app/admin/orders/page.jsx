@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"; // Assuming you might have a Badge component or use standard HTML
 import { MoreHorizontal, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
+import { useAuth } from "@/context/AuthContext";
 const statusMap = {
     pending: { label: "Chờ xử lý", color: "bg-yellow-100 text-yellow-800" },
     processing: { label: "Đang xử lý", color: "bg-blue-100 text-blue-800" },
@@ -52,21 +52,28 @@ export default function OrdersPage() {
         fetchOrders();
     }, []);
 
+    const { token } = useAuth(); // Assuming useAuth provides token
+
     const updateStatus = async (id, newStatus) => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
             const res = await fetch(`${apiUrl}/api/admin/orders/${id}/status`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: newStatus }),
             });
             if (res.ok) {
                 toast.success("Cập nhật trạng thái thành công");
                 fetchOrders();
             } else {
-                toast.error("Lỗi cập nhật");
+                const data = await res.json();
+                toast.error(data.error || data.message || "Lỗi cập nhật");
             }
         } catch (error) {
+            console.error(error);
             toast.error("Lỗi server");
         }
     };
@@ -91,6 +98,7 @@ export default function OrdersPage() {
                                     <TableHead>Mã đơn</TableHead>
                                     <TableHead>Khách hàng</TableHead>
                                     <TableHead>Ngày đặt</TableHead>
+                                    <TableHead>Dự kiến giao</TableHead>
                                     <TableHead>Tổng tiền</TableHead>
                                     <TableHead>Trạng thái</TableHead>
                                     <TableHead className="text-right">Hành động</TableHead>
@@ -107,6 +115,15 @@ export default function OrdersPage() {
                                             </div>
                                         </TableCell>
                                         <TableCell>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</TableCell>
+                                        <TableCell>
+                                            {order.estimatedDeliveryDate ? (
+                                                <span className={new Date(order.estimatedDeliveryDate) < new Date() && order.status !== 'completed' && order.status !== 'cancelled' ? "text-red-500 font-medium" : ""}>
+                                                    {new Date(order.estimatedDeliveryDate).toLocaleDateString('vi-VN')}
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400 italic">--</span>
+                                            )}
+                                        </TableCell>
                                         <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}</TableCell>
                                         <TableCell>
                                             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusMap[order.status]?.color || "bg-gray-100"}`}>

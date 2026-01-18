@@ -11,8 +11,12 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel"
 
-export default function ProductImageGallery({ mainImage, productName }) {
-    const [selectedImage, setSelectedImage] = React.useState(mainImage)
+export default function ProductImageGallery({ mainImage, productName, selectedImage, onImageSelect }) {
+    // Fallback to internal state if not controlled (though we intend to control it)
+    const [internalImage, setInternalImage] = React.useState(mainImage);
+
+    const currentImage = selectedImage !== undefined ? selectedImage : internalImage;
+    const handleImageSelect = onImageSelect || setInternalImage;
 
     const images = [
         mainImage,
@@ -27,7 +31,7 @@ export default function ProductImageGallery({ mainImage, productName }) {
         <div className="flex flex-col gap-6">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border bg-white shadow-sm">
                 <Image
-                    src={selectedImage}
+                    src={currentImage}
                     alt={productName}
                     fill
                     className="object-cover transition-all duration-500 ease-in-out hover:scale-105"
@@ -49,11 +53,11 @@ export default function ProductImageGallery({ mainImage, productName }) {
                                 <div
                                     className={cn(
                                         "relative aspect-square cursor-pointer overflow-hidden rounded-lg border-2 transition-all",
-                                        selectedImage === image
+                                        currentImage === image
                                             ? "border-indigo-600 ring-2 ring-indigo-600 ring-offset-1 opacity-100"
                                             : "border-transparent opacity-70 hover:opacity-100 hover:border-gray-300"
                                     )}
-                                    onClick={() => setSelectedImage(image)}
+                                    onClick={() => handleImageSelect(image)}
                                 >
                                     <Image
                                         src={image}

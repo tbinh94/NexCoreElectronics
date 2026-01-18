@@ -18,6 +18,7 @@ export default function CheckoutPage() {
     const [formData, setFormData] = useState({
         name: "",
         address: "",
+        city: "",
         phone: "",
         paymentMethod: "cash"
     });
@@ -59,6 +60,11 @@ export default function CheckoutPage() {
         e.preventDefault();
         if (!user) return;
 
+        if (!formData.city) {
+            alert("Vui lòng chọn Tỉnh/Thành phố");
+            return;
+        }
+
         try {
             const res = await fetch("/api/orders", {
                 method: "POST",
@@ -68,6 +74,7 @@ export default function CheckoutPage() {
                     shippingAddress: {
                         name: formData.name,
                         address: formData.address,
+                        city: formData.city,
                         phone: formData.phone
                     },
                     paymentMethod: formData.paymentMethod
@@ -79,7 +86,7 @@ export default function CheckoutPage() {
                 // If cash, redirect or show success
                 if (formData.paymentMethod === 'cash') {
                     alert("Đặt hàng thành công!");
-                    router.push("/products");
+                    router.push("/orders");
                 }
             } else {
                 alert("Đặt hàng thất bại");
@@ -100,8 +107,8 @@ export default function CheckoutPage() {
                 <div className="p-4 border rounded-lg shadow-sm bg-white text-center">
                     <p className="mb-4 font-semibold">Tổng tiền: {formatPrice(totalPrice)}</p>
                     <VietQRImage amount={totalPrice} />
-                    <Button variant="link" onClick={() => router.push("/products")} className="mt-4">
-                        Quay về trang chủ
+                    <Button variant="link" onClick={() => router.push("/orders")} className="mt-4">
+                        Xem đơn hàng của tôi
                     </Button>
                 </div>
             </div>
@@ -122,6 +129,25 @@ export default function CheckoutPage() {
                         <div className="grid gap-2">
                             <Label htmlFor="phone">Số điện thoại</Label>
                             <Input id="phone" value={formData.phone} onChange={handleInputChange} required placeholder="0901234567" />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="city">Tỉnh/Thành phố</Label>
+                            <Select
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, city: value }))}
+                                defaultValue={formData.city}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Hồ Chí Minh">Hồ Chí Minh</SelectItem>
+                                    <SelectItem value="Hà Nội">Hà Nội</SelectItem>
+                                    <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
+                                    <SelectItem value="Cần Thơ">Cần Thơ</SelectItem>
+                                    <SelectItem value="Hải Phòng">Hải Phòng</SelectItem>
+                                    <SelectItem value="Khác">Khác</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="address">Địa chỉ nhận hàng</Label>

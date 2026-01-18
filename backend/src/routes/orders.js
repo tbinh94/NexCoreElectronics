@@ -32,12 +32,25 @@ router.post("/", async (req, res) => {
         }
 
         console.log("Creating order with total:", totalAmount);
+
+        // Calculate estimated delivery date
+        const deliveryDate = new Date();
+        const city = shippingAddress.city || "";
+        // Simple logic: HCM/South = 2 days, Others = 5 days
+        // In a real app, use a proper distance/shipping API
+        if (city.includes("Hồ Chí Minh") || city.includes("HCM")) {
+            deliveryDate.setDate(deliveryDate.getDate() + 2);
+        } else {
+            deliveryDate.setDate(deliveryDate.getDate() + 5);
+        }
+
         const newOrder = new Order({
             userId,
             products: orderProducts,
             totalAmount,
             shippingAddress,
-            paymentMethod
+            paymentMethod,
+            estimatedDeliveryDate: deliveryDate
         });
 
         await newOrder.save();

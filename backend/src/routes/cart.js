@@ -1,11 +1,13 @@
 import { Router } from "express";
-const router = Router();
+import mongoose from "mongoose";
 import Product from "../models/Product.js";
 import Cart from "../models/Cart.js";
-import mongoose from "mongoose";
+
+const router = Router();
 
 router.post("/add", async (req, res) => {
     try {
+        console.log("Cart add request body:", req.body);
         const { userId, productId } = req.body;
 
         if (!userId || !productId) {
