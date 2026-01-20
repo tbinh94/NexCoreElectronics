@@ -67,6 +67,7 @@ export default function ProductDetailClient({ product }) {
                     <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2">
                         <ProductImageGallery
                             mainImage={product.image}
+                            images={product.images}
                             productName={product.name}
                             selectedImage={selectedImage}
                             onImageSelect={setSelectedImage}

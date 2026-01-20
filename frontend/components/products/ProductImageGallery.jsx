@@ -11,21 +11,14 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel"
 
-export default function ProductImageGallery({ mainImage, productName, selectedImage, onImageSelect }) {
+export default function ProductImageGallery({ mainImage, images, productName, selectedImage, onImageSelect }) {
     // Fallback to internal state if not controlled (though we intend to control it)
     const [internalImage, setInternalImage] = React.useState(mainImage);
 
     const currentImage = selectedImage !== undefined ? selectedImage : internalImage;
     const handleImageSelect = onImageSelect || setInternalImage;
 
-    const images = [
-        mainImage,
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
-        "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80",
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
-        "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&q=80",
-    ]
+    const galleryImages = images && images.length > 0 ? images : [mainImage];
 
     return (
         <div className="flex flex-col gap-6">
@@ -48,7 +41,7 @@ export default function ProductImageGallery({ mainImage, productName, selectedIm
                     className="w-full max-w-full"
                 >
                     <CarouselContent className="-ml-4">
-                        {images.map((image, index) => (
+                        {galleryImages.map((image, index) => (
                             <CarouselItem key={index} className="pl-4 basis-1/4 sm:basis-1/5">
                                 <div
                                     className={cn(
