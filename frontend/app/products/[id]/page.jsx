@@ -5,7 +5,8 @@ import {
     Star, Heart, BarChart2
 } from "lucide-react";
 import ProductDetailClient from "@/components/products/ProductDetailClient";
-import { fetchProductById } from "@/lib/api";
+import RelatedProducts from "@/components/products/RelatedProducts";
+import { fetchProductById, fetchProducts } from "@/lib/api";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -22,6 +23,12 @@ export default async function ProductPage({ params }) {
     if (!product) {
         notFound();
     }
+
+    const relatedProductsData = await fetchProducts({
+        category: product.category,
+        exclude: product._id,
+        limit: 4
+    });
 
     return (
         <Container className="max-w-7xl py-6 space-y-8">
@@ -73,6 +80,7 @@ export default async function ProductPage({ params }) {
             </div>
 
             <ProductDetailClient product={product} />
+            <RelatedProducts products={relatedProductsData.products} />
         </Container>
     );
 }

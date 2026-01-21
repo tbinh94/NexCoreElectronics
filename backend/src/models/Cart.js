@@ -15,6 +15,10 @@ const cartSchema = new mongoose.Schema({
                 type: Number,
                 default: 1,
             },
+            type: {
+                type: String,
+                default: 'new', // 'new' or 'used'
+            },
         },
     ],
 });

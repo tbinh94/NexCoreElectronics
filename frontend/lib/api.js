@@ -30,6 +30,7 @@ export async function fetchProducts(params = {}) {
         if (params.maxPrice) searchParams.set('maxPrice', params.maxPrice);
         if (params.sort) searchParams.set('sort', params.sort);
         if (params.search) searchParams.set('search', params.search);
+        if (params.exclude) searchParams.set('exclude', params.exclude);
 
         const res = await fetch(`${API_URL}/products?${searchParams.toString()}`, {
             next: { revalidate: 60 } // Cache for 1 minute

@@ -29,7 +29,7 @@ export function CartProvider({ children }) {
         fetchCart();
     }, [user]);
 
-    const addToCart = async (productId) => {
+    const addToCart = async (productId, type = 'new') => {
         if (!user) return;
         setLoading(true);
         try {
@@ -38,7 +38,7 @@ export function CartProvider({ children }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ productId, userId: user._id, }),
+                body: JSON.stringify({ productId, userId: user._id, type }),
             });
             if (!res.ok) {
                 let errorMessage = "Failed to add to cart";

@@ -9,7 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const getProducts = async (req, res) => {
     try {
-        const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search, promotion } = req.query;
+        const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search, promotion, exclude } = req.query;
         const limitNum = Number(limit);
         const pageNum = Number(page);
         const skip = (pageNum - 1) * limitNum;
@@ -23,6 +23,9 @@ export const getProducts = async (req, res) => {
         if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
         if (promotion === 'true') {
             filter.originalPrice = { $exists: true, $ne: null };
+        }
+        if (exclude) {
+            filter._id = { $ne: exclude };
         }
 
         // 2. Smart Search Logic
@@ -214,5 +217,53 @@ export const searchByImage = async (req, res) => {
             fs.unlinkSync(req.file.path);
         }
         res.status(500).json({ message: "Failed to analyze image" });
+    }
+};
+
+
+export const getDailyUsedProducts = async (req, res) => {
+    try {
+        // 1. Get all products
+        const allProducts = await Product.find({ isActive: true }).select('-detailedDescription -specs');
+
+        if (!allProducts || allProducts.length === 0) {
+            return res.json([]);
+        }
+
+        // 2. Seed based on Date (YYYY-MM-DD)
+        // Use UTC date to ensure consistency across timezones if needed, or just server local date
+        const today = new Date().toISOString().slice(0, 10); // "2024-01-21"
+
+        // 3. Deterministic Shuffle
+        // Assign a hash score to each product based on "Date + ProductID"
+        const shuffled = allProducts.map(p => {
+            const uniqueString = today + p._id.toString();
+            let hash = 0;
+            for (let i = 0; i < uniqueString.length; i++) {
+                hash = ((hash << 5) - hash) + uniqueString.charCodeAt(i);
+                hash |= 0; // Convert to 32bit integer
+            }
+            return { product: p, sortKey: hash };
+        }).sort((a, b) => a.sortKey - b.sortKey);
+
+        // 4. Take top 15
+        const selected = shuffled.slice(0, 15).map(item => {
+            const p = item.product.toObject();
+            return {
+                ...p,
+                _id: p._id, // Keep original ID
+                isUsed: true,
+                originalNewPrice: p.price, // Store original new price
+                price: Math.round(p.price * 0.6), // The "Used" price (60%)
+                name: `${p.name} (Cũ 99%)`, // Update name
+                category: "Máy cũ giá rẻ" // Override category for UI grouping if needed
+            };
+        });
+
+        res.json(selected);
+
+    } catch (error) {
+        console.error("Get Daily Used Error:", error);
+        res.status(500).json({ message: "Server Error" });
     }
 };

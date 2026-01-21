@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRightIcon, Minus, Plus } from "lucide-react";
+import { ArrowUpRightIcon, Minus, Plus, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import {
@@ -17,7 +17,7 @@ import {
 import { BaggageClaim } from "lucide-react";
 import Link from "next/link";
 
-const RemoveItemButton = ({ productId, removeItem }) => {
+const RemoveItemButton = ({ productId, type, removeItem }) => {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -35,7 +35,7 @@ const RemoveItemButton = ({ productId, removeItem }) => {
                 <AlertDialogFooter>
                     <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
 
-                    <AlertDialogAction className="cursor-pointer" onClick={() => removeItem(productId)}>
+                    <AlertDialogAction className="cursor-pointer" onClick={() => removeItem(productId, type)}>
                         Xóa
                     </AlertDialogAction>
                 </AlertDialogFooter>
@@ -99,11 +99,13 @@ const ClearCartButton = ({ onClear }) => {
         </AlertDialog>
     );
 };
+
 export default function CartPage() {
     const { user } = useAuth();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+
     const fetchCart = async () => {
         if (!user) return;
         try {
@@ -124,7 +126,7 @@ export default function CartPage() {
         fetchCart();
     }, [user]);
 
-    const updateQuantity = async (productId, newQuantity) => {
+    const updateQuantity = async (productId, type, newQuantity) => {
         if (!user) return;
         if (newQuantity < 1) return;
         try {
@@ -133,7 +135,7 @@ export default function CartPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userId: user._id, productId, quantity: newQuantity }),
+                body: JSON.stringify({ userId: user._id, productId, quantity: newQuantity, type }),
             });
             if (!res.ok) throw new Error("Failed to update quantity");
             await fetchCart();
@@ -142,11 +144,11 @@ export default function CartPage() {
         }
     };
 
-    const removeItem = async (productId) => {
+    const removeItem = async (productId, type) => {
         if (!user) return;
 
         try {
-            const res = await fetch(`/api/cart/${user._id}/${productId}`, {
+            const res = await fetch(`/api/cart/${user._id}/${productId}?type=${type}`, {
                 method: "DELETE",
             });
 
@@ -171,11 +173,18 @@ export default function CartPage() {
         }
     }
 
+    const getPrice = (item) => {
+        const basePrice = item.productId.price;
+        return item.type === 'used' ? Math.round(basePrice * 0.6) : basePrice;
+    };
+
     const totalPrice = cartItems.reduce((acc, item) => {
-        return acc + item.productId.price * item.quantity;
+        return acc + getPrice(item) * item.quantity;
     }, 0);
+
     const formattedTotalPrice = formatPrice(totalPrice);
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
     if (loading)
         return <p>Đang tải...</p>;
     if (cartItems.length === 0)
@@ -189,120 +198,147 @@ export default function CartPage() {
                 <ClearCartButton onClear={clearCart} />
             </div>
             <div className="flex flex-col gap-4">
-                {cartItems.map((item) => (
-                    <div
-                        key={item._id}
-                        className="bg-white dark:bg-card border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                        {/* Mobile Layout */}
-                        <div className="md:hidden">
-                            {/* Row 1: Image + Name (left) | Quantity Controls (right) */}
-                            <div className="flex items-start justify-between gap-3 mb-3">
-                                <div className="flex gap-3 flex-1 min-w-0">
-                                    <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                {cartItems.map((item) => {
+                    const price = getPrice(item);
+                    const isUsed = item.type === 'used';
+
+                    return (
+                        <div
+                            key={`${item.productId._id}-${item.type}`}
+                            className="bg-white dark:bg-card border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                        >
+                            {/* Mobile Layout */}
+                            <div className="md:hidden">
+                                {/* Row 1: Image + Name (left) | Quantity Controls (right) */}
+                                <div className="flex items-start justify-between gap-3 mb-3">
+                                    <div className="flex gap-3 flex-1 min-w-0">
+                                        <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
+                                            <Image
+                                                src={item.productId.image}
+                                                alt={item.productId.name}
+                                                width={80}
+                                                height={80}
+                                                className="object-cover w-full h-full"
+                                            />
+                                            {isUsed && (
+                                                <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] px-1 font-bold">
+                                                    -40%
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col justify-center min-w-0">
+                                            <h3 className="font-semibold text-base line-clamp-2 dark:text-white">
+                                                {item.productId.name}
+                                            </h3>
+                                            {isUsed && (
+                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded w-fit my-1">
+                                                    <Tag className="w-3 h-3" /> Máy Cũ 99%
+                                                </span>
+                                            )}
+                                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                                                {formatPrice(price)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1 shrink-0">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                            onClick={() => updateQuantity(item.productId._id, item.type, item.quantity - 1)}
+                                            disabled={item.quantity <= 1}
+                                        >
+                                            <Minus className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                        </Button>
+                                        <span className="w-8 text-center font-medium dark:text-white text-sm">
+                                            {item.quantity}
+                                        </span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                            onClick={() => updateQuantity(item.productId._id, item.type, item.quantity + 1)}
+                                        >
+                                            <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                        </Button>
+                                    </div>
+                                </div>
+                                {/* Row 2: Price (left) | Remove Button (right) */}
+                                <div className="flex items-center justify-between">
+                                    <p className="font-bold text-lg text-red-600 dark:text-red-400">
+                                        {formatPrice(price * item.quantity)}
+                                    </p>
+                                    <RemoveItemButton
+                                        productId={item.productId._id}
+                                        type={item.type}
+                                        removeItem={removeItem}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Desktop Layout */}
+                            <div className="hidden md:flex flex-col md:flex-row gap-4 items-start md:items-center">
+                                <div className="flex gap-4 flex-1 min-w-0">
+                                    <div className="w-24 h-24 aspect-4/3 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
                                         <Image
                                             src={item.productId.image}
                                             alt={item.productId.name}
-                                            width={80}
-                                            height={80}
+                                            width={128}
+                                            height={128}
                                             className="object-cover w-full h-full"
                                         />
+                                        {isUsed && (
+                                            <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] px-2 py-0.5 font-bold">
+                                                -40%
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex flex-col justify-center min-w-0">
-                                        <h3 className="font-semibold text-base line-clamp-2 dark:text-white">
-                                            {item.productId.name}
-                                        </h3>
-                                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                                            {formatPrice(item.productId.price)}
-                                        </p>
+                                    <div className="flex flex-col justify-center min-w-0 flex-1">
+                                        <h3 className="font-semibold text-lg truncate dark:text-white">{item.productId.name}</h3>
+                                        {isUsed && (
+                                            <span className="inline-flex items-center gap-1 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded w-fit my-1">
+                                                <Tag className="w-3 h-3" /> Máy Cũ 99%
+                                            </span>
+                                        )}
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">{formatPrice(price)}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1 shrink-0">
+                                <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                        onClick={() => updateQuantity(item.productId._id, item.quantity - 1)}
+                                        onClick={() => updateQuantity(item.productId._id, item.type, item.quantity - 1)}
                                         disabled={item.quantity <= 1}
                                     >
                                         <Minus className="h-4 w-4 text-red-600 dark:text-red-400" />
                                     </Button>
-                                    <span className="w-8 text-center font-medium dark:text-white text-sm">
-                                        {item.quantity}
-                                    </span>
+                                    <span className="w-12 text-center font-medium dark:text-white">{item.quantity}</span>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         className="h-8 w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30"
-                                        onClick={() => updateQuantity(item.productId._id, item.quantity + 1)}
+                                        onClick={() => updateQuantity(item.productId._id, item.type, item.quantity + 1)}
                                     >
                                         <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
                                     </Button>
                                 </div>
-                            </div>
-                            {/* Row 2: Price (left) | Remove Button (right) */}
-                            <div className="flex items-center justify-between">
-                                <p className="font-bold text-lg text-red-600 dark:text-red-400">
-                                    {formatPrice(item.productId.price * item.quantity)}
-                                </p>
-                                <RemoveItemButton
-                                    productId={item.productId._id}
-                                    removeItem={removeItem}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Desktop Layout */}
-                        <div className="hidden md:flex flex-col md:flex-row gap-4 items-start md:items-center">
-                            <div className="flex gap-4 flex-1 min-w-0">
-                                <div className="w-24 h-24 aspect-4/3 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                    <Image
-                                        src={item.productId.image}
-                                        alt={item.productId.name}
-                                        width={128}
-                                        height={128}
-                                        className="object-cover w-full h-full"
+                                <div className="flex justify-between items-center gap-4">
+                                    <div className="text-right min-w-30">
+                                        <p className="font-bold text-lg text-red-600 dark:text-red-400">
+                                            {formatPrice(price * item.quantity)}
+                                        </p>
+                                    </div>
+                                    <RemoveItemButton
+                                        productId={item.productId._id}
+                                        type={item.type}
+                                        removeItem={removeItem}
                                     />
                                 </div>
-                                <div className="flex flex-col justify-center min-w-0 flex-1">
-                                    <h3 className="font-semibold text-lg truncate dark:text-white">{item.productId.name}</h3>
-                                    <p className="text-gray-500 dark:text-gray-400 text-sm">{formatPrice(item.productId.price)}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                    onClick={() => updateQuantity(item.productId._id, item.quantity - 1)}
-                                    disabled={item.quantity <= 1}
-                                >
-                                    <Minus className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                </Button>
-                                <span className="w-12 text-center font-medium dark:text-white">{item.quantity}</span>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30"
-                                    onClick={() => updateQuantity(item.productId._id, item.quantity + 1)}
-                                >
-                                    <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                </Button>
-                            </div>
-                            <div className="flex justify-between items-center gap-4">
-                                <div className="text-right min-w-30">
-                                    <p className="font-bold text-lg text-red-600 dark:text-red-400">
-                                        {formatPrice(item.productId.price * item.quantity)}
-                                    </p>
-                                </div>
-                                <RemoveItemButton
-                                    productId={item.productId._id}
-                                    removeItem={removeItem}
-                                />
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Total Section */}

@@ -17,7 +17,7 @@ export const chatWithAI = async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Use gemini-1.5-flash for speed and efficiency
+        // Use gemini-flash-latest for speed and efficiency
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const { message } = req.body;

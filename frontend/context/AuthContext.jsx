@@ -17,8 +17,26 @@ export const AuthProvider = ({ children }) => {
 
         if (storedToken && storedUser && storedUser !== "undefined" && storedToken !== "undefined") {
             try {
-                setUser(JSON.parse(storedUser));
-                setToken(JSON.parse(storedToken));
+                // Auto-fix: Remove extra quotes if token was double-stringified
+                let cleanToken = storedToken;
+                if (cleanToken.startsWith('"') && cleanToken.endsWith('"')) {
+                    cleanToken = cleanToken.slice(1, -1);
+                }
+
+                // Check if token is expired
+                const payload = JSON.parse(atob(cleanToken.split('.')[1]));
+                const isExpired = payload.exp * 1000 < Date.now();
+
+                if (isExpired) {
+                    console.log("Token expired, logging out...");
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("token");
+                    setUser(null);
+                    setToken(null);
+                } else {
+                    setUser(JSON.parse(storedUser));
+                    setToken(cleanToken);
+                }
             } catch (error) {
                 console.error("Error parsing auth data:", error);
                 localStorage.removeItem("user");
@@ -47,7 +65,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(data.user);
                 setToken(data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("token", JSON.stringify(data.token));
+                localStorage.setItem("token", data.token); // Store token as raw string
                 router.push("/");
             } else {
                 throw new Error("Invalid response from server: missing user or token");

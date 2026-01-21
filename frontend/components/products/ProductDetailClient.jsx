@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, Heart, BarChart2, ShieldCheck, RotateCcw, Truck, Gift, ChevronRight, Check, ShoppingCart } from "lucide-react";
+import { Star, Heart, BarChart2, ShieldCheck, RotateCcw, Truck, Gift, ChevronRight, Check, ShoppingCart, Tag } from "lucide-react";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import ProductImageGallery from "@/components/products/ProductImageGallery";
 import ProductDescription from "@/components/products/ProductDescription";
@@ -10,10 +10,14 @@ import ReviewSection from "@/components/products/ReviewSection";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ProductDetailClient({ product }) {
+    const searchParams = useSearchParams();
+    const initialType = searchParams.get('type') === 'used' ? 'used' : 'new';
+
+    const [selectedCondition, setSelectedCondition] = useState(initialType);
     const [selectedStorage, setSelectedStorage] = useState('256GB');
     const [selectedColor, setSelectedColor] = useState('Titan Tự Nhiên');
 
@@ -46,7 +50,7 @@ export default function ProductDetailClient({ product }) {
         }
         setBuyingNow(true);
         try {
-            await addToCart(product._id);
+            await addToCart(product._id, selectedCondition);
             router.push('/cart');
         } catch (error) {
             toast.error("Có lỗi xảy ra");
@@ -55,9 +59,27 @@ export default function ProductDetailClient({ product }) {
         }
     };
 
+    const handleAddToCart = async () => {
+        if (!user) {
+            toast.warning("Bạn cần đăng nhập để mua hàng");
+            router.push('/login');
+            return;
+        }
+        try {
+            await addToCart(product._id, selectedCondition);
+            toast.success("Đã thêm vào giỏ hàng");
+        } catch (error) {
+            toast.error("Có lỗi xảy ra");
+        }
+    };
+
     const formattedPrice = formatPrice(product.price);
     const oldPrice = formatPrice(product.price * 1.1);
     const tradeInPrice = formatPrice(product.price * 0.85);
+
+    // Used Price Logic
+    const usedPrice = Math.round(product.price * 0.6);
+    const formattedUsedPrice = formatPrice(usedPrice);
 
     return (
         <div className="space-y-10">
@@ -109,18 +131,73 @@ export default function ProductDetailClient({ product }) {
 
                 {/* Right Column */}
                 <div className="lg:col-span-5 space-y-6">
-                    {/* Price Box */}
-                    <div className="flex gap-4 items-stretch">
-                        <div className="flex-1 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Giá sản phẩm</p>
-                            <p className="text-3xl font-bold text-red-600 dark:text-red-500">{formattedPrice}</p>
-                            <p className="text-sm text-gray-400 line-through mt-1">{oldPrice}</p>
+                    {/* Condition Selection */}
+                    <div>
+                        <h3 className="font-bold text-sm mb-3">Tình trạng máy</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* New Option */}
+                            <div
+                                onClick={() => setSelectedCondition('new')}
+                                className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedCondition === 'new'
+                                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 ring-1 ring-blue-500'
+                                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                    }`}
+                            >
+                                {selectedCondition === 'new' && (
+                                    <div className="absolute top-2 right-2 text-blue-500">
+                                        <Check className="w-4 h-4" />
+                                    </div>
+                                )}
+                                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">Máy Mới 100%</p>
+                                <p className="text-lg font-bold text-red-600 dark:text-red-500">{formattedPrice}</p>
+                                <p className="text-xs text-gray-500 mt-1">Nguyên seal, chưa active</p>
+                            </div>
+
+                            {/* Used Option */}
+                            <div
+                                onClick={() => setSelectedCondition('used')}
+                                className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedCondition === 'used'
+                                        ? 'bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500'
+                                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-red-300'
+                                    }`}
+                            >
+                                <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
+                                    -40%
+                                </div>
+                                {selectedCondition === 'used' && (
+                                    <div className="absolute top-2 right-2 text-red-500">
+                                        <Check className="w-4 h-4" />
+                                    </div>
+                                )}
+                                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
+                                    <Tag className="w-3 h-3" /> Máy Cũ 99%
+                                </p>
+                                <p className="text-lg font-bold text-red-600 dark:text-red-500">{formattedUsedPrice}</p>
+                                <p className="text-xs text-gray-500 mt-1">Bảo hành 6 tháng</p>
+                            </div>
                         </div>
-                        <div className="flex-1 p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-colors group">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Thu cũ lên đời chỉ từ</p>
-                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 group-hover:text-blue-700">{tradeInPrice}</p>
-                            <p className="text-xs text-blue-500 mt-2 flex items-center">Trợ giá đến 2.000.000đ <ChevronRight className="w-3 h-3 ml-1" /></p>
+                    </div>
+
+                    {/* Price Summary Box */}
+                    <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-500">Giá niêm yết:</span>
+                            <span className="text-sm text-gray-400 line-through">{oldPrice}</span>
                         </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-base font-bold text-gray-900 dark:text-white">Giá thanh toán:</span>
+                            <span className="text-3xl font-bold text-red-600 dark:text-red-500">
+                                {selectedCondition === 'new' ? formattedPrice : formattedUsedPrice}
+                            </span>
+                        </div>
+                        {selectedCondition === 'new' && (
+                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex justify-between items-center cursor-pointer group">
+                                    <span className="text-sm text-blue-600 dark:text-blue-400 font-medium group-hover:underline">Thu cũ đổi mới</span>
+                                    <span className="text-sm font-bold text-blue-600 dark:text-blue-400">Chỉ từ {tradeInPrice}</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Variants */}
@@ -168,7 +245,9 @@ export default function ProductDetailClient({ product }) {
                                     <div className={`w-8 h-8 rounded-full shadow-sm ${item.color}`}></div>
                                     <div className="text-center">
                                         <p className="text-xs font-bold">{item.name}</p>
-                                        <p className="text-[10px] text-gray-500">{formattedPrice}</p>
+                                        <p className="text-[10px] text-gray-500">
+                                            {selectedCondition === 'new' ? formattedPrice : formattedUsedPrice}
+                                        </p>
                                     </div>
                                     {selectedColor === item.name && (
                                         <div className="absolute top-2 right-2 text-red-500">
@@ -231,13 +310,13 @@ export default function ProductDetailClient({ product }) {
                             </Button>
                         </div>
 
-                        <AddToCartButton
-                            productId={product._id}
+                        <Button
+                            onClick={handleAddToCart}
                             className="w-full bg-black hover:bg-gray-800 text-white h-12 rounded-xl flex items-center justify-center gap-2"
                         >
                             <ShoppingCart className="w-5 h-5" />
                             <span className="font-bold">Thêm vào giỏ</span>
-                        </AddToCartButton>
+                        </Button>
                     </div>
                 </div>
             </div>

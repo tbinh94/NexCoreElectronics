@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Package, MessageCircle, ChevronDown } from "lucide-react";
+import { Menu, Package, MessageCircle, ChevronDown, Tag } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -138,6 +138,16 @@ export default function CategoryNavBar({ categories = [] }) {
                                     </Link>
                                 </CarouselItem>
 
+                                <CarouselItem className="pl-1 basis-auto">
+                                    <Link
+                                        href="/used-laptops"
+                                        className="relative flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap"
+                                    >
+                                        <Tag className="w-4 h-4" />
+                                        Máy Cũ Giá Rẻ
+                                    </Link>
+                                </CarouselItem>
+
                                 {categories.length > 0 && (
                                     <CarouselItem className="pl-1 basis-auto flex items-center">
                                         <div className="w-px h-6 bg-gray-200 dark:bg-gray-800 mx-2" />
@@ -162,6 +172,17 @@ export default function CategoryNavBar({ categories = [] }) {
 
                     {/* Right Side - Support Links (Fixed - Desktop Only) */}
                     <div className="hidden md:flex items-center gap-6 shrink-0">
+                        <Link
+                            href="/trade-in"
+                            className="flex items-center gap-2 text-sm font-bold text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors duration-200 group"
+                        >
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            <span>Thu cũ đổi mới</span>
+                        </Link>
+
                         <Link
                             href="/orders"
                             className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 group"

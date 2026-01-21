@@ -11,7 +11,7 @@ import uploadRoutes from "./upload.js";
 import chatbotRoutes from "./chatbot.js";
 import aiRoutes from "./ai.js";
 import categoryRoutes from "./categoryRoutes.js";
-import { getProducts, getProductFilters, getProductById, searchByImage } from "../controllers/productController.js";
+import { getProducts, getProductFilters, getProductById, searchByImage, getDailyUsedProducts } from "../controllers/productController.js";
 
 const router = Router();
 
@@ -37,6 +37,7 @@ router.use("/chat", chatbotRoutes);
 router.use("/ai", aiRoutes);
 router.use("/categories", categoryRoutes);
 
+router.get("/products/daily-used", getDailyUsedProducts); // New route
 router.get("/products", getProducts);
 router.get("/products/filters", getProductFilters);
 router.get("/products/:id", getProductById);

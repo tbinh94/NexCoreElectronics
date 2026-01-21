@@ -8,7 +8,7 @@ const router = Router();
 router.post("/add", async (req, res) => {
     try {
         console.log("Cart add request body:", req.body);
-        const { userId, productId } = req.body;
+        const { userId, productId, type = 'new' } = req.body;
 
         if (!userId || !productId) {
             return res.status(400).json({ message: "Missing userId or productId" });
@@ -26,15 +26,18 @@ router.post("/add", async (req, res) => {
 
         let cart = await Cart.findOne({ userId });
         if (!cart) {
-            const newCart = new Cart({ userId, products: [{ productId, quantity: 1 }] });
+            const newCart = new Cart({ userId, products: [{ productId, quantity: 1, type }] });
             await newCart.save();
             res.json(newCart);
         } else {
-            const productIndex = cart.products.findIndex((product) => product.productId.toString() === productId);
+            const productIndex = cart.products.findIndex((p) =>
+                p.productId.toString() === productId && p.type === type
+            );
+
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity += 1;
             } else {
-                cart.products.push({ productId, quantity: 1 });
+                cart.products.push({ productId, quantity: 1, type });
             }
             await cart.save();
             res.json(cart);
@@ -56,17 +59,20 @@ router.get("/:userId", async (req, res) => {
 });
 
 router.put("/update", async (req, res) => {
-    const { userId, productId, quantity } = req.body;
+    const { userId, productId, quantity, type = 'new' } = req.body;
     try {
         const cart = await Cart.findOne({ userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-        const productIndex = cart.products.findIndex(p => p.productId.toString() === productId);
+        const productIndex = cart.products.findIndex(p =>
+            p.productId.toString() === productId && p.type === type
+        );
+
         if (productIndex > -1) {
             if (quantity > 0)
                 cart.products[productIndex].quantity = quantity;
             else
-                cart.products.splice(productIndex, 1); // hàm thay thế 1 phần tử trong mảng
+                cart.products.splice(productIndex, 1);
             await cart.save();
             res.json(cart);
         }
@@ -82,10 +88,15 @@ router.put("/update", async (req, res) => {
 router.delete("/:userId/:productId", async (req, res) => {
     try {
         const { userId, productId } = req.params;
+        const { type = 'new' } = req.query;
+
         const cart = await Cart.findOne({ userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
-        // Lọc bỏ sản phẩm có id tương ứng
-        const productIndex = cart.products.findIndex(p => p.productId.toString() === productId);
+
+        const productIndex = cart.products.findIndex(p =>
+            p.productId.toString() === productId && p.type === type
+        );
+
         if (productIndex > -1) {
             cart.products.splice(productIndex, 1);
             await cart.save();
