@@ -27,8 +27,16 @@ export default function Header({ categories }) {
             <div className="bg-primary text-primary-foreground w-full py-3">
                 <Container className="flex h-16 items-center justify-between gap-8">
                     {/* Logo */}
-                    <Link href="/" className="text-xl md:text-3xl font-extrabold tracking-tight text-white hover:opacity-90 transition-opacity shrink-0">
-                        NextGenShop
+                    {/* Logo */}
+                    <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
+                        <Image
+                            src="/logo.png"
+                            alt="NextGenShop Logo"
+                            width={220}
+                            height={80}
+                            priority
+                            className="h-16 md:h-24 w-auto object-contain"
+                        />
                     </Link>
 
                     {/* Search Bar - Center & Prominent */}

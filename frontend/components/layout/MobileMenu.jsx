@@ -35,18 +35,21 @@ export default function MobileMenu({ categories = [], user, logout }) {
                         {user ? "Tài khoản" : "Menu"}
                     </SheetTitle>
                     {user ? (
-                        <div className="flex items-center gap-3 mt-4">
-                            <Avatar className="h-12 w-12 border-2 border-white/20">
-                                <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="bg-white/20 text-white font-bold text-lg">
-                                    {user.name?.charAt(0).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col overflow-hidden">
-                                <span className="font-bold text-lg truncate">{user.name}</span>
-                                <span className="text-xs text-white/80 truncate">{user.email}</span>
+                        <Link href="/profile" onClick={handleLinkClick}>
+                            <div className="flex items-center gap-3 mt-4 p-2 -mx-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
+                                <Avatar className="h-12 w-12 border-2 border-white/20">
+                                    <AvatarImage src={user.avatar} alt={user.name} />
+                                    <AvatarFallback className="bg-white/20 text-white font-bold text-lg">
+                                        {user.name?.charAt(0).toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col overflow-hidden">
+                                    <span className="font-bold text-lg truncate">{user.name}</span>
+                                    <span className="text-xs text-white/80 truncate">{user.email}</span>
+                                    <span className="text-xs text-secondary-foreground/80 font-medium mt-1">Xem hồ sơ</span>
+                                </div>
                             </div>
-                        </div>
+                        </Link>
                     ) : (
                         <div className="flex gap-2 mt-4">
                             <Button variant="secondary" size="sm" className="flex-1 font-semibold shadow-sm" asChild onClick={handleLinkClick}>
