@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Laptop, Gamepad2, Smartphone, Briefcase, Building2, Feather, Monitor } from "lucide-react";
+import { Laptop, Gamepad2, Smartphone, Briefcase, Building2, Feather, Monitor, Code, Palette, BookOpen } from "lucide-react";
 
 const categoryIcons = {
-    "Business Laptop": Briefcase,
-    "Gaming Laptop": Gamepad2,
-    "Macbook": Laptop,
-    "Office Laptop": Building2,
-    "Phone": Smartphone,
-    "Ultrabook": Feather,
-    "Default": Monitor
+    "Doanh nghiệp – Doanh nhân": Briefcase,
+    "Gaming": Gamepad2,
+    "Lập trình – IT": Code,
+    "Học tập – Văn phòng": BookOpen,
+    "Thiết kế – Đồ họa": Palette,
+    "Mỏng nhẹ – Di động": Feather,
+    "Default": Laptop
 };
 
 export default function CategoryGrid({ categories }) {
@@ -18,9 +18,9 @@ export default function CategoryGrid({ categories }) {
     return (
         <section className="space-y-6">
             <div className="flex items-start md:items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Danh mục nổi bật</h2>
-                <Link href="/products" className="text-sm font-medium text-primary hover:underline">
-                    Xem tất cả
+                <h2 className="text-2xl font-bold tracking-tight text-foreground uppercase">DANH MỤC NỔI BẬT</h2>
+                <Link href="/products" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
+                    Xem tất cả &rarr;
                 </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full left-0">

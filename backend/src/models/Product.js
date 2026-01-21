@@ -76,6 +76,18 @@ const productSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        usage: {
+            type: [String],
+            required: false,
+        },
+        cpu_type: {
+            type: String,
+            required: false,
+        },
+        screen_size_label: {
+            type: String,
+            required: false,
+        },
     },
     {
         timestamps: true,

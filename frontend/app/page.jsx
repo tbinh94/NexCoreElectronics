@@ -17,7 +17,14 @@ export default async function Home() {
                 <HeroBanner />
 
                 {/* 2. Danh mục */}
-                <CategoryGrid categories={filters.categories} />
+                <CategoryGrid categories={[
+                    "Gaming",
+                    "Macbook",
+                    "Học tập – Văn phòng",
+                    "Thiết kế – Đồ họa",
+                    "Mỏng nhẹ – Di động",
+                    "Doanh nghiệp – Doanh nhân"
+                ]} />
 
                 {/* 3. Sản phẩm nổi bật / bán chạy */}
                 <FeaturedProducts limit={8} />

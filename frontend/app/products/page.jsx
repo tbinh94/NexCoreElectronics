@@ -15,6 +15,8 @@ export default async function ProductsPage({
     const minPrice = typeof resolvedParams.minPrice === 'string' ? resolvedParams.minPrice : undefined;
     const maxPrice = typeof resolvedParams.maxPrice === 'string' ? resolvedParams.maxPrice : undefined;
     const sort = typeof resolvedParams.sort === 'string' ? resolvedParams.sort : undefined;
+    const cpu_type = typeof resolvedParams.cpu_type === 'string' ? resolvedParams.cpu_type : undefined;
+    const screen_size_label = typeof resolvedParams.screen_size_label === 'string' ? resolvedParams.screen_size_label : undefined;
 
     const data = await fetchProducts({
         page,
@@ -22,7 +24,9 @@ export default async function ProductsPage({
         brand,
         minPrice,
         maxPrice,
-        sort
+        sort,
+        cpu_type,
+        screen_size_label
     });
 
     const products = data.products || [];

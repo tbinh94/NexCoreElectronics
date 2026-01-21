@@ -1,66 +1,126 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import Product from "./models/Product.js";
 import User from "./models/User.js";
 import Faq from "./models/Faq.js";
 import connectDB from "./config/db.js";
 import users from "./data/users.js";
 import faqs from "./data/faqs.js";
+import productsData from "./data/products.js";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const inferCpuType = (specs, name) => {
+    const cpu = (specs?.cpu || "").toLowerCase();
+    const n = (name || "").toLowerCase();
 
-const getProductImage = (id) => {
-    return `https://loremflickr.com/600/400/laptop,technology,computer?lock=${id}`;
+    if (cpu.includes("core i3")) return "Laptop Core i3";
+    if (cpu.includes("core i5")) return "Laptop Core i5";
+    if (cpu.includes("core i7")) return "Laptop Core i7";
+    if (cpu.includes("core i9")) return "Laptop Core i9";
+    if (cpu.includes("ultra 5")) return "Laptop Core U5";
+    if (cpu.includes("ultra 7")) return "Laptop Core U7";
+    if (cpu.includes("ultra 9")) return "Laptop Core U9";
+    if (cpu.includes("ryzen")) return "AMD Ryzen";
+    if (cpu.includes("m1") || cpu.includes("m2") || cpu.includes("m3") || cpu.includes("m4") || n.includes("macbook")) {
+        if (cpu.includes("m4")) return "Apple M4 Series";
+        if (cpu.includes("m3") && cpu.includes("max")) return "Apple M3 Max";
+        if (cpu.includes("m3") && cpu.includes("pro")) return "Apple M3 Pro";
+        if (cpu.includes("m3")) return "Apple M3";
+        if (cpu.includes("m2")) return "Apple M2";
+        if (cpu.includes("m1")) return "Apple M1";
+        return "Apple M Series";
+    }
+    if (cpu.includes("celeron") || cpu.includes("pentium")) return "Laptop Core i3"; // Group low end
+    return "Khác";
 };
 
-const parseCSV = (filePath) => {
-    const csvData = fs.readFileSync(filePath, "utf-8");
-    const lines = csvData.split("\n");
-    const headers = lines[0].split(",").map((h) => h.trim());
-    const result = [];
+const inferScreenSize = (specs) => {
+    const screen = (specs?.screen || "").toLowerCase();
+    if (screen.includes("13.") || screen.includes("13 inch") || screen.includes("13.3") || screen.includes("13.4") || screen.includes("13.5") || screen.includes("13.6")) return "13 inch";
+    if (screen.includes("14.") || screen.includes("14 inch") || screen.includes("14.2")) return "14 inch";
+    if (screen.includes("15.") || screen.includes("15.3") || screen.includes("15.6")) return "15.6 inch";
+    if (screen.includes("16.") || screen.includes("16 inch") || screen.includes("16.1") || screen.includes("16.2")) return "16 inch";
+    if (screen.includes("17.") || screen.includes("18.")) return "16 inch"; // Group large to 16 inch for filtering simplicity or leave raw
+    if (screen.includes("11.") || screen.includes("12.")) return "13 inch"; // Group small
+    return "15.6 inch"; // Default
+};
 
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
+const inferUsage = (p, category) => {
+    const uses = [];
+    const lowerCat = category.toLowerCase();
+    const name = p.name.toLowerCase();
+    // const gpu = (p.specs?.gpu || "").toLowerCase();
 
-        // Handle commas inside quotes if necessary, but for this simple CSV a simple split might suffice
-        // However, to be safe, let's use a regex that handles quoted fields
-        const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-        // Fallback to simple split if regex fails or for simple lines (this regex is imperfect)
-        // Given the file view, it seems standard. Let's try a robust split.
+    // Map Category to Usage
+    if (lowerCat.includes("gaming")) uses.push("Gaming", "Đồ họa - kỹ thuật");
+    if (lowerCat.includes("học tập") || lowerCat.includes("văn phòng")) uses.push("Văn phòng", "Sinh viên");
+    if (lowerCat.includes("lập trình") || lowerCat.includes("it")) uses.push("Văn phòng", "Đồ họa - kỹ thuật");
+    if (lowerCat.includes("mỏng nhẹ") || lowerCat.includes("di động") || lowerCat.includes("ultrabook")) uses.push("Mỏng nhẹ");
+    if (lowerCat.includes("đồ họa") || lowerCat.includes("thiết kế")) uses.push("Đồ họa - kỹ thuật", "Thiết kế");
+    if (lowerCat.includes("doanh nghiệp") || lowerCat.includes("business")) uses.push("Doanh nghiệp", "Văn phòng");
 
-        let row = {};
-        let currentLine = lines[i];
-        let values = [];
-        let inQuote = false;
-        let currentValue = "";
-
-        for (let char of currentLine) {
-            if (char === '"') {
-                inQuote = !inQuote;
-            } else if (char === ',' && !inQuote) {
-                values.push(currentValue.trim());
-                currentValue = "";
-            } else {
-                currentValue += char;
-            }
-        }
-        values.push(currentValue.trim());
-
-        if (values.length < headers.length) continue;
-
-        headers.forEach((header, index) => {
-            row[header] = values[index] ? values[index].replace(/^"|"$/g, '') : "";
-        });
-        result.push(row);
+    // Check specific specs
+    if (name.includes("touch") || name.includes("xoay") || name.includes("flip") || name.includes("2-in-1") || p.specs?.screen?.toLowerCase().includes("touch")) {
+        uses.push("Cảm ứng");
     }
-    return result;
+    if (name.includes("ai") || p.description?.toLowerCase().includes("ai")) {
+        uses.push("Laptop AI");
+    }
+
+    return [...new Set(uses)];
+};
+
+const categorizeProduct = (p) => {
+    // Return explicit category if it matches the new system
+    const validCategories = [
+        "Gaming",
+        "Học tập – Văn phòng",
+        "Lập trình – IT",
+        "Thiết kế – Đồ họa",
+        "Mỏng nhẹ – Di động",
+        "Doanh nghiệp – Doanh nhân",
+        "Ultrabook",
+        "Macbook",
+        "Laptop AI"
+    ];
+
+    if (validCategories.includes(p.category)) return p.category;
+    if (p.category === "Gaming Laptop") return "Gaming";
+    if (p.category === "Business Laptop") return "Doanh nghiệp – Doanh nhân";
+    if (p.category === "Office Laptop") return "Học tập – Văn phòng";
+    if (p.category === "Workstation") return "Thiết kế – Đồ họa";
+
+    // Fallback logic
+    const getRamDiff = (ramStr) => {
+        const match = ramStr?.match(/(\d+)GB/);
+        return match ? parseInt(match[1]) : 4;
+    };
+    const getWeight = (wStr) => {
+        const match = wStr?.match(/(\d+(\.\d+)?)\s*kg/);
+        return match ? parseFloat(match[1]) : 2.0;
+    };
+
+    const name = p.name.toLowerCase();
+    const brand = p.brand.toLowerCase();
+    const gpu = p.specs?.gpu?.toLowerCase() || "";
+    // const cpu = p.specs?.cpu?.toLowerCase() || "";
+    // const ram = getRamDiff(p.specs?.ram);
+    const weight = getWeight(p.specs?.weight);
+
+    if (name.includes("macbook")) return "Macbook";
+
+    if (
+        brand === "alienware" || name.includes("rog") || name.includes("tuf") || name.includes("nitro") ||
+        name.includes("legion") || name.includes("predator") || name.includes("omen") ||
+        ((gpu.includes("rtx") || gpu.includes("gtx")) && !gpu.includes("iris"))
+    ) return "Gaming";
+
+    if (name.includes("thinkpad") || name.includes("elitebook") || name.includes("zbook")) return "Doanh nghiệp – Doanh nhân";
+
+    if (weight <= 1.5 || name.includes("air") || name.includes("swift") || name.includes("gram")) return "Mỏng nhẹ – Di động";
+
+    return "Học tập – Văn phòng";
 };
 
 
@@ -68,69 +128,51 @@ console.log("Starting seed script...");
 
 const importData = async () => {
     try {
-        console.log("Reading CSV data...");
-        const csvPath = path.join(__dirname, "data", "laptop.csv");
-        const rawProducts = parseCSV(csvPath);
-        console.log(`Found ${rawProducts.length} products in CSV.`);
-
         await connectDB();
 
-        const products = rawProducts.map((p, index) => {
-            // Convert price from INR (assumed) to VND (approx x300)
-            // Remove commas from price string if present
-            const rawPrice = parseFloat(p["price"].replace(/,/g, "")) || 0;
-            const priceVND = rawPrice * 300;
+        // Transform data
+        const processedProducts = productsData.map(p => {
+            const category = categorizeProduct(p);
+            const cpuType = p.cpu_type || inferCpuType(p.specs, p.name);
+            const screenSizeLabel = p.screen_size_label || inferScreenSize(p.specs);
+            const usage = p.usage || inferUsage(p, category);
 
-            const productImages = [
-                getProductImage(index + 1),
-                getProductImage(index + 1 + 10000),
-                getProductImage(index + 1 + 20000),
-                getProductImage(index + 1 + 30000)
-            ];
+            // Ensure numeric fields
+            const price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
 
             return {
-                name: p["model_name"],
-                brand: p["brand"],
-                description: `${p["model_name"]} with ${p["processor_name"]}, ${p["ram(GB)"]}GB RAM, ${p["ssd(GB)"]}GB SSD.`,
-                price: priceVND,
-                originalPrice: priceVND * 1.1, // Fake original price
-                image: productImages[0],
-                images: productImages,
-                category: "Laptop",
-                countInStock: Math.floor(Math.random() * 50) + 5,
-                rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
-                reviews: Math.floor(Math.random() * 100),
-                is_new_product: Math.random() < 0.2,
-                specs: {
-                    cpu: p["processor_name"],
-                    ram: `${p["ram(GB)"]}GB`,
-                    storage: `${p["ssd(GB)"]}GB SSD`,
-                    screen: `${p["screen_size(inches)"]} inch ${p["resolution (pixels)"]}`,
-                    gpu: p["graphics"],
-                    os: p["Operating System"],
-                    battery: "N/A",
-                    weight: "N/A",
-                },
-                highlights: [
-                    `${p["ram(GB)"]}GB RAM`,
-                    `${p["ssd(GB)"]}GB SSD`,
-                    p["processor_name"],
-                    p["Operating System"]
-                ],
-                detailedDescription: `Experience the power of the ${p["model_name"]}. Featuring a ${p["processor_name"]} processor and ${p["graphics"]} graphics, this laptop is designed for performance. The ${p["screen_size(inches)"]} inch display with ${p["resolution (pixels)"]} resolution delivers stunning visuals.`
+                ...p,
+                price: price,
+                category: category,
+                usage: usage,
+                cpu_type: cpuType,
+                screen_size_label: screenSizeLabel,
+                specs: p.specs || {},
+                countInStock: p.countInStock || 20,
+                rating: p.rating || 4.5,
+                reviews: p.reviews || 10,
             };
         });
 
-        await Product.deleteMany(); // Xóa dữ liệu cũ
-        await Product.insertMany(products); // Thêm dữ liệu mới
-        console.log(`Imported ${products.length} products.`);
+        console.log(`Processing ${processedProducts.length} products...`);
 
-        await User.deleteMany(); // Xóa dữ liệu cũ
-        await User.insertMany(users); // Thêm dữ liệu mới
+        // Log distribution
+        const Distribution = {};
+        processedProducts.forEach(p => {
+            Distribution[p.category] = (Distribution[p.category] || 0) + 1;
+        });
+        console.log("Category Distribution:", Distribution);
+
+        await Product.deleteMany(); // Clear old data
+        await Product.insertMany(processedProducts); // Insert new data
+        console.log(`Imported ${processedProducts.length} products.`);
+
+        await User.deleteMany();
+        await User.insertMany(users);
         console.log("Imported Users.");
 
-        await Faq.deleteMany(); // Xóa dữ liệu cũ
-        await Faq.insertMany(faqs); // Thêm dữ liệu mới
+        await Faq.deleteMany();
+        await Faq.insertMany(faqs);
         console.log("Imported FAQs.");
 
         console.log("Data Imported!");

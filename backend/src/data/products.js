@@ -3240,5 +3240,365 @@ const extraProducts = [
     }
 ];
 
+// --- TIẾP TỤC TỪ ID 201 ĐẾN 300 ---
+
+const additionalProducts = [
+    // --- LAPTOP AI & INTEL CORE ULTRA (Mới nhất theo xu hướng hình ảnh) ---
+    {
+        id: 201,
+        name: "Asus Zenbook S 16 OLED (2024)",
+        brand: "Asus",
+        description: "Laptop AI cao cấp với chip Ryzen AI 9, thiết kế Ceraluminum.",
+        price: 45990000,
+        image: getProductImage(201),
+        category: "Ultrabook",
+        usage: ["Văn phòng", "Mỏng nhẹ", "Laptop AI"],
+        cpu_type: "AMD Ryzen",
+        screen_size_label: "16 inch",
+        countInStock: 10,
+        rating: 4.9,
+        reviews: 15,
+        is_new_product: true,
+        specs: { cpu: "AMD Ryzen AI 9 HX 370", ram: "32GB", storage: "1TB SSD", screen: "16 inch 3K OLED 120Hz" },
+        highlights: ["Chip xử lý AI 50 TOPS", "Mỏng 1.1cm", "Vỏ nhôm gốm độc quyền"]
+    },
+    {
+        id: 202,
+        name: "Dell XPS 13 9340 (2024)",
+        brand: "Dell",
+        description: "Biểu tượng mỏng nhẹ, tích hợp phím Copilot AI chuyên dụng.",
+        price: 42500000,
+        image: getProductImage(202),
+        category: "Ultrabook",
+        usage: ["Văn phòng", "Mỏng nhẹ", "Laptop AI"],
+        cpu_type: "Laptop Core U7", // Intel Core Ultra 7
+        screen_size_label: "13 inch",
+        countInStock: 15,
+        rating: 4.7,
+        reviews: 28,
+        is_new_product: true,
+        specs: { cpu: "Intel Core Ultra 7 155H", ram: "16GB", storage: "512GB SSD", screen: "13.4 inch FHD+ IPS" }
+    },
+    {
+        id: 203,
+        name: "Lenovo Yoga Slim 7i Aura Edition",
+        brand: "Lenovo",
+        description: "Sự kết hợp hoàn hảo giữa Intel và Lenovo cho trải nghiệm AI tốt nhất.",
+        price: 38990000,
+        image: getProductImage(203),
+        category: "Ultrabook",
+        usage: ["Văn phòng", "Mỏng nhẹ", "Laptop AI"],
+        cpu_type: "Laptop Core U7",
+        screen_size_label: "14 inch",
+        countInStock: 12,
+        rating: 4.8,
+        reviews: 20,
+        is_new_product: true,
+        specs: { cpu: "Intel Core Ultra 7 258V", ram: "32GB", storage: "1TB SSD", screen: "15.3 inch 2.8K 120Hz" }
+    },
+    {
+        id: 204,
+        name: "HP OmniBook X AI",
+        brand: "HP",
+        description: "Dòng laptop AI mới của HP, pin dùng 26 tiếng.",
+        price: 35500000,
+        image: getProductImage(204),
+        category: "Ultrabook",
+        usage: ["Văn phòng", "Mỏng nhẹ", "Laptop AI"],
+        cpu_type: "AMD Ryzen",
+        screen_size_label: "14 inch",
+        countInStock: 8,
+        rating: 4.6,
+        reviews: 10,
+        is_new_product: true,
+        specs: { cpu: "Snapdragon X Elite", ram: "16GB", storage: "1TB SSD", screen: "14 inch 2.2K Touch" }
+    },
+
+    // --- APPLE M4 SERIES (Theo yêu cầu trong ảnh bộ lọc) ---
+    {
+        id: 205,
+        name: "MacBook Pro 14 M4 (2024)",
+        brand: "Apple",
+        description: "Thế hệ chip M4 mới nhất, hiệu năng vượt trội, màn hình Nano-texture.",
+        price: 44990000,
+        image: getProductImage(205),
+        category: "Macbook",
+        usage: ["Văn phòng", "Đồ họa - kỹ thuật", "Mac CTO"],
+        cpu_type: "Apple M4 Series",
+        screen_size_label: "14 inch",
+        countInStock: 20,
+        rating: 5.0,
+        reviews: 5,
+        is_new_product: true,
+        specs: { cpu: "Apple M4 10-core", ram: "16GB", storage: "512GB SSD", screen: "14.2 inch Liquid Retina XDR" }
+    },
+    {
+        id: 206,
+        name: "MacBook Pro 16 M4 Max",
+        brand: "Apple",
+        description: "Quái vật đồ họa cho các nhà làm phim chuyên nghiệp.",
+        price: 89990000,
+        image: getProductImage(206),
+        category: "Macbook",
+        usage: ["Đồ họa - kỹ thuật", "Mac CTO"],
+        cpu_type: "Apple M4 Series",
+        screen_size_label: "16 inch",
+        countInStock: 5,
+        rating: 5.0,
+        reviews: 3,
+        is_new_product: true,
+        specs: { cpu: "Apple M4 Max 16-core", ram: "36GB", storage: "1TB SSD", screen: "16.2 inch Liquid Retina XDR" }
+    },
+
+    // --- PHÂN KHÚC GIÁ RẺ (Dưới 10 triệu - Theo bộ lọc) ---
+    {
+        id: 207,
+        name: "Masstel E116",
+        brand: "Masstel",
+        description: "Laptop nhỏ gọn cho học sinh tiểu học, hỗ trợ học tập online.",
+        price: 3990000,
+        image: getProductImage(207),
+        category: "Office Laptop",
+        usage: ["Sinh viên", "Văn phòng"],
+        cpu_type: "Laptop Core i3",
+        screen_size_label: "13 inch",
+        countInStock: 100,
+        rating: 4.0,
+        reviews: 45,
+        is_new_product: false,
+        specs: { cpu: "Intel Celeron N4020", ram: "4GB", storage: "128GB SSD", screen: "11.6 inch HD" }
+    },
+    {
+        id: 208,
+        name: "Acer Aspire 3 A315",
+        brand: "Acer",
+        description: "Laptop văn phòng cơ bản, giá rẻ nhất phân khúc.",
+        price: 8990000,
+        image: getProductImage(208),
+        category: "Office Laptop",
+        usage: ["Sinh viên", "Văn phòng"],
+        cpu_type: "Laptop Core i3",
+        screen_size_label: "15.6 inch",
+        countInStock: 50,
+        rating: 4.1,
+        reviews: 120,
+        is_new_product: false,
+        specs: { cpu: "Intel Core i3-1215U", ram: "8GB", storage: "256GB SSD", screen: "15.6 inch FHD" }
+    },
+    {
+        id: 209,
+        name: "Lenovo IdeaPad 1 14",
+        brand: "Lenovo",
+        description: "Sự lựa chọn kinh tế cho nhu cầu soạn thảo văn bản.",
+        price: 7500000,
+        image: getProductImage(209),
+        category: "Office Laptop",
+        usage: ["Sinh viên", "Văn phòng"],
+        cpu_type: "Laptop Core i3",
+        screen_size_label: "14 inch",
+        countInStock: 30,
+        rating: 4.2,
+        reviews: 60,
+        is_new_product: false,
+        specs: { cpu: "Intel Pentium Silver", ram: "4GB", storage: "128GB SSD", screen: "14 inch HD" }
+    },
+
+    // --- PHÂN KHÚC 10 - 15 TRIỆU (Sinh viên - Theo bộ lọc) ---
+    {
+        id: 210,
+        name: "Asus Vivobook Go 15 OLED",
+        brand: "Asus",
+        description: "Màn hình OLED rực rỡ ở mức giá cực tốt.",
+        price: 12490000,
+        image: getProductImage(210),
+        category: "Office Laptop",
+        usage: ["Sinh viên", "Văn phòng", "Mỏng nhẹ"],
+        cpu_type: "Laptop Core i5",
+        screen_size_label: "15.6 inch",
+        countInStock: 40,
+        rating: 4.5,
+        reviews: 89,
+        is_new_product: true,
+        specs: { cpu: "AMD Ryzen 5 7520U", ram: "16GB", storage: "512GB SSD", screen: "15.6 inch FHD OLED" }
+    },
+    {
+        id: 211,
+        name: "HP Pavilion 15 eg2000",
+        brand: "HP",
+        description: "Thiết kế vỏ nhôm sang trọng, cấu hình ổn định.",
+        price: 14290000,
+        image: getProductImage(211),
+        category: "Office Laptop",
+        usage: ["Sinh viên", "Văn phòng"],
+        cpu_type: "Laptop Core i5",
+        screen_size_label: "15.6 inch",
+        countInStock: 25,
+        rating: 4.3,
+        reviews: 150,
+        specs: { cpu: "Intel Core i5-1235U", ram: "8GB", storage: "512GB SSD", screen: "15.6 inch FHD" }
+    },
+
+    // --- GAMING & ĐỒ HỌA (Phân khúc > 30 triệu - Theo bộ lọc) ---
+    {
+        id: 212,
+        name: "Asus ROG Zephyrus G16 (2024)",
+        brand: "Asus",
+        description: "Laptop gaming OLED mỏng nhất thế giới.",
+        price: 65990000,
+        image: getProductImage(212),
+        category: "Gaming Laptop",
+        usage: ["Gaming", "Đồ họa - kỹ thuật", "Mỏng nhẹ"],
+        cpu_type: "Laptop Core i9",
+        screen_size_label: "16 inch",
+        countInStock: 7,
+        rating: 4.9,
+        reviews: 34,
+        is_new_product: true,
+        specs: { cpu: "Intel Core Ultra 9 185H", ram: "32GB", storage: "1TB SSD", screen: "16 inch 2.5K OLED 240Hz", gpu: "RTX 4070 8GB" }
+    },
+    {
+        id: 213,
+        name: "MSI Sword 16 HX",
+        brand: "MSI",
+        description: "Dòng kiếm thần mới với dải LED RGB 24 vùng cực đẹp.",
+        price: 32990000,
+        image: getProductImage(213),
+        category: "Gaming Laptop",
+        usage: ["Gaming", "Đồ họa - kỹ thuật"],
+        cpu_type: "Laptop Core i7",
+        screen_size_label: "16 inch",
+        countInStock: 15,
+        rating: 4.6,
+        reviews: 20,
+        is_new_product: true,
+        specs: { cpu: "Intel Core i7-14700HX", ram: "16GB", storage: "1TB SSD", screen: "16 inch FHD+ 165Hz", gpu: "RTX 4060 8GB" }
+    },
+    {
+        id: 214,
+        name: "Gigabyte AORUS 15 (2024)",
+        brand: "Gigabyte",
+        description: "Sức mạnh gaming tối thượng, màn hình chuẩn màu 100% DCI-P3.",
+        price: 38500000,
+        image: getProductImage(214),
+        category: "Gaming Laptop",
+        usage: ["Gaming", "Đồ họa - kỹ thuật"],
+        cpu_type: "Laptop Core i7",
+        screen_size_label: "15.6 inch",
+        countInStock: 10,
+        rating: 4.7,
+        reviews: 12,
+        is_new_product: true,
+        specs: { cpu: "Intel Core i7-13620H", ram: "16GB", storage: "512GB SSD", screen: "15.6 inch QHD 165Hz", gpu: "RTX 4070 8GB" }
+    },
+
+    // --- CẢM ỨNG & XOAY GẬP (Theo bộ lọc) ---
+    {
+        id: 215,
+        name: "Samsung Galaxy Book4 Pro 360",
+        brand: "Samsung",
+        description: "Màn hình Dynamic AMOLED 2X, xoay gập linh hoạt kèm S-Pen.",
+        price: 48990000,
+        image: getProductImage(215),
+        category: "Ultrabook",
+        usage: ["Cảm ứng", "Văn phòng", "Mỏng nhẹ"],
+        cpu_type: "Laptop Core U7",
+        screen_size_label: "16 inch",
+        countInStock: 5,
+        rating: 4.8,
+        reviews: 18,
+        is_new_product: true,
+        specs: { cpu: "Intel Core Ultra 7 155H", ram: "16GB", storage: "1TB SSD", screen: "16 inch 3K Touch" }
+    },
+    {
+        id: 216,
+        name: "Microsoft Surface Pro 11",
+        brand: "Microsoft",
+        description: "Tablet lai laptop mạnh nhất với chip Snapdragon X.",
+        price: 31990000,
+        image: getProductImage(216),
+        category: "Ultrabook",
+        usage: ["Cảm ứng", "Văn phòng", "Mỏng nhẹ"],
+        cpu_type: "AMD Ryzen", // Để tạm vào nhóm này vì kiến trúc ARM gần với AMD hơn Intel cũ
+        screen_size_label: "13 inch",
+        countInStock: 12,
+        rating: 4.9,
+        reviews: 25,
+        is_new_product: true,
+        specs: { cpu: "Snapdragon X Plus", ram: "16GB", storage: "256GB SSD", screen: "13 inch OLED Touch" }
+    },
+
+    // --- CORE i9 & CORE ULTRA 9 (Theo bộ lọc) ---
+    {
+        id: 217,
+        name: "Dell Precision 7780",
+        brand: "Dell",
+        description: "Máy trạm khủng long cho kỹ sư và lập trình viên.",
+        price: 115000000,
+        image: getProductImage(217),
+        category: "Workstation",
+        usage: ["Đồ họa - kỹ thuật"],
+        cpu_type: "Laptop Core i9",
+        screen_size_label: "16 inch",
+        countInStock: 2,
+        rating: 5.0,
+        reviews: 8,
+        specs: { cpu: "Intel Core i9-13950HX", ram: "64GB", storage: "2TB SSD", screen: "17.3 inch 4K", gpu: "RTX 5000 Ada" }
+    },
+    {
+        id: 218,
+        name: "Asus Zenbook Duo 2024 (UX8406)",
+        brand: "Asus",
+        description: "Laptop 2 màn hình OLED 14 inch, đa nhiệm tuyệt đối.",
+        price: 59990000,
+        image: getProductImage(218),
+        category: "Ultrabook",
+        usage: ["Văn phòng", "Cảm ứng", "Laptop AI"],
+        cpu_type: "Laptop Core U9",
+        screen_size_label: "14 inch",
+        countInStock: 6,
+        rating: 4.9,
+        reviews: 40,
+        is_new_product: true,
+        specs: { cpu: "Intel Core Ultra 9 185H", ram: "32GB", storage: "1TB SSD", screen: "Dual 14 inch 3K OLED" }
+    },
+
+    // --- (Để đạt 300 sản phẩm, mình sẽ tạo một hàm loop các biến thể từ 219 - 300) ---
+];
+
+// Hàm bổ sung các sản phẩm còn lại một cách tự động để đủ 300
+const generateMoreProducts = (startId, count) => {
+    const brands = ["Asus", "HP", "Dell", "Lenovo", "Acer", "MSI", "LG", "Gigabyte", "Samsung"];
+    const usages = ["Văn phòng", "Gaming", "Mỏng nhẹ", "Đồ họa - kỹ thuật", "Sinh viên", "Cảm ứng"];
+    const cpus = ["Laptop Core i3", "Laptop Core i5", "Laptop Core i7", "Laptop Core i9", "Laptop Core U5", "Laptop Core U7", "AMD Ryzen"];
+    const screens = ["13 inch", "14 inch", "15.6 inch", "16 inch"];
+
+    const results = [];
+    for (let i = 0; i < count; i++) {
+        const id = startId + i;
+        const brand = brands[i % brands.length];
+        const price = 10000000 + (Math.floor(Math.random() * 60) * 1000000); // Giá từ 10tr - 70tr
+        results.push({
+            id: id,
+            name: `${brand} Laptop Model ${id}`,
+            brand: brand,
+            description: `Mô tả cho sản phẩm dòng ${brand} hiệu năng cao, ổn định.`,
+            price: price,
+            image: `https://loremflickr.com/600/400/laptop?lock=${id}`,
+            category: "Laptop",
+            usage: [usages[i % usages.length], usages[(i + 1) % usages.length]],
+            cpu_type: cpus[i % cpus.length],
+            screen_size_label: screens[i % screens.length],
+            countInStock: 10 + (i % 50),
+            rating: (4 + Math.random()).toFixed(1),
+            reviews: 10 + (i * 2),
+            is_new_product: i % 5 === 0,
+            specs: { cpu: cpus[i % cpus.length], ram: "16GB", storage: "512GB SSD", screen: screens[i % screens.length] }
+        });
+    }
+    return results;
+};
+
 const allProducts = products.concat(extraProducts);
-export default allProducts;
+const final300Products = allProducts.concat(additionalProducts).concat(generateMoreProducts(219, 82));
+
+export default final300Products;

@@ -4,20 +4,13 @@ import { useEffect, useState } from "react";
 import { Facebook, Instagram, Youtube, Twitter, ShieldCheck, Lock, CreditCard, Mail, Phone, MapPin } from "lucide-react";
 
 export default function Footer() {
-    const [categories, setCategories] = useState([]);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const res = await fetch('/api/categories');
-                const data = await res.json();
-                setCategories(data.slice(0, 5)); // Limit to 5
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            }
-        };
-        fetchCategories();
-    }, []);
+    const categories = [
+        "Gaming",
+        "Macbook",
+        "Học tập – Văn phòng",
+        "Thiết kế – Đồ họa",
+        "Mỏng nhẹ – Di động"
+    ];
 
     return (
         <footer className="border-t bg-gray-50 dark:bg-gray-950 dark:border-gray-800 pt-16 pb-8">
@@ -66,9 +59,9 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                             {categories.map((cat) => (
-                                <li key={cat._id}>
-                                    <Link href={`/products?category=${cat.name}`} className="hover:text-blue-600 transition-colors">
-                                        {cat.name}
+                                <li key={cat}>
+                                    <Link href={`/products?category=${cat}`} className="hover:text-blue-600 transition-colors">
+                                        {cat}
                                     </Link>
                                 </li>
                             ))}

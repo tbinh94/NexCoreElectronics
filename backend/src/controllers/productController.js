@@ -9,23 +9,70 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const getProducts = async (req, res) => {
     try {
-        const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search, promotion, exclude } = req.query;
+        const { limit = 12, page = 1, category, brand, minPrice, maxPrice, sort, search, promotion, exclude, cpu_type, screen_size_label } = req.query;
         const limitNum = Number(limit);
         const pageNum = Number(page);
         const skip = (pageNum - 1) * limitNum;
 
         let filter = {};
+        const andConditions = [];
 
-        // 1. Standard Filters (always apply if provided explicitly via UI filters)
-        if (category) filter.category = category;
-        if (brand) filter.brand = brand;
-        if (minPrice) filter.price = { ...filter.price, $gte: Number(minPrice) };
-        if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
+        // 1. Standard Filters
+        if (category) {
+            // Allow matching "Gaming" in category OR usage
+            andConditions.push({
+                $or: [
+                    { category: category },
+                    { usage: category }
+                ]
+            });
+        }
+        if (brand) andConditions.push({ brand: brand });
+
+        // Chip/CPU Filter Logic
+        if (cpu_type) {
+            if (cpu_type === "Laptop Core i9") {
+                andConditions.push({
+                    $or: [
+                        { cpu_type: "Laptop Core i9" },
+                        { cpu_type: "Laptop Core U9" }
+                    ]
+                });
+            } else if (cpu_type === "Laptop Core i7") {
+                andConditions.push({
+                    $or: [
+                        { cpu_type: "Laptop Core i7" },
+                        { cpu_type: "Laptop Core U7" }
+                    ]
+                });
+            } else if (cpu_type === "Laptop Core i5") {
+                andConditions.push({
+                    $or: [
+                        { cpu_type: "Laptop Core i5" },
+                        { cpu_type: "Laptop Core U5" }
+                    ]
+                });
+            } else {
+                andConditions.push({ cpu_type: cpu_type });
+            }
+        }
+
+        if (screen_size_label) {
+            andConditions.push({ screen_size_label: screen_size_label });
+        }
+
+        if (minPrice || maxPrice) {
+            const priceFilter = {};
+            if (minPrice) priceFilter.$gte = Number(minPrice);
+            if (maxPrice) priceFilter.$lte = Number(maxPrice);
+            andConditions.push({ price: priceFilter });
+        }
+
         if (promotion === 'true') {
-            filter.originalPrice = { $exists: true, $ne: null };
+            andConditions.push({ originalPrice: { $exists: true, $ne: null } });
         }
         if (exclude) {
-            filter._id = { $ne: exclude };
+            andConditions.push({ _id: { $ne: exclude } });
         }
 
         // 2. Smart Search Logic
@@ -67,21 +114,25 @@ export const getProducts = async (req, res) => {
 
                 console.log("Smart Search Analysis:", analysis);
 
-                // Apply Extracted Filters (Merge with existing filters, giving precedence to explicit UI filters if conflict? 
-                // Usually search query refines the current view, but here let's assume search query adds to filters)
+                // Apply Extracted Filters
+                if (analysis.filters.category && !category) {
+                    andConditions.push({
+                        $or: [
+                            { category: { $regex: analysis.filters.category, $options: 'i' } },
+                            { usage: { $regex: analysis.filters.category, $options: 'i' } }
+                        ]
+                    });
+                }
+                if (analysis.filters.brand && !brand) andConditions.push({ brand: { $regex: analysis.filters.brand, $options: 'i' } });
 
-                if (analysis.filters.category && !category) filter.category = { $regex: analysis.filters.category, $options: 'i' };
-                if (analysis.filters.brand && !brand) filter.brand = { $regex: analysis.filters.brand, $options: 'i' };
-
-                // Price logic: if user typed "under 10 million", use that.
                 if (analysis.filters.minPrice || analysis.filters.maxPrice) {
-                    filter.price = filter.price || {};
-                    if (analysis.filters.minPrice) filter.price.$gte = analysis.filters.minPrice;
-                    if (analysis.filters.maxPrice) filter.price.$lte = analysis.filters.maxPrice;
+                    const priceFilter = {};
+                    if (analysis.filters.minPrice) priceFilter.$gte = analysis.filters.minPrice;
+                    if (analysis.filters.maxPrice) priceFilter.$lte = analysis.filters.maxPrice;
+                    andConditions.push({ price: priceFilter });
                 }
 
                 // Build Search Query using $or
-                // We search in name, description, category, brand, and highlights
                 const searchTerms = [analysis.corrected, ...analysis.keywords].filter(Boolean);
 
                 if (searchTerms.length > 0) {
@@ -91,21 +142,25 @@ export const getProducts = async (req, res) => {
                             { description: { $regex: term, $options: 'i' } },
                             { category: { $regex: term, $options: 'i' } },
                             { brand: { $regex: term, $options: 'i' } },
-                            { highlights: { $regex: term, $options: 'i' } }
+                            { highlights: { $regex: term, $options: 'i' } },
+                            { cpu_type: { $regex: term, $options: 'i' } },
+                            { screen_size_label: { $regex: term, $options: 'i' } }
                         ]
                     }));
 
-                    // Use $and to ensure at least one of the semantic concepts matches, 
-                    // OR use $or to match ANY of the expanded terms. 
-                    // Usually $or is safer for "expansion" to avoid zero results.
-                    filter.$or = regexConditions.map(c => c.$or).flat();
+                    const searchOr = regexConditions.map(c => c.$or).flat();
+                    andConditions.push({ $or: searchOr });
                 }
 
             } catch (error) {
                 console.error("Smart Search Error (Gemini):", error);
                 // Fallback to basic regex if AI fails
-                filter.name = { $regex: search, $options: 'i' };
+                andConditions.push({ name: { $regex: search, $options: 'i' } });
             }
+        }
+
+        if (andConditions.length > 0) {
+            filter.$and = andConditions;
         }
 
         // Create query with filters
