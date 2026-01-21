@@ -20,12 +20,14 @@ export default function LoginPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(""); // Clear previous errors
         try {
             await login(email, password);
-            router.push("/");
+            // Router push is handled in AuthContext or here if you prefer, but AuthContext already does it.
+            // If AuthContext does it, we don't strictly need it here, but it doesn't hurt.
         } catch (error) {
-            console.log(error);
-            setError("Failed to login");
+            console.error(error);
+            setError(error.message || "Failed to login");
         }
     }
 

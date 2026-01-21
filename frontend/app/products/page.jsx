@@ -1,7 +1,7 @@
 import FilterSidebar from "@/components/products/FilterSidebar";
 import ProductList from "@/components/products/ProductList";
 import SortOptions from "@/components/products/SortOptions";
-import { PaginationControl } from "@/components/ui/usePagination";
+import HybridPaginationProductList from "@/components/products/HybridPaginationProductList";
 import { fetchProducts, fetchFilters } from "@/lib/api";
 
 export default async function ProductsPage({
@@ -45,6 +45,17 @@ export default async function ProductsPage({
         return `/products?${params.toString()}`;
     };
 
+    const searchParamsObj = {
+        page,
+        category,
+        brand,
+        minPrice,
+        maxPrice,
+        sort,
+        cpu_type,
+        screen_size_label
+    };
+
     return (
         <div className="min-h-screen overflow-x-hidden bg-gray-50 p-4 dark:bg-gray-900">
             <div className="max-w-7xl mx-auto">
@@ -64,15 +75,12 @@ export default async function ProductsPage({
                             <p className="text-sm text-gray-500 font-medium">Hiển thị {products.length} sản phẩm</p>
                             <SortOptions />
                         </div>
-                        <ProductList products={products} />
 
-                        <div className="mt-8">
-                            <PaginationControl
-                                currentPage={pagination.page}
-                                totalPages={pagination.totalPages}
-                                createPageUrl={createPageUrl}
-                            />
-                        </div>
+                        <HybridPaginationProductList
+                            initialProducts={products}
+                            initialPagination={pagination}
+                            searchParams={searchParamsObj}
+                        />
                     </div>
                 </div>
             </div>

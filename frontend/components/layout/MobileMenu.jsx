@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, Home, Package, ShoppingBag, User, LogOut, LogIn, UserPlus, ChevronRight, Sun, Moon, Laptop, Smartphone, Watch, Headphones } from "lucide-react";
+import { Menu, Home, Package, ShoppingBag, User, LogOut, LogIn, UserPlus, ChevronRight, Sun, Moon, Laptop, Smartphone, Watch, Headphones, Zap, Search, Briefcase, Monitor, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
+import { MEGA_MENU_DATA } from "@/data/menuData";
 
 export default function MobileMenu({ categories = [], user, logout }) {
     const [open, setOpen] = useState(false);
@@ -27,30 +28,33 @@ export default function MobileMenu({ categories = [], user, logout }) {
                     <span className="sr-only">Toggle menu</span>
                 </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 flex flex-col">
-                <SheetHeader className="p-4 bg-primary text-primary-foreground text-left">
-                    <SheetTitle className="text-white text-lg font-bold">Menu</SheetTitle>
+            <SheetContent side="right" className="w-[320px] sm:w-[380px] p-0 flex flex-col z-[60] overflow-y-auto">
+                <SheetHeader className="p-4 bg-primary text-primary-foreground text-left shadow-md">
+                    <SheetTitle className="text-white text-lg font-bold flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        {user ? "Tài khoản" : "Menu"}
+                    </SheetTitle>
                     {user ? (
                         <div className="flex items-center gap-3 mt-4">
-                            <Avatar className="h-10 w-10 border-2 border-white/20">
+                            <Avatar className="h-12 w-12 border-2 border-white/20">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="bg-white/20 text-white">
+                                <AvatarFallback className="bg-white/20 text-white font-bold text-lg">
                                     {user.name?.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col overflow-hidden">
-                                <span className="font-semibold truncate">{user.name}</span>
+                                <span className="font-bold text-lg truncate">{user.name}</span>
                                 <span className="text-xs text-white/80 truncate">{user.email}</span>
                             </div>
                         </div>
                     ) : (
                         <div className="flex gap-2 mt-4">
-                            <Button variant="secondary" size="sm" className="flex-1" asChild onClick={handleLinkClick}>
+                            <Button variant="secondary" size="sm" className="flex-1 font-semibold shadow-sm" asChild onClick={handleLinkClick}>
                                 <Link href="/login">
                                     <LogIn className="mr-2 h-4 w-4" /> Đăng nhập
                                 </Link>
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1 bg-transparent text-white border-white/30 hover:bg-white/10 hover:text-white" asChild onClick={handleLinkClick}>
+                            <Button variant="outline" size="sm" className="flex-1 bg-transparent text-white border-white/40 hover:bg-white/20 hover:text-white" asChild onClick={handleLinkClick}>
                                 <Link href="/register">
                                     <UserPlus className="mr-2 h-4 w-4" /> Đăng ký
                                 </Link>
@@ -59,111 +63,178 @@ export default function MobileMenu({ categories = [], user, logout }) {
                     )}
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 px-4 py-2">
-                    <div className="space-y-4">
+                <ScrollArea className="flex-1 px-0">
+                    <div className="flex flex-col py-4">
                         {/* Main Navigation */}
-                        <div className="flex flex-col space-y-1">
-                            <Button variant="ghost" className="justify-start font-medium" asChild onClick={handleLinkClick}>
+                        <div className="px-4 space-y-1 mb-2">
+                            <Button variant="ghost" className="w-full justify-start font-medium text-base h-11" asChild onClick={handleLinkClick}>
                                 <Link href="/">
-                                    <Home className="mr-3 h-5 w-5 text-muted-foreground" />
+                                    <Home className="mr-3 h-5 w-5 text-muted-foreground/80" />
                                     Trang chủ
                                 </Link>
                             </Button>
-                            <Button variant="ghost" className="justify-start font-medium" asChild onClick={handleLinkClick}>
-                                <Link href="/products">
-                                    <ShoppingBag className="mr-3 h-5 w-5 text-muted-foreground" />
-                                    Sản phẩm
+
+                            {/* New Links Request */}
+                            <Button variant="ghost" className="w-full justify-start font-medium text-base h-11 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20" asChild onClick={handleLinkClick}>
+                                <Link href="/trade-in">
+                                    <Zap className="mr-3 h-5 w-5" />
+                                    Thu cũ đổi mới
                                 </Link>
                             </Button>
-                            {user && (
-                                <>
-                                    <Button variant="ghost" className="justify-start font-medium" asChild onClick={handleLinkClick}>
-                                        <Link href="/profile">
-                                            <User className="mr-3 h-5 w-5 text-muted-foreground" />
-                                            Tài khoản của tôi
-                                        </Link>
-                                    </Button>
-                                    <Button variant="ghost" className="justify-start font-medium" asChild onClick={handleLinkClick}>
-                                        <Link href="/orders">
-                                            <Package className="mr-3 h-5 w-5 text-muted-foreground" />
-                                            Đơn hàng
-                                        </Link>
-                                    </Button>
-                                </>
-                            )}
+                            <Button variant="ghost" className="w-full justify-start font-medium text-base h-11" asChild onClick={handleLinkClick}>
+                                <Link href="/orders">
+                                    <Package className="mr-3 h-5 w-5 text-muted-foreground/80" />
+                                    Tra cứu đơn hàng
+                                </Link>
+                            </Button>
+
+                            <Button variant="ghost" className="w-full justify-start font-medium text-base h-11" asChild onClick={handleLinkClick}>
+                                <Link href="/products">
+                                    <ShoppingBag className="mr-3 h-5 w-5 text-muted-foreground/80" />
+                                    Tất cả sản phẩm
+                                </Link>
+                            </Button>
                         </div>
 
-                        <Separator />
+                        <Separator className="my-2" />
 
-                        {/* Categories Accordion */}
-                        <div className="space-y-2">
-                            <h4 className="text-sm font-medium text-muted-foreground px-2">Danh mục sản phẩm</h4>
-                            <Accordion type="single" collapsible className="w-full">
-                                <AccordionItem value="categories" className="border-none">
-                                    <AccordionTrigger className="py-2 px-2 hover:bg-accent hover:text-accent-foreground rounded-md">
-                                        <span className="flex items-center">
-                                            <Laptop className="mr-3 h-5 w-5 text-muted-foreground" />
-                                            Tất cả danh mục
+                        {/* Rich Categories Accordion */}
+                        <div className="px-4">
+                            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 px-2 mt-2">Danh mục & Lọc</h4>
+                            <Accordion type="single" collapsible className="w-full space-y-1">
+
+                                {/* Brands */}
+                                <AccordionItem value="brands" className="border rounded-lg px-3 data-[state=open]:bg-accent/50">
+                                    <AccordionTrigger className="py-3 hover:no-underline">
+                                        <span className="flex items-center font-medium">
+                                            <Laptop className="mr-3 h-4 w-4 text-blue-500" />
+                                            Thương hiệu
                                         </span>
                                     </AccordionTrigger>
-                                    <AccordionContent className="pb-0 pt-1">
-                                        <div className="flex flex-col space-y-1 pl-4 border-l ml-4 border-border">
-                                            {categories.map((category) => (
+                                    <AccordionContent className="pt-2 pb-3">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {MEGA_MENU_DATA.brands.map((brand) => (
                                                 <Link
-                                                    key={category}
-                                                    href={`/products?category=${category}`}
-                                                    className="flex items-center py-2 px-2 text-sm text-foreground/80 hover:text-primary hover:bg-accent rounded-md transition-colors"
+                                                    key={brand.label}
+                                                    href={`/products?brand=${brand.value}`}
+                                                    className="flex items-center justify-center p-2 text-sm border rounded-md hover:border-primary hover:text-primary bg-background transition-colors"
                                                     onClick={handleLinkClick}
                                                 >
-                                                    {category}
+                                                    {brand.label}
                                                 </Link>
                                             ))}
-                                            <Link
-                                                href="/products"
-                                                className="flex items-center py-2 px-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                onClick={handleLinkClick}
-                                            >
-                                                Xem tất cả <ChevronRight className="ml-1 h-3 w-3" />
-                                            </Link>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
+
+                                {/* Needs */}
+                                <AccordionItem value="needs" className="border rounded-lg px-3 data-[state=open]:bg-accent/50">
+                                    <AccordionTrigger className="py-3 hover:no-underline">
+                                        <span className="flex items-center font-medium">
+                                            <Briefcase className="mr-3 h-4 w-4 text-orange-500" />
+                                            Nhu cầu sử dụng
+                                        </span>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pt-2 pb-3">
+                                        <div className="flex flex-col space-y-1">
+                                            {MEGA_MENU_DATA.needs.map((item) => (
+                                                <Link
+                                                    key={item.name}
+                                                    href={`/products?category=${encodeURIComponent(item.category)}`}
+                                                    className="flex items-center p-2 rounded-md hover:bg-background transition-colors"
+                                                    onClick={handleLinkClick}
+                                                >
+                                                    <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mr-3">
+                                                        <item.icon className="h-4 w-4" />
+                                                    </div>
+                                                    <span className="text-sm">{item.name}</span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+
+                                {/* Prices */}
+                                <AccordionItem value="prices" className="border rounded-lg px-3 data-[state=open]:bg-accent/50">
+                                    <AccordionTrigger className="py-3 hover:no-underline">
+                                        <span className="flex items-center font-medium">
+                                            <Tag className="mr-3 h-4 w-4 text-green-500" />
+                                            Mức giá
+                                        </span>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pt-2 pb-3">
+                                        <div className="flex flex-col space-y-1">
+                                            {MEGA_MENU_DATA.prices.map((price) => (
+                                                <Link
+                                                    key={price.label}
+                                                    href={`/products?minPrice=${price.min}${price.max ? `&maxPrice=${price.max}` : ''}`}
+                                                    className="block py-2 px-2 text-sm hover:text-primary hover:bg-background rounded-md transition-colors"
+                                                    onClick={handleLinkClick}
+                                                >
+                                                    {price.label}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+
+                                {/* Screens */}
+                                <AccordionItem value="screens" className="border rounded-lg px-3 data-[state=open]:bg-accent/50">
+                                    <AccordionTrigger className="py-3 hover:no-underline">
+                                        <span className="flex items-center font-medium">
+                                            <Monitor className="mr-3 h-4 w-4 text-purple-500" />
+                                            Màn hình
+                                        </span>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pt-2 pb-3">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {MEGA_MENU_DATA.screens.map((screen) => (
+                                                <Link
+                                                    key={screen}
+                                                    href={`/products?screen_size_label=${encodeURIComponent(screen)}`}
+                                                    className="flex items-center justify-center p-2 text-sm border rounded-md hover:border-primary hover:text-primary bg-background transition-colors"
+                                                    onClick={handleLinkClick}
+                                                >
+                                                    {screen}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+
                             </Accordion>
-                        </div>
-
-                        <Separator />
-
-                        {/* Theme Toggle */}
-                        <div className="flex items-center justify-between px-2 py-2">
-                            <span className="text-sm font-medium">Giao diện</span>
-                            <div className="flex items-center bg-secondary rounded-full p-1">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={`h-7 w-7 rounded-full ${theme === 'light' ? 'bg-background shadow-sm' : 'text-muted-foreground'}`}
-                                    onClick={() => setTheme('light')}
-                                >
-                                    <Sun className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={`h-7 w-7 rounded-full ${theme === 'dark' ? 'bg-background shadow-sm' : 'text-muted-foreground'}`}
-                                    onClick={() => setTheme('dark')}
-                                >
-                                    <Moon className="h-4 w-4" />
-                                </Button>
-                            </div>
                         </div>
                     </div>
                 </ScrollArea>
 
-                {/* Footer Actions */}
-                {user && (
-                    <div className="p-4 border-t bg-muted/30">
+                <div className="p-4 border-t bg-muted/20">
+                    {/* Theme Toggle */}
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm font-medium">Giao diện</span>
+                        <div className="flex items-center bg-secondary rounded-full p-1 border">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`h-7 w-7 rounded-full ${theme === 'light' ? 'bg-background shadow-sm text-yellow-500' : 'text-muted-foreground'}`}
+                                onClick={() => setTheme('light')}
+                            >
+                                <Sun className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`h-7 w-7 rounded-full ${theme === 'dark' ? 'bg-background shadow-sm text-blue-400' : 'text-muted-foreground'}`}
+                                onClick={() => setTheme('dark')}
+                            >
+                                <Moon className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    {user && (
                         <Button
                             variant="destructive"
-                            className="w-full justify-start"
+                            className="w-full"
                             onClick={() => {
                                 logout();
                                 setOpen(false);
@@ -172,9 +243,10 @@ export default function MobileMenu({ categories = [], user, logout }) {
                             <LogOut className="mr-2 h-4 w-4" />
                             Đăng xuất
                         </Button>
-                    </div>
-                )}
+                    )}
+                </div>
             </SheetContent>
         </Sheet>
     );
 }
+

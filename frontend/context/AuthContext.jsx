@@ -56,7 +56,15 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({ email, password }),
             });
             if (!res.ok) {
-                throw new Error("Failed to login");
+                // Try to parse error message from server
+                let errorMessage = "Failed to login";
+                try {
+                    const errorData = await res.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    // ignore json parse error
+                }
+                throw new Error(errorMessage);
             }
             const data = await res.json();
             console.log("Login successful", data);
@@ -72,7 +80,8 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             console.log(error);
-            setError("Failed to login");
+            setError(error.message); // Update local error state if needed, though usually better for UI to handle
+            throw error; // Re-throw to let the component handle the UI feedback
         }
     };
 

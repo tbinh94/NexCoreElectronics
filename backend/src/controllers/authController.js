@@ -29,13 +29,13 @@ export const login = async (req, res) => {
         let user = await User.findOne({ email });
         console.log("User found:", user);
         if (!user) {
-            return res.status(400).json({ message: "User not found" });
+            return res.status(400).json({ message: "Tên đăng nhập hoặc mật khẩu không chính xác" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         console.log("Password match:", isMatch);
         if (!isMatch) {
-            return res.status(400).json({ message: "Invalid username or password" });
+            return res.status(400).json({ message: "Tên đăng nhập hoặc mật khẩu không chính xác" });
         }
         const userData = {
             _id: user._id,
