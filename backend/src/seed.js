@@ -1,14 +1,35 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Load env vars first
+dotenv.config();
+
 import Product from "./models/Product.js";
 import User from "./models/User.js";
 import Faq from "./models/Faq.js";
 import connectDB from "./config/db.js";
 import users from "./data/users.js";
 import faqs from "./data/faqs.js";
-import productsData from "./data/products.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const jsonPath = path.join(__dirname, "data/products.json");
+
+console.log(`Reading products from: ${jsonPath}`);
+
+let productsData = [];
+
+try {
+    const rawData = fs.readFileSync(jsonPath, "utf-8");
+    productsData = JSON.parse(rawData);
+    console.log(`Successfully parsed products.json. Found ${productsData.length} items.`);
+} catch (err) {
+    console.error("FATAL: Failed to read/parse products.json", err);
+    process.exit(1);
+}
 
 const inferCpuType = (specs, name) => {
     const cpu = (specs?.cpu || "").toLowerCase();
@@ -31,7 +52,7 @@ const inferCpuType = (specs, name) => {
         if (cpu.includes("m1")) return "Apple M1";
         return "Apple M Series";
     }
-    if (cpu.includes("celeron") || cpu.includes("pentium")) return "Laptop Core i3"; // Group low end
+    if (cpu.includes("celeron") || cpu.includes("pentium")) return "Laptop Core i3";
     return "Khác";
 };
 
@@ -41,18 +62,16 @@ const inferScreenSize = (specs) => {
     if (screen.includes("14.") || screen.includes("14 inch") || screen.includes("14.2")) return "14 inch";
     if (screen.includes("15.") || screen.includes("15.3") || screen.includes("15.6")) return "15.6 inch";
     if (screen.includes("16.") || screen.includes("16 inch") || screen.includes("16.1") || screen.includes("16.2")) return "16 inch";
-    if (screen.includes("17.") || screen.includes("18.")) return "16 inch"; // Group large to 16 inch for filtering simplicity or leave raw
-    if (screen.includes("11.") || screen.includes("12.")) return "13 inch"; // Group small
-    return "15.6 inch"; // Default
+    if (screen.includes("17.") || screen.includes("18.")) return "16 inch";
+    if (screen.includes("11.") || screen.includes("12.")) return "13 inch";
+    return "15.6 inch";
 };
 
 const inferUsage = (p, category) => {
     const uses = [];
     const lowerCat = category.toLowerCase();
     const name = p.name.toLowerCase();
-    // const gpu = (p.specs?.gpu || "").toLowerCase();
 
-    // Map Category to Usage
     if (lowerCat.includes("gaming")) uses.push("Gaming", "Đồ họa - kỹ thuật");
     if (lowerCat.includes("học tập") || lowerCat.includes("văn phòng")) uses.push("Văn phòng", "Sinh viên");
     if (lowerCat.includes("lập trình") || lowerCat.includes("it")) uses.push("Văn phòng", "Đồ họa - kỹ thuật");
@@ -60,7 +79,6 @@ const inferUsage = (p, category) => {
     if (lowerCat.includes("đồ họa") || lowerCat.includes("thiết kế")) uses.push("Đồ họa - kỹ thuật", "Thiết kế");
     if (lowerCat.includes("doanh nghiệp") || lowerCat.includes("business")) uses.push("Doanh nghiệp", "Văn phòng");
 
-    // Check specific specs
     if (name.includes("touch") || name.includes("xoay") || name.includes("flip") || name.includes("2-in-1") || p.specs?.screen?.toLowerCase().includes("touch")) {
         uses.push("Cảm ứng");
     }
@@ -72,7 +90,6 @@ const inferUsage = (p, category) => {
 };
 
 const categorizeProduct = (p) => {
-    // Return explicit category if it matches the new system
     const validCategories = [
         "Gaming",
         "Học tập – Văn phòng",
@@ -91,22 +108,10 @@ const categorizeProduct = (p) => {
     if (p.category === "Office Laptop") return "Học tập – Văn phòng";
     if (p.category === "Workstation") return "Thiết kế – Đồ họa";
 
-    // Fallback logic
-    const getRamDiff = (ramStr) => {
-        const match = ramStr?.match(/(\d+)GB/);
-        return match ? parseInt(match[1]) : 4;
-    };
-    const getWeight = (wStr) => {
-        const match = wStr?.match(/(\d+(\.\d+)?)\s*kg/);
-        return match ? parseFloat(match[1]) : 2.0;
-    };
-
     const name = p.name.toLowerCase();
     const brand = p.brand.toLowerCase();
     const gpu = p.specs?.gpu?.toLowerCase() || "";
-    // const cpu = p.specs?.cpu?.toLowerCase() || "";
-    // const ram = getRamDiff(p.specs?.ram);
-    const weight = getWeight(p.specs?.weight);
+    // const weight = getWeight(p.specs?.weight); // Not strictly needed for logic below if simplified
 
     if (name.includes("macbook")) return "Macbook";
 
@@ -118,17 +123,18 @@ const categorizeProduct = (p) => {
 
     if (name.includes("thinkpad") || name.includes("elitebook") || name.includes("zbook")) return "Doanh nghiệp – Doanh nhân";
 
-    if (weight <= 1.5 || name.includes("air") || name.includes("swift") || name.includes("gram")) return "Mỏng nhẹ – Di động";
+    if (name.includes("air") || name.includes("swift") || name.includes("gram")) return "Mỏng nhẹ – Di động";
 
     return "Học tập – Văn phòng";
 };
 
 
-console.log("Starting seed script...");
+const log = (msg) => console.log(msg);
 
 const importData = async () => {
     try {
         await connectDB();
+        log("Database connected.");
 
         // Transform data
         const processedProducts = productsData.map(p => {
@@ -138,34 +144,53 @@ const importData = async () => {
             const usage = p.usage || inferUsage(p, category);
 
             // Ensure numeric fields
-            const price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
+            let price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
+            if (isNaN(price)) price = 10000000; // 10 million default
+
+            const originalPrice = typeof p.originalPrice === 'string' ? parseFloat(p.originalPrice) : p.originalPrice;
+
+            // Log if description is missing
+            if (!p.description) console.warn(`Warning: Product ${p.id} - ${p.name} missing description`);
+            if (!p.detailedDescription) console.warn(`Warning: Product ${p.id} - ${p.name} missing detailedDescription`);
+
+            // Fallbacks for required fields
+            if (!p.image) console.log(`Notice: Product ${p.id || 'N/A'} - ${p.name} is missing 'image'. Using fallback.`);
+            const image = p.image || "https://loremflickr.com/600/400/laptop?lock=100";
+
+            if (!p.description) console.log(`Notice: Product ${p.id || 'N/A'} - ${p.name} is missing 'description'. Using fallback.`);
+            const description = p.description || "Máy tính xách tay cấu hình cao, phù hợp cho nhiều nhu cầu sử dụng.";
 
             return {
-                ...p,
+                name: p.name || "Sản phẩm Laptop",
                 price: price,
+                originalPrice: isNaN(originalPrice) ? undefined : originalPrice,
+                description: description,
+                detailedDescription: p.detailedDescription || "",
+                image: image,
+                images: p.images && p.images.length > 0 ? p.images : [image],
                 category: category,
+                brand: p.brand || "Generics",
+                countInStock: Number(p.countInStock) || 20,
+                rating: Number(p.rating) || 4.5,
+                reviews: Number(p.reviews) || 10,
+                is_new_product: !!p.is_new_product,
+                highlights: p.highlights || [],
+                specs: p.specs || {},
                 usage: usage,
                 cpu_type: cpuType,
                 screen_size_label: screenSizeLabel,
-                specs: p.specs || {},
-                countInStock: p.countInStock || 20,
-                rating: p.rating || 4.5,
-                reviews: p.reviews || 10,
             };
         });
 
-        console.log(`Processing ${processedProducts.length} products...`);
+        log(`Processing ${processedProducts.length} products...`);
+        fs.writeFileSync("processed_products_debug.json", JSON.stringify(processedProducts.slice(0, 10), null, 2));
 
-        // Log distribution
-        const Distribution = {};
-        processedProducts.forEach(p => {
-            Distribution[p.category] = (Distribution[p.category] || 0) + 1;
-        });
-        console.log("Category Distribution:", Distribution);
+        // Perform Transactions
+        await Product.deleteMany();
+        log("Old products removed.");
 
-        await Product.deleteMany(); // Clear old data
-        await Product.insertMany(processedProducts); // Insert new data
-        console.log(`Imported ${processedProducts.length} products.`);
+        await Product.insertMany(processedProducts);
+        log(`Imported ${processedProducts.length} new products.`);
 
         await User.deleteMany();
         await User.insertMany(users);
@@ -175,10 +200,10 @@ const importData = async () => {
         await Faq.insertMany(faqs);
         console.log("Imported FAQs.");
 
-        console.log("Data Imported!");
+        console.log("Data Import Completed Successfully!");
         process.exit();
     } catch (error) {
-        console.error(`${error}`);
+        console.error("Import Failed:", error);
         process.exit(1);
     }
 };

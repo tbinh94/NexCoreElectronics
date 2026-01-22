@@ -12,11 +12,7 @@ export default function ProductDescription({ product }) {
 
                 <div className="prose prose-lg prose-indigo dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
                     {product.detailedDescription ? (
-                        product.detailedDescription.split('\n\n').map((paragraph, index) => (
-                            <p key={index} className="mb-4 leading-relaxed">
-                                {paragraph}
-                            </p>
-                        ))
+                        <div dangerouslySetInnerHTML={{ __html: product.detailedDescription }} />
                     ) : (
                         <p>Đang cập nhật thông tin chi tiết...</p>
                     )}
