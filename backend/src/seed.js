@@ -24,7 +24,7 @@ let productsData = [];
 
 try {
     const rawData = fs.readFileSync(jsonPath, "utf-8");
-    productsData = JSON.parse(rawData);
+    productsData = JSON.parse(rawData).flat(Infinity);
     console.log(`Successfully parsed products.json. Found ${productsData.length} items.`);
 } catch (err) {
     console.error("FATAL: Failed to read/parse products.json", err);
@@ -69,8 +69,8 @@ const inferScreenSize = (specs) => {
 
 const inferUsage = (p, category) => {
     const uses = [];
-    const lowerCat = category.toLowerCase();
-    const name = p.name.toLowerCase();
+    const lowerCat = (category || "").toLowerCase();
+    const name = (p.name || "").toLowerCase();
 
     if (lowerCat.includes("gaming")) uses.push("Gaming", "Đồ họa - kỹ thuật");
     if (lowerCat.includes("học tập") || lowerCat.includes("văn phòng")) uses.push("Văn phòng", "Sinh viên");
@@ -108,8 +108,8 @@ const categorizeProduct = (p) => {
     if (p.category === "Office Laptop") return "Học tập – Văn phòng";
     if (p.category === "Workstation") return "Thiết kế – Đồ họa";
 
-    const name = p.name.toLowerCase();
-    const brand = p.brand.toLowerCase();
+    const name = (p.name || "").toLowerCase();
+    const brand = (p.brand || "").toLowerCase();
     const gpu = p.specs?.gpu?.toLowerCase() || "";
     // const weight = getWeight(p.specs?.weight); // Not strictly needed for logic below if simplified
 
