@@ -204,8 +204,9 @@ export default function ChatBot() {
                                                             <div className="w-full max-w-[280px] mt-2">
                                                                 <div className="flex gap-3 overflow-x-auto pb-4 -mx-1 px-1 snap-x scrollbar-none">
                                                                     {products.map((product, pIndex) => {
+                                                                        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
                                                                         const imageUrl = product.image && product.image.startsWith('/uploads')
-                                                                            ? product.image
+                                                                            ? `${apiUrl}${product.image}`
                                                                             : (product.image || "/placeholder.svg");
 
                                                                         return (

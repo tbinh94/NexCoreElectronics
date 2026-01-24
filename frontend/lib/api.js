@@ -33,6 +33,7 @@ export async function fetchProducts(params = {}) {
         if (params.exclude) searchParams.set('exclude', params.exclude);
         if (params.cpu_type) searchParams.set('cpu_type', params.cpu_type);
         if (params.screen_size_label) searchParams.set('screen_size_label', params.screen_size_label);
+        if (params.promotion) searchParams.set('promotion', params.promotion);
 
         const res = await fetch(`${API_URL}/products?${searchParams.toString()}`, {
             next: { revalidate: 60 } // Cache for 1 minute

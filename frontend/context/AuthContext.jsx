@@ -96,10 +96,17 @@ export const AuthProvider = ({ children }) => {
         router.push("/login");
     };
 
-    const updateUser = (updatedUserData) => {
-        console.log("Updating user data:", updatedUserData);
-        setUser(updatedUserData);
-        localStorage.setItem("user", JSON.stringify(updatedUserData));
+    const updateUser = (data) => {
+        console.log("Updating user data:", data);
+        const { token: newToken, ...userData } = data;
+
+        setUser(userData);
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        if (newToken) {
+            setToken(newToken);
+            localStorage.setItem("token", newToken);
+        }
     };
 
     return (

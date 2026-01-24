@@ -18,7 +18,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12">
                     {/* Brand & Contact */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">NextGenShop</h3>
+                        <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">NexCore Electronics</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                             Trải nghiệm mua sắm công nghệ đỉnh cao với những sản phẩm mới nhất, chính hãng và giá tốt nhất thị trường.
                         </p>
@@ -33,7 +33,7 @@ export default function Footer() {
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <Mail className="h-4 w-4 text-blue-500" />
-                                <span>support@nextgenshop.com</span>
+                                <span>support@nexcore.com</span>
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@ export default function Footer() {
                 <div className="border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
-                            © {new Date().getFullYear()} NextGenShop. Bảo lưu mọi quyền.
+                            © {new Date().getFullYear()} NexCore Electronics. Bảo lưu mọi quyền.
                         </div>
 
                         {/* Security Badges */}

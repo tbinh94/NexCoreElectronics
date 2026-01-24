@@ -13,40 +13,71 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
 
-const slides = [
-    {
-        id: 1,
-        image: "/bannerPC.png", // Fallback or actual image
-        title: "Siêu Sale Mùa Hè",
-        subtitle: "Giảm giá lên đến 50% cho các sản phẩm công nghệ hot nhất năm nay.",
-        cta: "Khám phá deal hôm nay",
-        link: "/products?promotion=true",
-        bgClass: "bg-gradient-to-r from-blue-900 to-blue-600"
-    },
-    {
-        id: 2,
-        image: "/banner_green.png",
-        title: "Công Nghệ Xanh",
-        subtitle: "Các dòng Laptop tiết kiệm điện, thân thiện môi trường.",
-        cta: "Khám phá ngay",
-        link: "/products?category=Ultrabook",
-        bgClass: "bg-gradient-to-r from-emerald-800 to-emerald-500"
-    },
-    {
-        id: 3,
-        image: "/banner_purple.png",
-        title: "Gaming Gear Đỉnh Cao",
-        subtitle: "Nâng tầm trải nghiệm chơi game với bộ sưu tập mới nhất.",
-        cta: "Mua ngay",
-        link: "/products?category=Gaming%20Laptop",
-        bgClass: "bg-gradient-to-r from-violet-900 to-violet-600"
-    }
-];
+import { MEGA_MENU_DATA } from "@/data/menuData";
+import { useState, useEffect } from "react";
 
 export default function HeroBanner() {
     const plugin = useRef(
         Autoplay({ delay: 4000, stopOnInteraction: true, loop: true })
     );
+
+    const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 59, seconds: 59 });
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const diff = endOfDay - now;
+
+            if (diff <= 0) {
+                setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
+            } else {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                setTimeLeft({ hours, minutes, seconds });
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    // Brand of the week logic
+    const currentWeek = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+    const brandIndex = currentWeek % MEGA_MENU_DATA.brands.length;
+    const brandOfTheWeek = MEGA_MENU_DATA.brands[brandIndex];
+
+    const slides = [
+        {
+            id: 1,
+            image: "/bannerPC.png",
+            title: `Tuần Lễ ${brandOfTheWeek.label}`,
+            subtitle: `Giảm giá cực sốc lên đến 30% cho toàn bộ sản phẩm thương hiệu ${brandOfTheWeek.label}.`,
+            cta: "Săn deal ngay",
+            link: `/products?brand=${brandOfTheWeek.value}`,
+            bgClass: "bg-gradient-to-r from-blue-900 to-blue-600"
+        },
+        {
+            id: 2,
+            image: "/banner_green.png",
+            title: "Laptop AI - Kỷ Nguyên Mới",
+            subtitle: "Trải nghiệm sức mạnh trí tuệ nhân tạo trên các dòng Laptop mới nhất 2024.",
+            cta: "Khám phá ngay",
+            link: "/products?category=Laptop AI",
+            bgClass: "bg-gradient-to-r from-emerald-800 to-emerald-500"
+        },
+        {
+            id: 3,
+            image: "/banner_purple.png",
+            title: "Gaming Gear Đỉnh Cao",
+            subtitle: "Nâng tầm trải nghiệm chơi game với các dòng Laptop Gaming mạnh mẽ nhất.",
+            cta: "Chiến ngay",
+            link: "/products?category=Gaming",
+            bgClass: "bg-gradient-to-r from-violet-900 to-violet-600"
+        }
+    ];
 
     return (
         <section className="w-full py-4">
@@ -102,7 +133,7 @@ export default function HeroBanner() {
                 {/* Side Banners (Right - 1/3 width) */}
                 <div className="hidden lg:flex flex-col gap-4 h-full">
                     {/* Top Side Banner */}
-                    <div className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
+                    <Link href="/products?promotion=true" className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
                         <div className="absolute inset-0 bg-linear-to-r from-orange-400 to-red-500"></div>
                         <Image
                             src="/banner_flash_sale.png"
@@ -111,17 +142,24 @@ export default function HeroBanner() {
                             className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500 mix-blend-overlay"
                         />
                         <div className="absolute inset-0 p-6 flex flex-col justify-center text-white">
-                            <span className="text-sm font-bold uppercase tracking-wider mb-1 bg-white/20 w-fit px-2 py-1 rounded">Hot Deal</span>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-sm font-bold uppercase tracking-wider bg-white/20 w-fit px-2 py-1 rounded">Hot Deal</span>
+                                <div className="flex items-center gap-1 text-xs font-mono bg-black/30 px-2 py-1 rounded">
+                                    <span>{String(timeLeft.hours).padStart(2, '0')}</span>:
+                                    <span>{String(timeLeft.minutes).padStart(2, '0')}</span>:
+                                    <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
+                                </div>
+                            </div>
                             <h3 className="text-2xl font-bold mb-2">Flash Sale 24h</h3>
                             <p className="text-sm text-white/90 mb-4">Săn deal giá sốc mỗi ngày</p>
-                            <Link href="/products?promotion=true" className="text-sm font-bold underline decoration-2 underline-offset-4 hover:text-white/80">
+                            <div className="text-sm font-bold underline decoration-2 underline-offset-4 hover:text-white/80">
                                 Xem ngay &rarr;
-                            </Link>
+                            </div>
                         </div>
-                    </div>
+                    </Link>
 
                     {/* Bottom Side Banner */}
-                    <div className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
+                    <Link href="/services" className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
                         <div className="absolute inset-0 bg-linear-to-br from-slate-800 to-black"></div>
                         <Image
                             src="/banner_vip.png"
@@ -133,11 +171,11 @@ export default function HeroBanner() {
                             <span className="text-sm font-bold uppercase tracking-wider mb-1 bg-yellow-500/20 text-yellow-300 w-fit px-2 py-1 rounded">Premium</span>
                             <h3 className="text-2xl font-bold mb-2">Đặc quyền VIP</h3>
                             <p className="text-sm text-white/90 mb-4">Miễn phí vận chuyển & Bảo hành tận nơi</p>
-                            <Link href="/services" className="text-sm font-bold underline decoration-2 underline-offset-4 hover:text-white/80">
+                            <div className="text-sm font-bold underline decoration-2 underline-offset-4 hover:text-white/80">
                                 Tìm hiểu thêm &rarr;
-                            </Link>
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </section>

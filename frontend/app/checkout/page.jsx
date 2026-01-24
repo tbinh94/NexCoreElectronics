@@ -138,10 +138,6 @@ export default function CheckoutPage() {
 
             if (res.ok) {
                 setOrderSuccess(true);
-                if (formData.paymentMethod === 'cash') {
-                    alert("Đặt hàng thành công!");
-                    router.push("/orders");
-                }
             } else {
                 alert("Đặt hàng thất bại");
             }
@@ -153,17 +149,51 @@ export default function CheckoutPage() {
 
     if (loading) return <p className="text-center py-10">Đang tải...</p>;
 
-    if (orderSuccess && formData.paymentMethod === 'transfer') {
+    if (orderSuccess) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-                <h2 className="text-2xl font-bold text-green-600">Đặt hàng thành công!</h2>
-                <p>Vui lòng quét mã QR dưới đây để thanh toán</p>
-                <div className="p-4 border rounded-lg shadow-sm bg-white text-center">
-                    <p className="mb-4 font-semibold">Tổng tiền: {formatPrice(totalPrice)}</p>
-                    <VietQRImage amount={totalPrice} />
-                    <Button variant="link" onClick={() => router.push("/orders")} className="mt-4">
-                        Xem đơn hàng của tôi
-                    </Button>
+            <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
+                <div className="bg-white dark:bg-card p-8 rounded-2xl shadow-xl border border-green-100 dark:border-green-900/30 animate-in zoom-in duration-300">
+                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Đặt hàng thành công!</h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-8">
+                        Cảm ơn bạn đã tin tưởng NexCore Electronics. Mã đơn hàng của bạn đã được hệ thống ghi nhận.
+                    </p>
+
+                    {formData.paymentMethod === 'transfer' ? (
+                        <div className="space-y-6">
+                            <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
+                                <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-4">Vui lòng quét mã QR để hoàn tất thanh toán</p>
+                                <div className="flex justify-center mb-4">
+                                    <VietQRImage amount={totalPrice} />
+                                </div>
+                                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">Tổng tiền: {formatPrice(totalPrice)}</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 mb-8">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-gray-500 dark:text-gray-400">Phương thức:</span>
+                                <span className="font-semibold">Thanh toán khi nhận hàng (COD)</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-500 dark:text-gray-400">Tổng cộng:</span>
+                                <span className="font-bold text-red-600">{formatPrice(totalPrice)}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                        <Button onClick={() => router.push("/orders")} className="bg-primary hover:bg-primary/90 px-8">
+                            Xem đơn hàng
+                        </Button>
+                        <Button variant="outline" onClick={() => router.push("/")} className="px-8">
+                            Tiếp tục mua sắm
+                        </Button>
+                    </div>
                 </div>
             </div>
         );

@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 export default function ProfilePage() {
-    const { user, logout, loading, updateUser } = useAuth();
+    const { user, token, logout, loading, updateUser } = useAuth();
     const router = useRouter();
 
     const [isEditing, setIsEditing] = useState(false);
@@ -59,8 +59,6 @@ export default function ProfilePage() {
             }
 
             // 2. Update profile
-            const token = localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null;
-
             const res = await fetch(`/api/auth/profile`, {
                 method: "PUT",
                 headers: {

@@ -60,7 +60,7 @@ export default function ProductList({ products }) {
                                     {isBrandOfTheWeek ? (
                                         <>
                                             <div className="flex items-center gap-2">
-                                                <p className="text-lg font-bold text-red-600 dark:text-red-400">
+                                                <p className="text-sm md:text-lg font-bold text-red-600 dark:text-red-400">
                                                     {formatPrice(product.price * 0.7)}
                                                 </p>
                                                 <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
@@ -69,6 +69,20 @@ export default function ProductList({ products }) {
                                             </div>
                                             <p className="text-sm text-gray-400 line-through">
                                                 {formatPrice(product.price)}
+                                            </p>
+                                        </>
+                                    ) : product.originalPrice && product.originalPrice > product.price ? (
+                                        <>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm md:text-lg font-bold text-red-600 dark:text-red-400">
+                                                    {formatPrice(product.price)}
+                                                </p>
+                                                <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                                    -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-400 line-through">
+                                                {formatPrice(product.originalPrice)}
                                             </p>
                                         </>
                                     ) : (

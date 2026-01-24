@@ -25,16 +25,16 @@ export default function Header({ categories }) {
         <header className="sticky top-0 z-50 w-full shadow-md">
             {/* Top Main Header - Primary Color Background */}
             <div className="bg-primary text-primary-foreground w-full py-3">
-                <Container className="flex h-16 items-center justify-between gap-8">
+                <Container className="flex h-10 md:h-20 items-center justify-between gap-8">
                     {/* Logo */}
                     <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
                         <Image
-                            src="/logo_v2.png"
-                            alt="NextGenShop Logo"
-                            width={220}
-                            height={80}
+                            src="/logo1.png"
+                            alt="NexCore Logo"
+                            width={400}
+                            height={120}
                             priority
-                            className="h-16 md:h-24 w-auto object-contain"
+                            className="h-20 md:h-28 w-auto object-contain bg-blue-500"
                         />
                     </Link>
 
