@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { Star, Quote } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 import {
     Carousel,
     CarouselContent,
@@ -47,6 +49,10 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+    const plugin = useRef(
+        Autoplay({ delay: 4000, stopOnInteraction: true })
+    );
+
     return (
         <section className="py-12 bg-gray-50 dark:bg-gray-900/50 rounded-3xl w-full">
             <div className="container px-4 md:px-6">
@@ -64,6 +70,9 @@ export default function Testimonials() {
                         align: "start",
                         loop: true,
                     }}
+                    plugins={[plugin.current]}
+                    onMouseEnter={plugin.current.stop}
+                    onMouseLeave={plugin.current.reset}
                     className="w-full max-w-5xl mx-auto"
                 >
                     <CarouselContent className="-ml-2 md:-ml-4">
