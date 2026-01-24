@@ -19,4 +19,13 @@ router.post("/login", login);
 // @access  Private
 router.put("/profile", protect, updateProfile);
 
+// @route   POST api/auth/google
+// @desc    Google login
+// @access  Public
+router.post("/google", (req, res, next) => {
+    import("../controllers/authController.js").then(module => {
+        module.googleLogin(req, res, next);
+    }).catch(next);
+});
+
 export default router;

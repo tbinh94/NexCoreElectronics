@@ -2,6 +2,12 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+    });
+};
+
 export const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -84,8 +90,57 @@ export const updateProfile = async (req, res) => {
     }
 };
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: "30d",
-    });
+export const googleLogin = async (req, res) => {
+    try {
+        const { credential, clientId } = req.body;
+        const { OAuth2Client } = await import('google-auth-library');
+        const client = new OAuth2Client(clientId);
+
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: clientId,
+        });
+        const payload = ticket.getPayload();
+        const { email, name, picture } = payload;
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            // User exists, log them in
+            const token = generateToken(user._id);
+            const userData = {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                isAdmin: user.isAdmin
+            };
+            return res.status(200).json({ token, user: userData });
+        } else {
+            // User doesn't exist, create new user
+            const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+            user = await User.create({
+                name,
+                email,
+                password: hashedPassword,
+                avatar: picture
+            });
+
+            const token = generateToken(user._id);
+            const userData = {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                isAdmin: user.isAdmin
+            };
+            return res.status(201).json({ token, user: userData });
+        }
+    } catch (error) {
+        console.error("Google Login Error:", error);
+        return res.status(500).json({ message: "Google Login Failed" });
+    }
 };

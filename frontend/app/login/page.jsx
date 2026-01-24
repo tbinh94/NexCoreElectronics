@@ -7,6 +7,8 @@ import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
+import { GoogleLogin } from '@react-oauth/google';
+
 export default function LoginPage() {
     const { login } = useAuth();
     const router = useRouter();
@@ -79,9 +81,21 @@ export default function LoginPage() {
                         <Button type="submit" className="w-full cursor-pointer">
                             Đăng nhập
                         </Button>
-                        <Button variant="outline" className="w-full">
-                            Đăng nhập bằng Google
-                        </Button>
+                        <div className="flex justify-center w-full">
+                            <GoogleLogin
+                                onSuccess={async (credentialResponse) => {
+                                    try {
+                                        await login(null, null, credentialResponse.credential);
+                                    } catch (err) {
+                                        setError("Google Login Failed");
+                                    }
+                                }}
+                                onError={() => {
+                                    setError("Google Login Failed");
+                                }}
+                                useOneTap
+                            />
+                        </div>
                     </form>
                     <div className="mt-4 text-center text-sm">
                         Chưa có tài khoản?{" "}

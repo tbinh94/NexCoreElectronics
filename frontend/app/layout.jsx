@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/context/CartContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import ChatBot from "@/components/features/ChatBot";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -38,15 +39,17 @@ export default async function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <AuthProvider>
-                        <CartProvider>
-                            <MainLayoutWrapper categories={filters.categories}>
-                                {children}
-                            </MainLayoutWrapper>
-                            <ChatBot />
-                            <Toaster />
-                        </CartProvider>
-                    </AuthProvider>
+                    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+                        <AuthProvider>
+                            <CartProvider>
+                                <MainLayoutWrapper categories={filters.categories}>
+                                    {children}
+                                </MainLayoutWrapper>
+                                <ChatBot />
+                                <Toaster />
+                            </CartProvider>
+                        </AuthProvider>
+                    </GoogleOAuthProvider>
                 </ThemeProvider>
             </body>
         </html>

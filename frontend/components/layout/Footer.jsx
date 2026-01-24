@@ -25,7 +25,7 @@ export default function Footer() {
                         <div className="space-y-2 pt-2">
                             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <MapPin className="h-4 w-4 text-blue-500" />
-                                <span>123 Đường Công Nghệ, Q.1, TP.HCM</span>
+                                <span>123 Hàm Nghi, Q.1, TP.HCM</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <Phone className="h-4 w-4 text-blue-500" />

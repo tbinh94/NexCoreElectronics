@@ -46,14 +46,17 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (email, password, credential = null) => {
         try {
-            const res = await fetch("/api/auth/login", {
+            const url = credential ? "/api/auth/google" : "/api/auth/login";
+            const body = credential ? { credential, clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID } : { email, password };
+
+            const res = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify(body),
             });
             if (!res.ok) {
                 // Try to parse error message from server
