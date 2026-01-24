@@ -112,18 +112,12 @@ export default function ProfilePage() {
                         <div className="relative flex justify-between items-end -mt-12 mb-6">
                             <div className="flex items-end relative group">
                                 <div className="h-24 w-24 rounded-full ring-4 ring-white dark:ring-card bg-white dark:bg-card flex items-center justify-center shadow-lg overflow-hidden relative">
-                                    {previewAvatar || user.avatar ? (
-                                        <Image
-                                            src={previewAvatar || user.avatar}
-                                            alt={user.name}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    ) : (
-                                        <div className="h-full w-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 text-3xl font-bold">
-                                            {user.name?.charAt(0).toUpperCase()}
-                                        </div>
-                                    )}
+                                    <Image
+                                        src={previewAvatar || user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                                        alt={user.name}
+                                        fill
+                                        className="object-cover"
+                                    />
 
                                     {isEditing && (
                                         <div

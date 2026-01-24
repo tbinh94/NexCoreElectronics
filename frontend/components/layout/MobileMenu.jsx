@@ -20,6 +20,11 @@ export default function MobileMenu({ categories = [], user, logout }) {
         setOpen(false);
     };
 
+    // Brand of the week logic
+    const currentWeek = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+    const brandIndex = currentWeek % MEGA_MENU_DATA.brands.length;
+    const brandOfTheWeek = MEGA_MENU_DATA.brands[brandIndex];
+
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -29,37 +34,37 @@ export default function MobileMenu({ categories = [], user, logout }) {
                 </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[320px] sm:w-[380px] p-0 flex flex-col z-[60] overflow-y-auto">
-                <SheetHeader className="p-4 bg-primary text-primary-foreground text-left shadow-md">
-                    <SheetTitle className="text-white text-lg font-bold flex items-center gap-2">
-                        <User className="h-5 w-5" />
-                        {user ? "Tài khoản" : "Menu"}
-                    </SheetTitle>
+                <SheetHeader className="h-[88px] px-4 bg-primary text-primary-foreground text-left shadow-md flex flex-col justify-center shrink-0">
+                    <div className="flex items-center justify-between w-full">
+                        <SheetTitle className="text-white text-lg font-bold flex items-center gap-2">
+                            <User className="h-5 w-5" />
+                            {user ? "Tài khoản" : "Menu"}
+                        </SheetTitle>
+                    </div>
                     {user ? (
-                        <Link href="/profile" onClick={handleLinkClick}>
-                            <div className="flex items-center gap-3 mt-4 p-2 -mx-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
-                                <Avatar className="h-12 w-12 border-2 border-white/20">
-                                    <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="bg-white/20 text-white font-bold text-lg">
-                                        {user.name?.charAt(0).toUpperCase()}
+                        <Link href="/profile" onClick={handleLinkClick} className="mt-1">
+                            <div className="flex items-center gap-2 hover:bg-white/10 transition-colors cursor-pointer rounded-md p-1 -ml-1">
+                                <Avatar className="h-8 w-8 border border-white/20">
+                                    <AvatarImage src={user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} alt={user.name} className="object-cover" />
+                                    <AvatarFallback className="bg-white/20 text-white font-bold text-xs">
+                                        <User className="h-4 w-4" />
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col overflow-hidden">
-                                    <span className="font-bold text-lg truncate">{user.name}</span>
-                                    <span className="text-xs text-white/80 truncate">{user.email}</span>
-                                    <span className="text-xs text-secondary-foreground/80 font-medium mt-1">Xem hồ sơ</span>
+                                    <span className="font-bold text-sm truncate">{user.name}</span>
                                 </div>
                             </div>
                         </Link>
                     ) : (
-                        <div className="flex gap-2 mt-4">
-                            <Button variant="secondary" size="sm" className="flex-1 font-semibold shadow-sm" asChild onClick={handleLinkClick}>
+                        <div className="flex gap-2 mt-1">
+                            <Button variant="secondary" size="sm" className="h-8 px-3 text-xs font-semibold shadow-sm" asChild onClick={handleLinkClick}>
                                 <Link href="/login">
-                                    <LogIn className="mr-2 h-4 w-4" /> Đăng nhập
+                                    <LogIn className="mr-1.5 h-3.5 w-3.5" /> Đăng nhập
                                 </Link>
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1 bg-transparent text-white border-white/40 hover:bg-white/20 hover:text-white" asChild onClick={handleLinkClick}>
+                            <Button variant="outline" size="sm" className="h-8 px-3 text-xs bg-transparent text-white border-white/40 hover:bg-white/20 hover:text-white" asChild onClick={handleLinkClick}>
                                 <Link href="/register">
-                                    <UserPlus className="mr-2 h-4 w-4" /> Đăng ký
+                                    <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Đăng ký
                                 </Link>
                             </Button>
                         </div>
@@ -100,6 +105,23 @@ export default function MobileMenu({ categories = [], user, logout }) {
                         </div>
 
                         <Separator className="my-2" />
+
+                        {/* Promo Banner - Brand of the Week */}
+                        <div className="px-4 mb-4">
+                            <div className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white relative overflow-hidden group shadow-md">
+                                <div className="relative z-10">
+                                    <p className="font-bold text-base">Tuần lễ {brandOfTheWeek.label}</p>
+                                    <p className="text-xs text-blue-100 mb-2">Giảm ngay 30% toàn bộ sản phẩm</p>
+                                    <Link href={`/products?brand=${brandOfTheWeek.value}`} onClick={handleLinkClick}>
+                                        <Button size="sm" variant="secondary" className="h-7 px-3 text-[10px] bg-white text-blue-700 hover:bg-blue-50 border-none font-bold">
+                                            Xem ngay
+                                        </Button>
+                                    </Link>
+                                </div>
+                                <div className="absolute right-0 top-0 w-16 h-full bg-white/10 skew-x-12 translate-x-4 group-hover:translate-x-2 transition-transform"></div>
+                                <Tag className="absolute -right-2 -bottom-2 h-12 w-12 text-white/10 -rotate-12" />
+                            </div>
+                        </div>
 
                         {/* Rich Categories Accordion */}
                         <div className="px-4">
