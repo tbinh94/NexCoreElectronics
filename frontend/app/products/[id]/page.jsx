@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import ProductDetailClient from "@/components/products/ProductDetailClient";
 import RelatedProducts from "@/components/products/RelatedProducts";
-import { fetchProductById, fetchProducts } from "@/lib/api";
+import { fetchProductById, fetchProducts, fetchReviews } from "@/lib/api";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -19,10 +19,17 @@ import {
 export default async function ProductPage({ params }) {
     const { id } = await params;
     const product = await fetchProductById(id);
+    const reviews = await fetchReviews(id);
 
     if (!product) {
         notFound();
     }
+
+    // Calculate real stats
+    const realReviewCount = reviews.length;
+    const realRating = realReviewCount > 0
+        ? (reviews.reduce((acc, r) => acc + r.rating, 0) / realReviewCount).toFixed(1)
+        : 0;
 
     const relatedProductsData = await fetchProducts({
         category: product.category,
@@ -60,10 +67,10 @@ export default async function ProductPage({ params }) {
                     <div className="flex items-center gap-4">
                         <div className="flex items-center text-amber-500">
                             <Star className="w-5 h-5 fill-amber-500" />
-                            <span className="ml-1 font-bold text-base">{product.rating}</span>
+                            <span className="ml-1 font-bold text-base">{realRating > 0 ? realRating : "Chưa có đánh giá"}</span>
                             <span className="text-gray-400 mx-2">|</span>
                             <span className="text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-                                {product.reviews} Đánh giá
+                                {realReviewCount} Đánh giá
                             </span>
                         </div>
                         <span className="hidden sm:inline text-gray-300">|</span>
@@ -79,8 +86,8 @@ export default async function ProductPage({ params }) {
                 </div>
             </div>
 
-            <ProductDetailClient product={product} />
+            <ProductDetailClient product={{ ...product, rating: realRating, reviews: realReviewCount }} />
             <RelatedProducts products={relatedProductsData.products} />
-        </Container>
+        </Container >
     );
 }

@@ -52,7 +52,7 @@ export default function ProfilePage() {
                     body: formData,
                 });
 
-                if (!uploadRes.ok) throw new Error("Failed to upload avatar");
+                if (!uploadRes.ok) throw new Error("Tải ảnh đại diện thất bại");
 
                 const uploadData = await uploadRes.json();
                 avatarUrl = uploadData.image;
@@ -76,7 +76,7 @@ export default function ProfilePage() {
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
                 console.error("Update profile failed:", res.status, errorData);
-                throw new Error(errorData.message || `Failed to update profile (${res.status})`);
+                throw new Error(errorData.message || `Cập nhật hồ sơ thất bại (${res.status})`);
             }
 
             const updatedUser = await res.json();
@@ -238,7 +238,7 @@ export default function ProfilePage() {
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Ngày tham gia</p>
                                     <p className="font-medium text-gray-900 dark:text-gray-100">
-                                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
+                                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}
                                     </p>
                                 </div>
                             </div>

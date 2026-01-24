@@ -117,14 +117,26 @@ export default function CategoryNavBar({ categories = [] }) {
 
                                         {/* Promo Banner inside Dropdown */}
                                         <div className="mt-auto p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white relative overflow-hidden group">
-                                            <div className="relative z-10">
-                                                <p className="font-bold text-lg">Đại tiệc công nghệ</p>
-                                                <p className="text-sm text-blue-100 mb-2">Giảm tới 50% cho Laptop Gaming</p>
-                                                <Button size="sm" variant="secondary" className="h-8 text-xs bg-white text-blue-700 hover:bg-blue-50 border-none">
-                                                    Xem ngay
-                                                </Button>
-                                            </div>
-                                            <div className="absolute right-0 top-0 w-24 h-full bg-white/10 skew-x-12 translate-x-8 group-hover:translate-x-4 transition-transform"></div>
+                                            {(() => {
+                                                const currentWeek = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+                                                const brandIndex = currentWeek % MEGA_MENU_DATA.brands.length;
+                                                const brandOfTheWeek = MEGA_MENU_DATA.brands[brandIndex];
+
+                                                return (
+                                                    <>
+                                                        <div className="relative z-10">
+                                                            <p className="font-bold text-lg">Tuần lễ {brandOfTheWeek.label}</p>
+                                                            <p className="text-sm text-blue-100 mb-2">Giảm ngay 30% toàn bộ sản phẩm</p>
+                                                            <Link href={`/products?brand=${brandOfTheWeek.value}`}>
+                                                                <Button size="sm" variant="secondary" className="h-8 text-xs bg-white text-blue-700 hover:bg-blue-50 border-none">
+                                                                    Xem ngay
+                                                                </Button>
+                                                            </Link>
+                                                        </div>
+                                                        <div className="absolute right-0 top-0 w-24 h-full bg-white/10 skew-x-12 translate-x-8 group-hover:translate-x-4 transition-transform"></div>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
 

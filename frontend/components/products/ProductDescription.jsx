@@ -62,7 +62,7 @@ export default function ProductDescription({ product }) {
                             </div>
                             <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
                                 <dt className="font-medium text-gray-900 dark:text-white text-sm">Đánh giá</dt>
-                                <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400">{product.rating} / 5 ({product.reviews} reviews)</dd>
+                                <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400">{product.rating} / 5 ({product.reviews} đánh giá)</dd>
                             </div>
                         </dl>
                     </div>

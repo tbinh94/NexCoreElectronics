@@ -28,6 +28,26 @@
             "Sạc MagSafe 3 quay lại",
             "Pin 18 giờ"
         ],
+        "variants": [
+            {
+                "name": "256GB",
+                "price": 26990000,
+                "originalPrice": 28990000,
+                "inStock": true
+            },
+            {
+                "name": "512GB",
+                "price": 27990000,
+                "originalPrice": 29490000,
+                "inStock": true
+            },
+            {
+                "name": "1TB",
+                "price": 28990000,
+                "originalPrice": 29990000,
+                "inStock": true
+            }
+        ],
         "detailedDescription": "<div class=\"detailed-review\">\n    <h2>Đánh giá chi tiết MacBook Air M2: Chuẩn mực Ultrabook thế hệ mới</h2>\n    <p>MacBook Air M2 là cuộc lột xác toàn diện nhất của dòng Air kể từ năm 2008. Apple đã từ bỏ thiết kế vát mỏng hình nêm kinh điển để chuyển sang ngôn ngữ phẳng, vuông vức, đồng bộ với dòng MacBook Pro 14/16 inch.</p>\n\n    <h3>Thiết kế: Mỏng, Nhẹ và Sang trọng</h3>\n    <p>Với độ mỏng chỉ 11.3 mm và trọng lượng 1.24 kg, chiếc máy này mang lại cảm giác cầm nắm cực kỳ chắc chắn nhưng vẫn nhẹ nhàng. Phiên bản màu Midnight (Xanh đen) tạo nên cơn sốt bởi vẻ đẹp huyền bí, dù người dùng cần lưu ý nó khá dễ bám vân tay. Cổng sạc MagSafe 3 đã quay trở lại, không chỉ giúp sạc an toàn hơn (tự ngắt khi vấp dây) mà còn giải phóng một cổng Thunderbolt cho các thiết bị ngoại vi.</p>\n\n    <h3>Màn hình Liquid Retina: Trải nghiệm thị giác nâng cấp</h3>\n    <p>Viền màn hình mỏng hơn giúp kích thước hiển thị tăng lên 13.6 inch. Tấm nền Liquid Retina với độ sáng 500 nits (sáng hơn 25% so với M1) và hỗ trợ 1 tỷ màu giúp hình ảnh rực rỡ, sắc nét ngay cả khi dùng ngoài trời. Phần notch (tai thỏ) chứa webcam 1080p giúp các cuộc gọi video sắc nét hơn hẳn, và bạn sẽ nhanh chóng quên đi sự tồn tại của nó chỉ sau vài giờ sử dụng.</p>\n\n    <h3>Hiệu năng M2: Mạnh mẽ trong sự tĩnh lặng</h3>\n    <p>Con chip M2 mang lại hiệu năng CPU nhanh hơn 18% và GPU nhanh hơn 35% so với M1. Điểm đặc trưng của dòng Air là thiết kế không quạt (fanless), giúp máy hoạt động hoàn toàn im lặng. Nó xử lý mượt mà các tác vụ văn phòng, chỉnh sửa ảnh RAW hay dựng video 4K layer đơn giản. Tuy nhiên, nếu render nặng liên tục quá 20 phút, máy sẽ nóng lên và giảm xung để bảo vệ linh kiện.</p>\n\n    <h3>Tổng kết</h3>\n    <p>MacBook Air M2 là chiếc laptop hoàn hảo cho 90% người dùng: Đẹp, sang, màn hình xuất sắc và pin \"trâu\" lên tới 18 tiếng.</p>\n</div>"
     },
     {

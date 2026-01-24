@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
             });
             if (!res.ok) {
                 // Try to parse error message from server
-                let errorMessage = "Failed to login";
+                let errorMessage = "Đăng nhập thất bại";
                 try {
                     const errorData = await res.json();
                     errorMessage = errorData.message || errorMessage;
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem("token", data.token); // Store token as raw string
                 router.push("/");
             } else {
-                throw new Error("Invalid response from server: missing user or token");
+                throw new Error("Phản hồi không hợp lệ từ máy chủ: thiếu thông tin người dùng hoặc token");
             }
         } catch (error) {
             console.log(error);

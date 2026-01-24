@@ -58,18 +58,18 @@ export default function RegisterPage() {
             <div className="flex items-center justify-center py-12">
                 <div className="mx-auto grid w-[350px] gap-6">
                     <div className="grid gap-2 text-center">
-                        <h1 className="text-3xl font-bold">Register</h1>
+                        <h1 className="text-3xl font-bold">Đăng ký</h1>
                         <p className="text-balance text-muted-foreground">
-                            Enter your email below to register to your account
+                            Nhập thông tin bên dưới để tạo tài khoản
                         </p>
                     </div>
                     <form onSubmit={handleSubmit} className="grid gap-4">
                         <div className='grid gap-2'>
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">Họ tên</Label>
                             <Input
                                 id="name"
                                 type="text"
-                                placeholder="Your name"
+                                placeholder="Họ tên của bạn"
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -87,32 +87,32 @@ export default function RegisterPage() {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">Mật khẩu</Label>
                             <div className='relative'>
-                                <Input id="password" type={passwordVisible ? "text" : "password"} required placeholder="Your password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                <Input id="password" type={passwordVisible ? "text" : "password"} required placeholder="Mật khẩu của bạn" value={password} onChange={(e) => setPassword(e.target.value)} />
                                 <Button type="button" onClick={toggleVisibility} variant="outline" className='absolute bg-transparent border-none right-0 top-1/2 -translate-y-1/2'>
                                     {passwordVisible ? <Eye /> : <EyeOff />}
                                 </Button>
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="confirm-password">Confirm Password</Label>
+                            <Label htmlFor="confirm-password">Xác nhận mật khẩu</Label>
                             <div className='relative'>
-                                <Input id="confirm-password" type={rePasswordVisible ? "text" : "password"} required placeholder="Confirm your password" value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
+                                <Input id="confirm-password" type={rePasswordVisible ? "text" : "password"} required placeholder="Nhập lại mật khẩu" value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
                                 <Button type="button" onClick={toggleReVisibility} variant="outline" className='absolute bg-transparent border-none right-0 top-1/2 -translate-y-1/2'>
                                     {rePasswordVisible ? <Eye /> : <EyeOff />}
                                 </Button>
                             </div>
                         </div>
-                        {isInvalid && <p className="text-red-500">Passwords do not match</p>}
+                        {isInvalid && <p className="text-red-500">Mật khẩu không khớp</p>}
                         <Button disabled={isInvalid} className="w-full cursor-pointer">
-                            Register
+                            Đăng ký
                         </Button>
                     </form>
                     <div className="mt-4 text-center text-sm">
-                        Already have an account?{" "}
+                        Đã có tài khoản?{" "}
                         <Link href="/login" className="underline">
-                            Login
+                            Đăng nhập ngay
                         </Link>
                     </div>
                 </div>

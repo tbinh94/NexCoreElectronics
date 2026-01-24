@@ -36,9 +36,9 @@ export default function LoginPage() {
             <div className="flex items-center justify-center py-12">
                 <div className="mx-auto grid w-[350px] gap-6">
                     <div className="grid gap-2 text-center">
-                        <h1 className="text-3xl font-bold">Login</h1>
+                        <h1 className="text-3xl font-bold">Đăng nhập</h1>
                         <p className="text-balance text-muted-foreground">
-                            Enter your email below to login to your account
+                            Nhập email của bạn để đăng nhập vào tài khoản
                         </p>
                     </div>
                     {error && <p className="text-sm text-red-500 text-center">{error}</p>}
@@ -56,16 +56,16 @@ export default function LoginPage() {
                         </div>
                         <div className="grid gap-2">
                             <div className="flex items-center">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="password">Mật khẩu</Label>
                                 <Link
                                     href="/forgot-password"
                                     className="ml-auto inline-block text-sm underline"
                                 >
-                                    Forgot your password?
+                                    Quên mật khẩu?
                                 </Link>
                             </div>
                             <div className='relative'>
-                                <Input placeholder='Your password' id="password" type={passwordVisible ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} />
+                                <Input placeholder='Mật khẩu của bạn' id="password" type={passwordVisible ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} />
                                 <Button
                                     type="button"
                                     onClick={toggleVisibility}
@@ -77,16 +77,16 @@ export default function LoginPage() {
                             </div>
                         </div>
                         <Button type="submit" className="w-full cursor-pointer">
-                            Login
+                            Đăng nhập
                         </Button>
                         <Button variant="outline" className="w-full">
-                            Login with Google
+                            Đăng nhập bằng Google
                         </Button>
                     </form>
                     <div className="mt-4 text-center text-sm">
-                        Don&apos;t have an account?{" "}
+                        Chưa có tài khoản?{" "}
                         <Link href="/register" className="underline">
-                            Sign up
+                            Đăng ký ngay
                         </Link>
                     </div>
                 </div>

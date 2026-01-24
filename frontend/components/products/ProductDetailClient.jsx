@@ -14,20 +14,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ProductDetailClient({ product }) {
+    console.log("ProductDetailClient product:", product);
     const searchParams = useSearchParams();
     const initialType = searchParams.get('type') === 'used' ? 'used' : 'new';
 
     const [selectedCondition, setSelectedCondition] = useState(initialType);
     const [selectedStorage, setSelectedStorage] = useState('256GB');
-    const [selectedColor, setSelectedColor] = useState('Titan Tự Nhiên');
+    const storageOptions = ['256GB', '512GB', '1TB'];
 
-    // Mock images for colors - in a real app this would come from product variants
+    // Mock images for colors
     const colorImages = {
         'Titan Tự Nhiên': product.image,
         'Titan Xanh': "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
         'Titan Đen': "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"
     };
 
+    const [selectedColor, setSelectedColor] = useState('Titan Tự Nhiên');
     const [selectedImage, setSelectedImage] = useState(product.image);
 
     const { addToCart } = useCart();
@@ -48,15 +50,15 @@ export default function ProductDetailClient({ product }) {
             router.push('/login');
             return;
         }
-        setBuyingNow(true);
-        try {
-            await addToCart(product._id, selectedCondition);
-            router.push('/cart');
-        } catch (error) {
-            toast.error("Có lỗi xảy ra");
-        } finally {
-            setBuyingNow(false);
-        }
+
+        // Direct checkout flow
+        const query = new URLSearchParams({
+            productId: product._id,
+            type: selectedCondition,
+            variant: selectedStorage
+        });
+
+        router.push(`/checkout?${query.toString()}`);
     };
 
     const handleAddToCart = async () => {
@@ -73,13 +75,23 @@ export default function ProductDetailClient({ product }) {
         }
     };
 
-    const formattedPrice = formatPrice(product.price);
-    const oldPrice = formatPrice(product.price * 1.1);
-    const tradeInPrice = formatPrice(product.price * 0.85);
+    // Pricing Logic (Rule-based)
+    // New: Base + (Index * 1,000,000)
+    // Used: (Base * 0.6) + (Index * 500,000)
 
-    // Used Price Logic
-    const usedPrice = Math.round(product.price * 0.6);
-    const formattedUsedPrice = formatPrice(usedPrice);
+    const storageIndex = storageOptions.indexOf(selectedStorage);
+
+    const baseNewPrice = product.price;
+    const currentNewPrice = baseNewPrice + (storageIndex * 1000000);
+
+    const baseUsedPrice = Math.round(product.price * 0.6);
+    const currentUsedPrice = baseUsedPrice + (storageIndex * 500000);
+
+    const formattedPrice = formatPrice(currentNewPrice);
+    const formattedUsedPrice = formatPrice(currentUsedPrice);
+
+    const oldPrice = formatPrice(currentNewPrice * 1.1); // Fake original price
+    const tradeInPrice = formatPrice(currentNewPrice * 0.85);
 
     return (
         <div className="space-y-10">
@@ -139,8 +151,8 @@ export default function ProductDetailClient({ product }) {
                             <div
                                 onClick={() => setSelectedCondition('new')}
                                 className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedCondition === 'new'
-                                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 ring-1 ring-blue-500'
-                                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 ring-1 ring-blue-500'
+                                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                     }`}
                             >
                                 {selectedCondition === 'new' && (
@@ -157,8 +169,8 @@ export default function ProductDetailClient({ product }) {
                             <div
                                 onClick={() => setSelectedCondition('used')}
                                 className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedCondition === 'used'
-                                        ? 'bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500'
-                                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-red-300'
+                                    ? 'bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500'
+                                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-red-300'
                                     }`}
                             >
                                 <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
@@ -204,7 +216,7 @@ export default function ProductDetailClient({ product }) {
                     <div>
                         <h3 className="font-bold text-sm mb-3">Phiên bản</h3>
                         <div className="flex flex-wrap gap-3">
-                            {['256GB', '512GB', '1TB'].map((size) => (
+                            {storageOptions.map((size) => (
                                 <button
                                     key={size}
                                     onClick={() => setSelectedStorage(size)}

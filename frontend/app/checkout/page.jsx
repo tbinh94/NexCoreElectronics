@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { fetchProductById } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,27 +25,75 @@ export default function CheckoutPage() {
     });
     const [orderSuccess, setOrderSuccess] = useState(false);
 
-    // Fetch cart to calculate total
+    const searchParams = useSearchParams();
+    const directProductId = searchParams.get('productId');
+    const directVariant = searchParams.get('variant');
+    const directType = searchParams.get('type');
+
+    // Fetch cart or direct product
     useEffect(() => {
-        const fetchCart = async () => {
+        const fetchData = async () => {
             if (!user) return;
-            try {
-                const res = await fetch(`/api/cart/${user._id}`);
-                const data = await res.json();
-                if (data && data.products) {
-                    setCartItems(data.products);
+
+            if (directProductId) {
+                try {
+                    const product = await fetchProductById(directProductId);
+                    if (product) {
+                        setCartItems([{
+                            productId: product,
+                            quantity: 1,
+                            variant: directVariant,
+                            type: directType
+                        }]);
+                    }
+                } catch (error) {
+                    console.error("Error fetching direct product:", error);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
+            } else {
+                const fetchCart = async () => {
+                    try {
+                        const res = await fetch(`/api/cart/${user._id}`);
+                        const data = await res.json();
+                        if (data && data.products) {
+                            setCartItems(data.products);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchCart();
             }
         };
-        fetchCart();
-    }, [user]);
+        fetchData();
+    }, [user, directProductId, directVariant, directType]);
 
     const totalPrice = cartItems.reduce((acc, item) => {
-        return acc + (item.productId?.price || 0) * item.quantity;
+        let price = item.productId?.price || 0;
+        const storageOptions = ['256GB', '512GB', '1TB'];
+
+        // Handle variant price (Rule-based)
+        if (item.variant) {
+            const index = storageOptions.indexOf(item.variant);
+            if (index !== -1) {
+                if (item.type === 'used') {
+                    // Used: (Base * 0.6) + (Index * 500,000)
+                    const baseUsedPrice = Math.round(price * 0.6);
+                    price = baseUsedPrice + (index * 500000);
+                } else {
+                    // New: Base + (Index * 1,000,000)
+                    price = price + (index * 1000000);
+                }
+            }
+        } else if (item.type === 'used') {
+            // Fallback if no variant but type is used
+            price = Math.round(price * 0.6);
+        }
+
+        return acc + price * item.quantity;
     }, 0);
 
     const handleInputChange = (e) => {
@@ -77,13 +126,18 @@ export default function CheckoutPage() {
                         city: formData.city,
                         phone: formData.phone
                     },
-                    paymentMethod: formData.paymentMethod
+                    paymentMethod: formData.paymentMethod,
+                    items: cartItems.map(item => ({
+                        productId: item.productId._id,
+                        quantity: item.quantity,
+                        variant: item.variant,
+                        type: item.type
+                    }))
                 })
             });
 
             if (res.ok) {
                 setOrderSuccess(true);
-                // If cash, redirect or show success
                 if (formData.paymentMethod === 'cash') {
                     alert("Đặt hàng thành công!");
                     router.push("/orders");
@@ -186,9 +240,38 @@ export default function CheckoutPage() {
                     <h3 className="font-bold text-xl mb-4">Đơn hàng của bạn</h3>
                     <div className="space-y-4 max-h-[400px] overflow-auto pr-2">
                         {cartItems.map((item) => (
-                            <div key={item._id} className="flex justify-between text-sm">
-                                <span>{item.productId?.name} x {item.quantity}</span>
-                                <span className="font-medium">{formatPrice((item.productId?.price || 0) * item.quantity)}</span>
+                            <div key={item.productId?._id || Math.random()} className="flex justify-between text-sm">
+                                <span>
+                                    {item.productId?.name}
+                                    {item.variant && <span className="text-gray-500"> ({item.variant})</span>}
+                                    {item.type === 'used' && <span className="text-red-500"> (Cũ)</span>}
+                                    x {item.quantity}
+                                </span>
+                                <span className="font-medium">
+                                    {(() => {
+                                        let price = item.productId?.price || 0;
+                                        const storageOptions = ['256GB', '512GB', '1TB'];
+
+                                        // Handle variant price (Rule-based)
+                                        if (item.variant) {
+                                            const index = storageOptions.indexOf(item.variant);
+                                            if (index !== -1) {
+                                                if (item.type === 'used') {
+                                                    // Used: (Base * 0.6) + (Index * 500,000)
+                                                    const baseUsedPrice = Math.round(price * 0.6);
+                                                    price = baseUsedPrice + (index * 500000);
+                                                } else {
+                                                    // New: Base + (Index * 1,000,000)
+                                                    price = price + (index * 1000000);
+                                                }
+                                            }
+                                        } else if (item.type === 'used') {
+                                            // Fallback if no variant but type is used
+                                            price = Math.round(price * 0.6);
+                                        }
+                                        return formatPrice(price * item.quantity);
+                                    })()}
+                                </span>
                             </div>
                         ))}
                     </div>

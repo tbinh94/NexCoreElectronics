@@ -179,6 +179,7 @@ const importData = async () => {
                 usage: usage,
                 cpu_type: cpuType,
                 screen_size_label: screenSizeLabel,
+                variants: p.variants || []
             };
         });
 

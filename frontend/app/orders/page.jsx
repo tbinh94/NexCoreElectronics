@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import OrderDetail from "@/components/orders/OrderDetail";
 import { Calendar, Phone, MapPin, Package, CreditCard, ShoppingBag, Truck } from 'lucide-react';
 import { LocateFixed } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 const getStatusConfig = (status) => {
     const configs = {
@@ -19,24 +20,31 @@ const getStatusConfig = (status) => {
 };
 
 export default function Orders() {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user) {
-            setLoading(true);
-            fetch(`/api/orders/${user._id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data)) setOrders(data);
-                    else console.error("Data is not an array:", data);
-                })
-                .finally(() => setLoading(false));
-        }
-    }, [user]);
+        if (authLoading) return;
 
-    if (loading) {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        setLoading(true);
+        fetch(`/api/orders/${user._id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) setOrders(data);
+                else console.error("Dữ liệu không hợp lệ:", data);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+    }, [user, authLoading, router]);
+
+    if (loading || authLoading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
                 <div className="max-w-5xl mx-auto">

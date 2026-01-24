@@ -108,22 +108,22 @@ export default function Footer() {
                 <div className="border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
-                            © {new Date().getFullYear()} NextGenShop. All rights reserved.
+                            © {new Date().getFullYear()} NextGenShop. Bảo lưu mọi quyền.
                         </div>
 
                         {/* Security Badges */}
                         <div className="flex items-center gap-6">
                             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400" title="Bảo mật SSL">
                                 <Lock className="h-5 w-5" />
-                                <span className="text-xs font-medium">SSL Secured</span>
+                                <span className="text-xs font-medium">Bảo mật SSL</span>
                             </div>
                             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400" title="Thanh toán an toàn">
                                 <CreditCard className="h-5 w-5" />
-                                <span className="text-xs font-medium">Safe Payment</span>
+                                <span className="text-xs font-medium">Thanh toán an toàn</span>
                             </div>
                             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400" title="Đảm bảo chất lượng">
                                 <ShieldCheck className="h-5 w-5" />
-                                <span className="text-xs font-medium">100% Authentic</span>
+                                <span className="text-xs font-medium">100% Chính hãng</span>
                             </div>
                         </div>
                     </div>

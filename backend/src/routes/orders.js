@@ -7,28 +7,65 @@ import Product from "../models/Product.js";
 router.post("/", async (req, res) => {
     console.log("Received order request:", req.body);
     try {
-        const { userId, shippingAddress, paymentMethod } = req.body;
-        const cart = await Cart.findOne({ userId });
-        console.log("Found cart:", cart);
+        const { userId, shippingAddress, paymentMethod, items } = req.body;
 
-        if (!cart || cart.products.length === 0) {
-            return res.status(400).json({ message: "Cart is empty" });
+        let orderItemsData = [];
+        let isCartOrder = false;
+
+        if (items && items.length > 0) {
+            orderItemsData = items;
+        } else {
+            const cart = await Cart.findOne({ userId });
+            if (!cart || cart.products.length === 0) {
+                return res.status(400).json({ message: "Cart is empty" });
+            }
+            orderItemsData = cart.products;
+            isCartOrder = true;
         }
 
         let totalAmount = 0;
         const orderProducts = [];
 
-        for (const item of cart.products) {
-            const product = await Product.findById(item.productId);
+        for (const item of orderItemsData) {
+            // item.productId might be an object if passed from frontend, or ID if from cart
+            const productId = item.productId._id || item.productId;
+            const product = await Product.findById(productId);
+
             if (!product) {
-                console.log("Product not found:", item.productId);
+                console.log("Product not found:", productId);
                 return res.status(404).json({ message: "Product not found" });
             }
+
+            let price = product.price;
+
+            // Variant pricing
+            if (item.variant && product.variants && product.variants.length > 0) {
+                const variant = product.variants.find(v => v.name === item.variant);
+                if (variant) price = variant.price;
+            }
+
+            // Used pricing
+            if (item.type === 'used') {
+                if (product.variants && product.variants.length > 0) {
+                    const index = product.variants.findIndex(v => v.name === item.variant);
+                    // Fallback if variant not found but type is used?
+                    if (index !== -1) {
+                        const firstVariantPrice = product.variants[0].price;
+                        const firstVariantUsedPrice = Math.round(firstVariantPrice * 0.6);
+                        price = firstVariantUsedPrice + (index * 500000);
+                    } else {
+                        price = Math.round(price * 0.6);
+                    }
+                } else {
+                    price = Math.round(price * 0.6);
+                }
+            }
+
             orderProducts.push({
-                productId: item.productId,
+                productId: productId,
                 quantity: item.quantity
             });
-            totalAmount += item.quantity * product.price;
+            totalAmount += item.quantity * price;
         }
 
         console.log("Creating order with total:", totalAmount);
@@ -36,8 +73,6 @@ router.post("/", async (req, res) => {
         // Calculate estimated delivery date
         const deliveryDate = new Date();
         const city = shippingAddress.city || "";
-        // Simple logic: HCM/South = 2 days, Others = 5 days
-        // In a real app, use a proper distance/shipping API
         if (city.includes("Hồ Chí Minh") || city.includes("HCM")) {
             deliveryDate.setDate(deliveryDate.getDate() + 2);
         } else {
@@ -56,8 +91,10 @@ router.post("/", async (req, res) => {
         await newOrder.save();
         console.log("Order saved:", newOrder._id);
 
-        await Cart.deleteOne({ userId });
-        console.log("Cart cleared");
+        if (isCartOrder) {
+            await Cart.deleteOne({ userId });
+            console.log("Cart cleared");
+        }
 
         res.status(201).json(newOrder);
     } catch (error) {

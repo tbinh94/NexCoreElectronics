@@ -52,7 +52,7 @@ export async function fetchProducts(params = {}) {
 export async function fetchProductById(id) {
     try {
         const res = await fetch(`${API_URL}/products/${id}`, {
-            next: { revalidate: 60 }
+            cache: 'no-store'
         });
 
         if (!res.ok) {
@@ -63,5 +63,22 @@ export async function fetchProductById(id) {
     } catch (error) {
         console.error(`Error fetching product ${id} from ${API_URL}/products/${id}:`, error);
         return null;
+    }
+}
+
+export async function fetchReviews(productId) {
+    try {
+        const res = await fetch(`${API_URL}/reviews/${productId}`, {
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            return [];
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error(`Error fetching reviews for ${productId}:`, error);
+        return [];
     }
 }
