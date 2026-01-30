@@ -35,14 +35,23 @@ export const chatWithAI = async (req, res) => {
         User Message: "${message}"
         
         Return ONLY a raw JSON object (no markdown formatting) with the following fields:
-        - keyword: (string) Main product keyword (e.g., "laptop", "iphone", "mouse"). If generic, leave null.
+        - keyword: (string) Main product keyword (e.g., "laptop", "iphone", "mouse", "gaming"). If generic, leave null.
         - category: (string) Product category if mentioned (e.g., "Laptop", "Smartphone", "Tablet", "Accessories").
         - brand: (string) Brand name if mentioned (e.g., "Apple", "Dell", "Samsung").
-        - minPrice: (number) Minimum price in VND if mentioned.
+        - minPrice: (number) Minimum price in VND if mentioned. 
         - maxPrice: (number) Maximum price in VND if mentioned.
         - sort: (string) "price_asc", "price_desc", or "newest" if implied.
         
-        Example JSON: {"keyword": "gaming", "category": "Laptop", "minPrice": 10000000, "maxPrice": 20000000, "brand": "Asus"}
+        CRITICAL RULES FOR PRICE:
+        1. If user says "tầm 15 triệu" or "khoảng 15 triệu" or "15tr":
+           - Set minPrice = 13500000 (15m - 10%)
+           - Set maxPrice = 16500000 (15m + 10%)
+        2. If user says "dưới 15 triệu": set maxPrice = 15000000.
+        3. If user says "trên 15 triệu": set minPrice = 15000000.
+        4. If user says just a number like "17 triệu" in context of price update:
+           - Treat it as "around 17 million" -> min: 15.3m, max: 18.7m.
+
+        Example JSON: {"keyword": "gaming", "category": "Laptop", "minPrice": 13500000, "maxPrice": 16500000, "brand": "Asus"}
         If no specific criteria are found, return empty object {}.
         `;
 
@@ -110,7 +119,7 @@ Description: ${p.description ? p.description.substring(0, 150) + "..." : "N/A"}
 `).join("\n---\n") : "Không tìm thấy sản phẩm nào khớp với tiêu chí tìm kiếm của bạn trong kho hàng.";
 
         const prompt = `
-Bạn là trợ lý ảo bán hàng chuyên nghiệp (AI Sales Assistant) của cửa hàng NextGen Electronics.
+Bạn là trợ lý ảo bán hàng chuyên nghiệp (AI Sales Assistant) của cửa hàng Nexcore Electronics.
 Nhiệm vụ của bạn là tư vấn, giải đáp thắc mắc và hỗ trợ khách hàng chọn mua sản phẩm công nghệ phù hợp nhất.
 
 Dưới đây là danh sách sản phẩm ĐÃ ĐƯỢC LỌC theo yêu cầu của khách (Context):
@@ -121,7 +130,9 @@ HƯỚNG DẪN TRẢ LỜI:
 1.  **Phân tích & Tư vấn**:
     -   Dựa vào Context, hãy giới thiệu các sản phẩm phù hợp nhất với câu hỏi: "${message}".
     -   Nếu khách hỏi về giá, cấu hình, hãy trả lời chi tiết dựa trên thông tin có sẵn.
-    -   Nếu không có sản phẩm nào trong Context, hãy xin lỗi và gợi ý khách tìm kiếm chung chung hơn.
+    -   **QUAN TRỌNG:** Nếu Context ghi "Không tìm thấy sản phẩm nào...", BẠN PHẢI TRẢ LỜI THẬT LÒNG là hiện chưa có mẫu khớp chính xác yêu cầu đó. 
+        - ĐỪNG BỊA RA SẢN PHẨM KHÔNG CÓ TRONG CONTEXT.
+        - Thay vào đó, hãy gợi ý khách tìm các dòng khác hoặc mức giá khác hợp lý hơn.
 
 2.  **Phong cách**:
     -   Thân thiện, chuyên nghiệp, ngắn gọn.
@@ -131,6 +142,7 @@ HƯỚNG DẪN TRẢ LỜI:
     -   Phần trả lời text: Sử dụng Markdown (in đậm **tên sản phẩm**, gạch đầu dòng -).
     -   **Khối JSON sản phẩm**:
         -   Nếu có gợi ý sản phẩm từ Context, BẮT BUỘC phải đặt khối JSON ở **CUỐI CÙNG** câu trả lời.
+        -   Tuyệt đối KHÔNG trả về JSON nếu không có sản phẩm nào trong Context.
         -   Cấu trúc JSON:
         \`\`\`json
         [
