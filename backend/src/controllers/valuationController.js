@@ -9,7 +9,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export const estimateLaptopValue = async (req, res) => {
     try {
         console.log("Valuation request received");
-        const { modelCode, modelName, specs, operationStatus, repairHistory, fanNoise, batteryLife, overheating } = req.body;
+        const { modelCode, modelName, specs, operationStatus, repairHistory, yearsUsed, fanNoise, batteryLife, overheating } = req.body;
         const files = req.files;
         console.log("Files received:", files ? files.length : 0);
 
@@ -53,6 +53,7 @@ export const estimateLaptopValue = async (req, res) => {
         - Cấu hình (có thể không đầy đủ): ${specs}
         - Tình trạng hoạt động: ${operationStatus}
         - Lịch sử sửa chữa: ${repairHistory}
+        - Thời gian đã sử dụng: ${req.body.yearsUsed || "Không rõ"} năm
 
         Thông tin bổ sung:
         - Quạt: ${fanNoise || "Không rõ"}
@@ -83,8 +84,10 @@ export const estimateLaptopValue = async (req, res) => {
 
         4. PHÂN TÍCH RỦI RO SỬ DỤNG
         - Dựa trên:
-        + Tuổi đời model
+        + Tuổi đời model và THỜI GIAN ĐÃ SỬ DỤNG (${req.body.yearsUsed || "?"} năm).
         + Pin, quạt, nhiệt độ
+        - Máy dùng > 3 năm: Rủi ro trung bình/cao (Pin/SSD có thể kém).
+        - Máy dùng > 5 năm: Rủi ro cao.
         - Ước lượng rủi ro hỏng trong 6–12 tháng tới (thấp / trung bình / cao).
 
         5. ƯỚC LƯỢNG GIÁ THỊ TRƯỜNG (KHÔNG SEARCH)
@@ -95,17 +98,31 @@ export const estimateLaptopValue = async (req, res) => {
         - Nếu không chắc chắn → đưa RA KHOẢNG GIÁ.
 
         6. TÍNH GIÁ THU MUA (TRADE-IN)
-        - Giá thu = giá thị trường * (70% → 80%)
+        - Giá thu = giá thị trường * (45% → 70%) tuỳ thuộc vào ngoại hình (Grade) và THỜI GIAN SỬ DỤNG:
+          + Grade A (Như mới, dùng < 1 năm): 65% - 70%
+          + Grade B (Xước nhẹ, dùng 1-3 năm): 55% - 65%
+          + Grade C (Cấn/Xước nhiều, dùng > 3 năm): 45% - 55%
+          + Grade D (Xấu/Lỗi): < 45%
         - Trừ thêm:
         + Lỗi phần cứng
-        + Ngoại hình xấu
-        + Rủi ro hỏng sớm
+        + Rủi ro hỏng sớm (đặc biệt nếu dùng lâu)
         - Mỗi khoản trừ PHẢI được giải thích.
+
+        -------------------------
+        BƯỚC 0: KIỂM TRA ĐỐI TƯỢNG (QUAN TRỌNG NHẤT)
+        - Quan sát kỹ hình ảnh.
+        - Nếu hình ảnh KHÔNG PHẢI LÀ LAPTOP (ví dụ: điện thoại, xe cộ, động vật, người, hoặc vật dụng khác...), 
+          HÃY DỪNG NGAY VÀ TRẢ VỀ JSON SAU:
+          {
+            "error": "NOT_A_LAPTOP",
+            "message": "Hình ảnh bạn cung cấp có vẻ không phải là laptop. Vui lòng kiểm tra lại."
+          }
+        -------------------------
 
         -------------------------
         YÊU CẦU ĐẦU RA (JSON ONLY – KHÔNG THÊM CHỮ)
         -------------------------
-
+        Nếu là laptop, trả về:
         {
         "condition_grade": "A | B | C | D",
         "condition_details": "Mô tả ngắn gọn nhưng cụ thể về ngoại hình và tình trạng máy dựa trên ảnh",

@@ -19,6 +19,7 @@ export default function TradeInPage() {
         specs: "",
         operationStatus: "Hoạt động bình thường",
         repairHistory: "Chưa sửa",
+        yearsUsed: "",
         fanNoise: "",
         batteryLife: "",
         overheating: "",
@@ -111,6 +112,7 @@ export default function TradeInPage() {
             data.append("specs", formData.specs);
             data.append("operationStatus", formData.operationStatus);
             data.append("repairHistory", formData.repairHistory);
+            data.append("yearsUsed", formData.yearsUsed);
             data.append("fanNoise", formData.fanNoise);
             data.append("batteryLife", formData.batteryLife);
             data.append("overheating", formData.overheating);
@@ -133,6 +135,13 @@ export default function TradeInPage() {
             }
 
             const valuationResult = await response.json();
+
+            if (valuationResult.error === 'NOT_A_LAPTOP') {
+                toast.error(valuationResult.message);
+                setResult(null); // Clear any previous result
+                return;
+            }
+
             setResult(valuationResult);
             toast.success("Định giá thành công!");
         } catch (error) {
@@ -257,8 +266,23 @@ export default function TradeInPage() {
                                 </div>
 
                                 <div className="space-y-2 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                                    <Label className="text-blue-700 dark:text-blue-300">Câu hỏi phụ (Tùy chọn)</Label>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                                    <Label className="text-blue-700 dark:text-blue-300">Thông tin sử dụng</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                                        <div className="space-y-1">
+                                            <Label htmlFor="yearsUsed" className="text-xs font-normal">Đã dùng bao lâu (năm)?</Label>
+                                            <Input
+                                                id="yearsUsed"
+                                                name="yearsUsed"
+                                                placeholder="VD: 2.5"
+                                                value={formData.yearsUsed}
+                                                onChange={handleInputChange}
+                                                className="h-8 text-sm"
+                                                disabled={!user}
+                                                type="number"
+                                                step="0.5"
+                                                min="0"
+                                            />
+                                        </div>
                                         <div className="space-y-1">
                                             <Label htmlFor="fanNoise" className="text-xs font-normal">Quạt có ồn khi dùng lâu?</Label>
                                             <Input
@@ -399,13 +423,19 @@ export default function TradeInPage() {
                                     <div className="flex justify-between items-end mb-2">
                                         <span className="text-sm text-gray-500">Giá thị trường ước tính:</span>
                                         <span className="font-medium text-gray-900 dark:text-gray-100">
-                                            {formatCurrency(result.market_price_estimate)}
+                                            {typeof result.market_price_estimate === 'object' ?
+                                                `${formatCurrency(result.market_price_estimate.low)} - ${formatCurrency(result.market_price_estimate.high)}` :
+                                                formatCurrency(result.market_price_estimate)
+                                            }
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-end">
                                         <span className="font-bold text-gray-900 dark:text-white">Giá thu mua đề xuất:</span>
                                         <span className="text-2xl font-bold text-blue-600">
-                                            {formatCurrency(result.trade_in_value)}
+                                            {typeof result.trade_in_value === 'object' ?
+                                                formatCurrency(result.trade_in_value.recommended) :
+                                                formatCurrency(result.trade_in_value)
+                                            }
                                         </span>
                                     </div>
                                 </div>
