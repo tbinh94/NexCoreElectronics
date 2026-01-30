@@ -34,7 +34,7 @@ export default function Header({ categories }) {
                             width={400}
                             height={120}
                             priority
-                            className="h-20 md:h-28 w-auto object-contain bg-blue-500"
+                            className="h-20 md:h-28 w-auto object-contain"
                         />
                     </Link>
 
