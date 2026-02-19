@@ -4,13 +4,20 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package, ShoppingCart, Users, TrendingUp } from "lucide-react";
 
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
         revenue: 0,
         orders: 0,
         products: 0,
         customers: 0,
-        recentOrders: []
+        revenueGrowth: 0,
+        ordersGrowth: 0,
+        productsGrowth: 0,
+        customersGrowth: 0,
+        recentOrders: [],
+        revenueChart: []
     });
     const [loading, setLoading] = useState(true);
 
@@ -30,7 +37,12 @@ export default function AdminDashboard() {
                     orders: 0,
                     products: 0,
                     customers: 0,
-                    recentOrders: []
+                    revenueGrowth: 0,
+                    ordersGrowth: 0,
+                    productsGrowth: 0,
+                    customersGrowth: 0,
+                    recentOrders: [],
+                    revenueChart: []
                 });
             } finally {
                 setLoading(false);
@@ -44,34 +56,38 @@ export default function AdminDashboard() {
         {
             title: "Tổng doanh thu",
             value: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats.revenue),
-            change: "+12.5%", // Placeholder for now
+            change: `${stats.revenueGrowth >= 0 ? '+' : ''}${stats.revenueGrowth?.toFixed(1) || 0}%`,
             icon: DollarSign,
             color: "text-green-600",
             bg: "bg-green-100",
+            trend: stats.revenueGrowth >= 0 ? "up" : "down"
         },
         {
             title: "Đơn hàng",
             value: stats.orders,
-            change: "+4.3%",
+            change: `${stats.ordersGrowth >= 0 ? '+' : ''}${stats.ordersGrowth?.toFixed(1) || 0}%`,
             icon: ShoppingCart,
             color: "text-blue-600",
             bg: "bg-blue-100",
+            trend: stats.ordersGrowth >= 0 ? "up" : "down"
         },
         {
             title: "Sản phẩm",
             value: stats.products,
-            change: "+1.2%",
+            change: `${stats.productsGrowth >= 0 ? '+' : ''}${stats.productsGrowth?.toFixed(1) || 0}%`,
             icon: Package,
             color: "text-orange-600",
             bg: "bg-orange-100",
+            trend: stats.productsGrowth >= 0 ? "up" : "down"
         },
         {
             title: "Khách hàng",
             value: stats.customers,
-            change: "+8.1%",
+            change: `${stats.customersGrowth >= 0 ? '+' : ''}${stats.customersGrowth?.toFixed(1) || 0}%`,
             icon: Users,
             color: "text-purple-600",
             bg: "bg-purple-100",
+            trend: stats.customersGrowth >= 0 ? "up" : "down"
         },
     ];
 
@@ -82,27 +98,27 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">Chào mừng trở lại! Đây là tổng quan cửa hàng của bạn hôm nay.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-900">Dashboard</h1>
+                <p className="text-gray-500 dark:text-gray-500 mt-2">Chào mừng trở lại! Đây là tổng quan cửa hàng của bạn hôm nay.</p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, index) => (
-                    <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-card">
+                    <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-white bg-white">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-500">
                                 {stat.title}
                             </CardTitle>
-                            <div className={`p-2 rounded-lg ${stat.bg} dark:bg-opacity-20`}>
+                            <div className={`p-2 rounded-lg ${stat.bg} dark:bg-opacity-100`}>
                                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3 text-green-500" />
-                                <span className="text-green-600 dark:text-green-400 font-medium">{stat.change}</span> so với tháng trước
+                            <div className="text-2xl font-bold text-gray-900 dark:text-gray-900">{stat.value}</div>
+                            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
+                                <TrendingUp className={`h-3 w-3 ${stat.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
+                                <span className={`${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'} font-medium`}>{stat.change}</span> so với hôm qua
                             </p>
                         </CardContent>
                     </Card>
@@ -111,41 +127,64 @@ export default function AdminDashboard() {
 
             {/* Recent Activity Section */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border-none shadow-sm dark:bg-card">
+                <Card className="col-span-4 border-none shadow-sm dark:bg-white bg-white">
                     <CardHeader>
-                        <CardTitle className="dark:text-white">Biểu đồ doanh thu</CardTitle>
+                        <CardTitle className="text-gray-900 dark:text-gray-900">Doanh thu 7 ngày qua</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[200px] flex items-center justify-center text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-md border border-dashed dark:border-gray-700">
-                            Biểu đồ sẽ được tích hợp tại đây
+                        <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={stats.revenueChart || []}>
+                                    <XAxis
+                                        dataKey="name"
+                                        stroke="#888888"
+                                        fontSize={12}
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <YAxis
+                                        stroke="#888888"
+                                        fontSize={12}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
+                                    />
+                                    <Tooltip
+                                        formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
+                                        cursor={{ fill: 'transparent' }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                    />
+                                    <Bar dataKey="revenue" fill="#2563eb" radius={[4, 4, 0, 0]} barSize={40} />
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="col-span-3 border-none shadow-sm dark:bg-card">
+                <Card className="col-span-3 border-none shadow-sm dark:bg-white bg-white">
                     <CardHeader>
-                        <CardTitle className="dark:text-white">Đơn hàng gần đây</CardTitle>
+                        <CardTitle className="text-gray-900 dark:text-gray-900">Đơn hàng gần đây</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
                             {stats.recentOrders.length > 0 ? (
                                 stats.recentOrders.map((order) => (
-                                    <div key={order._id} className="flex items-center justify-between border-b dark:border-gray-700 pb-4 last:border-0 last:pb-0">
+                                    <div key={order._id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0 border-gray-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300">
+                                            <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">
                                                 {order.userId?.name ? order.userId.name.charAt(0).toUpperCase() : 'K'}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium dark:text-white">{order.userId?.name || 'Khách lẻ'}</p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">vừa đặt đơn hàng</p>
+                                                <p className="text-sm font-medium text-gray-900">{order.userId?.name || 'Khách lẻ'}</p>
+                                                <p className="text-xs text-gray-500">vừa đặt đơn hàng</p>
                                             </div>
                                         </div>
-                                        <div className="text-sm font-medium text-green-600 dark:text-green-400">
+                                        <div className="text-sm font-medium text-green-600">
                                             +{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Chưa có đơn hàng nào.</p>
+                                <p className="text-sm text-gray-500">Chưa có đơn hàng nào.</p>
                             )}
                         </div>
                     </CardContent>

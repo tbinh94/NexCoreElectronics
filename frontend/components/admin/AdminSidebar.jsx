@@ -26,8 +26,8 @@ export default function AdminSidebar({ className }) {
     const pathname = usePathname();
 
     return (
-        <div className={cn("flex flex-col h-full bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 text-gray-900 dark:text-white w-64 transition-colors duration-300", className)}>
-            <div className="p-6 border-b border-gray-200 dark:border-slate-800 flex items-center gap-2">
+        <div className={cn("flex flex-col h-full bg-white border-r border-gray-200 text-gray-900 w-64 transition-colors duration-300", className)}>
+            <div className="p-6 border-b border-gray-200 flex items-center gap-2">
                 <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <Store className="h-5 w-5 text-white" />
                 </div>
@@ -43,19 +43,19 @@ export default function AdminSidebar({ className }) {
                             className={cn(
                                 "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors mx-2",
                                 pathname === item.href
-                                    ? "bg-blue-50 text-blue-600 dark:bg-slate-800 dark:text-white"
-                                    : "text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white"
+                                    ? "bg-blue-50 text-blue-600"
+                                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             )}
                         >
-                            <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-blue-600 dark:text-white" : "text-gray-500 dark:text-slate-400")} />
+                            <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-blue-600" : "text-gray-500")} />
                             {item.label}
                         </Link>
                     ))}
                 </div>
             </nav>
 
-            <div className="p-4 border-t border-gray-200 dark:border-slate-800">
-                <Button className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-slate-800 transition-colors bg-transparent shadow-none justify-start">
+            <div className="p-4 border-t border-gray-200">
+                <Button className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors bg-transparent shadow-none justify-start">
                     <LogOut className="h-5 w-5" />
                     Logout
                 </Button>

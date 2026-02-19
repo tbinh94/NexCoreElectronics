@@ -5,38 +5,131 @@ import User from "../models/User.js";
 
 const router = Router();
 
-// GET /api/admin/stats
 router.get("/stats", async (req, res) => {
     try {
-        // 1. Total Revenue (Sum of totalAmount for completed orders)
-        // Note: If you want all orders, remove the match condition.
-        const revenueAggregation = await Order.aggregate([
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Helper function to calculate percentage change
+        const calculateGrowth = (current, previous) => {
+            if (previous === 0) return current > 0 ? 100 : 0;
+            return ((current - previous) / previous) * 100;
+        };
+
+        // 1. Revenue (Sum of totalAmount for completed orders)
+        // Today's Revenue
+        const revenueTodayAgg = await Order.aggregate([
+            {
+                $match: {
+                    status: "completed",
+                    createdAt: { $gte: today, $lt: tomorrow }
+                }
+            },
+            { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+        ]);
+        const incomeToday = revenueTodayAgg.length > 0 ? revenueTodayAgg[0].total : 0;
+
+        // Yesterday's Revenue
+        const revenueYesterdayAgg = await Order.aggregate([
+            {
+                $match: {
+                    status: "completed",
+                    createdAt: { $gte: yesterday, $lt: today }
+                }
+            },
+            { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+        ]);
+        const incomeYesterday = revenueYesterdayAgg.length > 0 ? revenueYesterdayAgg[0].total : 0;
+
+        // Total Revenue (All time)
+        const totalRevenueAgg = await Order.aggregate([
             { $match: { status: "completed" } },
             { $group: { _id: null, total: { $sum: "$totalAmount" } } }
         ]);
-        const totalRevenue = revenueAggregation.length > 0 ? revenueAggregation[0].total : 0;
+        const totalRevenue = totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;
 
-        // 2. New Orders (Count of all orders, or pending orders)
-        const newOrdersCount = await Order.countDocuments({});
+        // 2. Orders
+        const ordersToday = await Order.countDocuments({ createdAt: { $gte: today, $lt: tomorrow } });
+        const ordersYesterday = await Order.countDocuments({ createdAt: { $gte: yesterday, $lt: today } });
+        const totalOrders = await Order.countDocuments({});
 
-        // 3. Total Products
+        // 3. Products
+        const productsToday = await Product.countDocuments({ createdAt: { $gte: today, $lt: tomorrow } });
+        const productsYesterday = await Product.countDocuments({ createdAt: { $gte: yesterday, $lt: today } });
         const totalProducts = await Product.countDocuments({});
 
-        // 4. Total Customers (Users who are not admins)
+        // 4. Customers
+        const customersToday = await User.countDocuments({ isAdmin: false, createdAt: { $gte: today, $lt: tomorrow } });
+        const customersYesterday = await User.countDocuments({ isAdmin: false, createdAt: { $gte: yesterday, $lt: today } });
         const totalCustomers = await User.countDocuments({ isAdmin: false });
 
-        // 5. Recent Orders (Get last 5)
+        // Calculate Growths
+        const revenueGrowth = calculateGrowth(incomeToday, incomeYesterday);
+        const ordersGrowth = calculateGrowth(ordersToday, ordersYesterday);
+        const productsGrowth = calculateGrowth(productsToday, productsYesterday);
+        const customersGrowth = calculateGrowth(customersToday, customersYesterday);
+
+        // 5. Recent Orders
         const recentOrders = await Order.find()
             .sort({ createdAt: -1 })
             .limit(5)
             .populate("userId", "name email");
 
+        // 6. Daily Revenue Chart (Last 7 Days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+
+        const dailyRevenue = await Order.aggregate([
+            {
+                $match: {
+                    status: "completed",
+                    createdAt: { $gte: sevenDaysAgo }
+                }
+
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    revenue: { $sum: "$totalAmount" }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        // Format chart data (fill missing days)
+        const revenueChart = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const dayName = d.toLocaleDateString('vi-VN', { weekday: 'short' }); // "T2", "T3"...
+
+            const found = dailyRevenue.find(item => item._id === dateStr);
+            revenueChart.push({
+                date: dateStr,
+                name: dayName,
+                revenue: found ? found.revenue : 0
+            });
+        }
+
         res.json({
             revenue: totalRevenue,
-            orders: newOrdersCount,
+            revenueGrowth,
+            orders: totalOrders,
+            ordersGrowth,
             products: totalProducts,
+            productsGrowth,
             customers: totalCustomers,
-            recentOrders
+            customersGrowth,
+            recentOrders,
+            revenueChart
         });
     } catch (error) {
         console.error("Admin Stats Error:", error);
