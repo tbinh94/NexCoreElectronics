@@ -149,6 +149,20 @@ router.get("/products", async (req, res) => {
     }
 });
 
+// GET /api/admin/products/:id - Get single product details
+router.get("/products/:id", async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (product) {
+            res.json(product);
+        } else {
+            res.status(404).json({ message: "Product not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 // POST /api/admin/products - Create a new product
 router.post("/products", async (req, res) => {
     try {

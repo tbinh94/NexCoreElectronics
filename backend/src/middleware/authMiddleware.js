@@ -2,6 +2,13 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 export const protect = async (req, res, next) => {
+    // 1. Check for Admin Passcode Bypass (Special access for admin UI)
+    const adminPasscode = req.headers["x-admin-passcode"];
+    if (adminPasscode && adminPasscode === process.env.ADMIN_PASSCODE) {
+        req.user = { isAdmin: true, name: "Admin UI Session" };
+        return next();
+    }
+
     let token;
 
     if (
@@ -10,27 +17,27 @@ export const protect = async (req, res, next) => {
     ) {
         try {
             token = req.headers.authorization.split(" ")[1];
-            console.log("Token received in middleware:", token); // Debug
+
+            // Handle null/undefined strings from localStorage
+            if (!token || token === "null" || token === "undefined") {
+                return res.status(401).json({ message: "Not authorized, token missing" });
+            }
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            console.log("Decoded token:", decoded); // Debug
-
             req.user = await User.findById(decoded.id).select("-password");
 
             if (!req.user) {
-                console.log("User not found for token"); // Debug
                 return res.status(401).json({ message: "User not found" });
             }
 
             next();
         } catch (error) {
-            console.error("Auth Middleware Error:", error.message); // Debug
+            console.error("Auth Middleware Error:", error.message);
             return res.status(401).json({ message: "Not authorized, token failed" });
         }
     }
 
-
-    if (!token) {
+    if (!token && !adminPasscode) {
         res.status(401).json({ message: "Not authorized, no token" });
     }
 };

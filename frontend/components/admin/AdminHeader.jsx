@@ -65,18 +65,30 @@ export default function AdminHeader() {
                         <ScrollArea className="h-[300px]">
                             {notifications.length > 0 ? (
                                 <div className="divide-y divide-gray-100">
-                                    {notifications.map((note) => (
-                                        <div key={note.id} className="p-4 hover:bg-gray-50 transition-colors flex gap-3 items-start">
-                                            <div className={`p-2 rounded-full shrink-0 ${note.type === 'warning' ? 'bg-orange-50' : note.type === 'success' ? 'bg-green-50' : 'bg-blue-50'}`}>
-                                                {getIcon(note.type)}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-medium text-gray-900">{note.title}</p>
-                                                <p className="text-xs text-gray-500 line-clamp-2">{note.message}</p>
-                                                <p className="text-[10px] text-gray-400">{note.time}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                    {notifications.map((note) => {
+                                        let href = "/admin";
+                                        if (note.title.toLowerCase().includes("hàng") || note.title.toLowerCase().includes("stock")) {
+                                            href = "/admin/products";
+                                        }
+                                        if (note.title.toLowerCase().includes("đơn") || note.title.toLowerCase().includes("order")) {
+                                            href = "/admin/orders";
+                                        }
+
+                                        return (
+                                            <Link key={note.id} href={href} className="block group">
+                                                <div className="p-4 hover:bg-gray-50 transition-colors flex gap-3 items-start">
+                                                    <div className={`p-2 rounded-full shrink-0 ${note.type === 'warning' ? 'bg-orange-50' : note.type === 'success' ? 'bg-green-50' : 'bg-blue-50'}`}>
+                                                        {getIcon(note.type)}
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{note.title}</p>
+                                                        <p className="text-xs text-gray-500 line-clamp-2">{note.message}</p>
+                                                        <p className="text-[10px] text-gray-400">{note.time}</p>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <div className="p-8 text-center text-gray-500">

@@ -54,9 +54,13 @@ export default function ProductsPage() {
     const handleDelete = async () => {
         if (!deleteId) return;
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
             const res = await fetch(`${apiUrl}/api/admin/products/${deleteId}`, {
                 method: "DELETE",
+                headers: {
+                    'x-admin-passcode': adminPasscode
+                }
             });
             if (res.ok) {
                 toast.success("Đã xoá sản phẩm");
@@ -73,10 +77,14 @@ export default function ProductsPage() {
 
     const toggleStatus = async (id, currentStatus) => {
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
             const res = await fetch(`${apiUrl}/api/admin/products/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    'x-admin-passcode': adminPasscode
+                },
                 body: JSON.stringify({ isActive: !currentStatus }),
             });
             if (res.ok) {
@@ -167,7 +175,11 @@ export default function ProductsPage() {
                                                                 Copy ID
                                                             </DropdownMenuItem>
                                                             <DropdownMenuSeparator />
-                                                            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+                                                            <Link href={`/admin/products/${item._id}`}>
+                                                                <DropdownMenuItem className="cursor-pointer">
+                                                                    Chỉnh sửa
+                                                                </DropdownMenuItem>
+                                                            </Link>
                                                             <DropdownMenuItem onClick={() => toggleStatus(item._id, item.isActive !== false)}>
                                                                 {item.isActive !== false ? "Dừng bán" : "Mở bán lại"}
                                                             </DropdownMenuItem>

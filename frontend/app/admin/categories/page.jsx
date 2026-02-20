@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function CategoriesPage() {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [categories, setCategories] = useState([]);
     const [newCategory, setNewCategory] = useState({ name: '', description: '', image: '' });
     const [loading, setLoading] = useState(true);
@@ -42,11 +42,13 @@ export default function CategoriesPage() {
     const handleCreateCategory = async (e) => {
         e.preventDefault();
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const res = await fetch('/api/categories', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming token is stored in localStorage
+                    'Authorization': `Bearer ${token}`,
+                    'x-admin-passcode': adminPasscode
                 },
                 body: JSON.stringify(newCategory),
             });
@@ -69,10 +71,12 @@ export default function CategoriesPage() {
         if (!confirm('Are you sure you want to delete this category?')) return;
 
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const res = await fetch(`/api/categories/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`,
+                    'x-admin-passcode': adminPasscode
                 }
             });
 

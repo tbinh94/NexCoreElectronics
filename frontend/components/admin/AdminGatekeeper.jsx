@@ -14,9 +14,20 @@ export default function AdminGatekeeper({ children }) {
 
     useEffect(() => {
         // Check session storage on mount
+        const verifiedTime = sessionStorage.getItem("admin_passcode_verified_at");
         const verified = sessionStorage.getItem("admin_passcode_verified");
-        if (verified === "true") {
-            setIsUnlocked(true);
+
+        if (verified === "true" && verifiedTime) {
+            const oneHour = 60 * 60 * 1000;
+            const now = Date.now();
+            if (now - parseInt(verifiedTime) < oneHour) {
+                setIsUnlocked(true);
+            } else {
+                // Expired
+                sessionStorage.removeItem("admin_passcode_verified");
+                sessionStorage.removeItem("admin_passcode_verified_at");
+                sessionStorage.removeItem("admin_passcode");
+            }
         }
         setLoading(false);
     }, []);
@@ -27,6 +38,8 @@ export default function AdminGatekeeper({ children }) {
 
         if (passcode === correctPasscode) {
             sessionStorage.setItem("admin_passcode_verified", "true");
+            sessionStorage.setItem("admin_passcode_verified_at", Date.now().toString());
+            sessionStorage.setItem("admin_passcode", passcode);
             setIsUnlocked(true);
             toast.success("Truy cập thành công!");
         } else {
