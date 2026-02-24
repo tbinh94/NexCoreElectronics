@@ -159,7 +159,7 @@ export default function TradeInPage() {
     return (
         <Container className="py-10 max-w-4xl">
             <div className="text-center mb-10">
-                <h1 className="text-3xl font-bold mb-2">Định Giá Laptop Cũ Bằng AI</h1>
+                <h1 className="text-3xl font-bold mb-2">Định Giá Laptop Cũ Thông Minh</h1>
                 <p className="text-gray-500 dark:text-gray-400">
                     Chụp ảnh laptop của bạn và nhận báo giá thu cũ đổi mới ngay lập tức.
                 </p>
