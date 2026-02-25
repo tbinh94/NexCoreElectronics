@@ -5,14 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 
 export default function AdminGatekeeper({ children }) {
+    const { setTheme } = useTheme();
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [passcode, setPasscode] = useState("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Force light mode for admin area
+        setTheme('light');
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+
         // Check session storage on mount
         const verifiedTime = sessionStorage.getItem("admin_passcode_verified_at");
         const verified = sessionStorage.getItem("admin_passcode_verified");

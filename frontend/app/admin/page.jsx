@@ -13,9 +13,6 @@ export default function AdminDashboard() {
         products: 0,
         customers: 0,
         revenueGrowth: 0,
-        ordersGrowth: 0,
-        productsGrowth: 0,
-        customersGrowth: 0,
         recentOrders: [],
         revenueChart: []
     });
@@ -24,7 +21,12 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/stats`);
+                const adminPasscode = sessionStorage.getItem("admin_passcode");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/stats`, {
+                    headers: {
+                        'x-admin-passcode': adminPasscode
+                    }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setStats(data);
@@ -38,9 +40,6 @@ export default function AdminDashboard() {
                     products: 0,
                     customers: 0,
                     revenueGrowth: 0,
-                    ordersGrowth: 0,
-                    productsGrowth: 0,
-                    customersGrowth: 0,
                     recentOrders: [],
                     revenueChart: []
                 });
@@ -56,7 +55,7 @@ export default function AdminDashboard() {
         {
             title: "Tổng doanh thu",
             value: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats.revenue),
-            change: `${stats.revenueGrowth >= 0 ? '+' : ''}${stats.revenueGrowth?.toFixed(1) || 0}%`,
+            change: stats.revenueGrowth !== 0 ? `${stats.revenueGrowth >= 0 ? '+' : ''}${stats.revenueGrowth?.toFixed(1) || 0}%` : null,
             icon: DollarSign,
             color: "text-green-600",
             bg: "bg-green-100",
@@ -65,29 +64,23 @@ export default function AdminDashboard() {
         {
             title: "Đơn hàng",
             value: stats.orders,
-            change: `${stats.ordersGrowth >= 0 ? '+' : ''}${stats.ordersGrowth?.toFixed(1) || 0}%`,
             icon: ShoppingCart,
             color: "text-blue-600",
             bg: "bg-blue-100",
-            trend: stats.ordersGrowth >= 0 ? "up" : "down"
         },
         {
             title: "Sản phẩm",
             value: stats.products,
-            change: `${stats.productsGrowth >= 0 ? '+' : ''}${stats.productsGrowth?.toFixed(1) || 0}%`,
             icon: Package,
             color: "text-orange-600",
             bg: "bg-orange-100",
-            trend: stats.productsGrowth >= 0 ? "up" : "down"
         },
         {
             title: "Khách hàng",
             value: stats.customers,
-            change: `${stats.customersGrowth >= 0 ? '+' : ''}${stats.customersGrowth?.toFixed(1) || 0}%`,
             icon: Users,
             color: "text-purple-600",
             bg: "bg-purple-100",
-            trend: stats.customersGrowth >= 0 ? "up" : "down"
         },
     ];
 
@@ -98,28 +91,30 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-900">Dashboard</h1>
-                <p className="text-gray-500 dark:text-gray-500 mt-2">Chào mừng trở lại! Đây là tổng quan cửa hàng của bạn hôm nay.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
+                <p className="text-gray-500 mt-2">Chào mừng trở lại! Đây là tổng quan cửa hàng của bạn hôm nay.</p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, index) => (
-                    <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow dark:bg-white bg-white">
+                    <Card key={index} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-500">
+                            <CardTitle className="text-sm font-medium text-gray-500">
                                 {stat.title}
                             </CardTitle>
-                            <div className={`p-2 rounded-lg ${stat.bg} dark:bg-opacity-100`}>
+                            <div className={`p-2 rounded-lg ${stat.bg}`}>
                                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-gray-900 dark:text-gray-900">{stat.value}</div>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
-                                <TrendingUp className={`h-3 w-3 ${stat.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
-                                <span className={`${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'} font-medium`}>{stat.change}</span> so với hôm qua
-                            </p>
+                            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                            {stat.change && (
+                                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                                    <TrendingUp className={`h-3 w-3 ${stat.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
+                                    <span className={`${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'} font-medium`}>{stat.change}</span> so với hôm qua
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
                 ))}
@@ -127,9 +122,9 @@ export default function AdminDashboard() {
 
             {/* Recent Activity Section */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border-none shadow-sm dark:bg-white bg-white">
+                <Card className="col-span-4 border-none shadow-sm bg-white">
                     <CardHeader>
-                        <CardTitle className="text-gray-900 dark:text-gray-900">Doanh thu 7 ngày qua</CardTitle>
+                        <CardTitle className="text-gray-900">Doanh thu 7 ngày qua</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
                         <div className="h-[300px] w-full">
@@ -147,7 +142,11 @@ export default function AdminDashboard() {
                                         fontSize={12}
                                         tickLine={false}
                                         axisLine={false}
-                                        tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
+                                        tickFormatter={(value) => {
+                                            if (value >= 1000000) return `${(value / 1000000).toFixed(stats.revenue > 10000000 ? 0 : 1)}M`;
+                                            if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+                                            return value;
+                                        }}
                                     />
                                     <Tooltip
                                         formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
@@ -160,9 +159,9 @@ export default function AdminDashboard() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="col-span-3 border-none shadow-sm dark:bg-white bg-white">
+                <Card className="col-span-3 border-none shadow-sm bg-white">
                     <CardHeader>
-                        <CardTitle className="text-gray-900 dark:text-gray-900">Đơn hàng gần đây</CardTitle>
+                        <CardTitle className="text-gray-900">Đơn hàng gần đây</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">

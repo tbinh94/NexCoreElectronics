@@ -5,7 +5,7 @@ import AdminGatekeeper from "@/components/admin/AdminGatekeeper";
 export default function AdminLayout({ children }) {
     return (
         <AdminGatekeeper>
-            <div className="min-h-screen bg-gray-50 flex">
+            <div className="min-h-screen bg-gray-50 flex light" style={{ colorScheme: 'light' }}>
                 {/* Sidebar - Hidden on mobile, handled via Sheet usually, but simple for now */}
                 <aside className="hidden md:block fixed inset-y-0 left-0 z-40">
                     <AdminSidebar />

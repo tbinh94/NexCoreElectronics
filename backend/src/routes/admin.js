@@ -22,12 +22,12 @@ router.get("/stats", async (req, res) => {
             return ((current - previous) / previous) * 100;
         };
 
-        // 1. Revenue (Sum of totalAmount for completed orders)
+        // 1. Revenue (Sum of totalAmount for all orders except cancelled)
         // Today's Revenue
         const revenueTodayAgg = await Order.aggregate([
             {
                 $match: {
-                    status: "completed",
+                    status: { $ne: "cancelled" },
                     createdAt: { $gte: today, $lt: tomorrow }
                 }
             },
@@ -39,7 +39,7 @@ router.get("/stats", async (req, res) => {
         const revenueYesterdayAgg = await Order.aggregate([
             {
                 $match: {
-                    status: "completed",
+                    status: { $ne: "cancelled" },
                     createdAt: { $gte: yesterday, $lt: today }
                 }
             },
@@ -49,7 +49,7 @@ router.get("/stats", async (req, res) => {
 
         // Total Revenue (All time)
         const totalRevenueAgg = await Order.aggregate([
-            { $match: { status: "completed" } },
+            { $match: { status: { $ne: "cancelled" } } },
             { $group: { _id: null, total: { $sum: "$totalAmount" } } }
         ]);
         const totalRevenue = totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;
@@ -60,20 +60,14 @@ router.get("/stats", async (req, res) => {
         const totalOrders = await Order.countDocuments({});
 
         // 3. Products
-        const productsToday = await Product.countDocuments({ createdAt: { $gte: today, $lt: tomorrow } });
-        const productsYesterday = await Product.countDocuments({ createdAt: { $gte: yesterday, $lt: today } });
         const totalProducts = await Product.countDocuments({});
 
         // 4. Customers
-        const customersToday = await User.countDocuments({ isAdmin: false, createdAt: { $gte: today, $lt: tomorrow } });
-        const customersYesterday = await User.countDocuments({ isAdmin: false, createdAt: { $gte: yesterday, $lt: today } });
         const totalCustomers = await User.countDocuments({ isAdmin: false });
 
         // Calculate Growths
-        const revenueGrowth = calculateGrowth(incomeToday, incomeYesterday);
-        const ordersGrowth = calculateGrowth(ordersToday, ordersYesterday);
-        const productsGrowth = calculateGrowth(productsToday, productsYesterday);
-        const customersGrowth = calculateGrowth(customersToday, customersYesterday);
+        // Only calculate revenue growth if there was income yesterday to avoid misleading 100% jumps
+        const revenueGrowth = incomeYesterday > 0 ? calculateGrowth(incomeToday, incomeYesterday) : 0;
 
         // 5. Recent Orders
         const recentOrders = await Order.find()
@@ -89,10 +83,9 @@ router.get("/stats", async (req, res) => {
         const dailyRevenue = await Order.aggregate([
             {
                 $match: {
-                    status: "completed",
+                    status: { $ne: "cancelled" },
                     createdAt: { $gte: sevenDaysAgo }
                 }
-
             },
             {
                 $group: {
@@ -109,7 +102,7 @@ router.get("/stats", async (req, res) => {
             const d = new Date();
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
-            const dayName = d.toLocaleDateString('vi-VN', { weekday: 'short' }); // "T2", "T3"...
+            const dayName = d.toLocaleDateString('vi-VN', { weekday: 'short' });
 
             const found = dailyRevenue.find(item => item._id === dateStr);
             revenueChart.push({
@@ -123,11 +116,8 @@ router.get("/stats", async (req, res) => {
             revenue: totalRevenue,
             revenueGrowth,
             orders: totalOrders,
-            ordersGrowth,
             products: totalProducts,
-            productsGrowth,
             customers: totalCustomers,
-            customersGrowth,
             recentOrders,
             revenueChart
         });

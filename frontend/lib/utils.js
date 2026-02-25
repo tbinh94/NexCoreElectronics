@@ -14,3 +14,13 @@ export function formatPrice(price) {
         maximumFractionDigits: 0,
     }).format(numericPrice);
 }
+
+export function getImageUrl(imagePath) {
+    if (!imagePath) return "";
+    if (imagePath.startsWith('http')) return imagePath;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    // Ensure no double slash if imagePath starts with /
+    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${apiUrl}${cleanPath}`;
+}

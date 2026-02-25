@@ -11,6 +11,7 @@ import uploadRoutes from "./upload.js";
 import chatbotRoutes from "./chatbot.js";
 import aiRoutes from "./ai.js";
 import categoryRoutes from "./categoryRoutes.js";
+import { protect, admin } from "../middleware/authMiddleware.js";
 import { getProducts, getProductFilters, getProductById, searchByImage, getDailyUsedProducts } from "../controllers/productController.js";
 
 const router = Router();
@@ -31,8 +32,8 @@ router.use("/auth", authRoutes);
 router.use("/faqs", faqRoutes);
 router.use("/orders", orderRoutes);
 router.use("/reviews", reviewRoutes);
-router.use("/admin", adminRoutes);
-router.use("/upload", uploadRoutes);
+router.use("/admin", protect, admin, adminRoutes);
+router.use("/upload", protect, admin, uploadRoutes);
 router.use("/chat", chatbotRoutes);
 router.use("/ai", aiRoutes);
 router.use("/categories", categoryRoutes);

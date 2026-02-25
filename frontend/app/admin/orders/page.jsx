@@ -35,8 +35,13 @@ export default function OrdersPage() {
 
     const fetchOrders = async () => {
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiUrl}/api/admin/orders`);
+            const res = await fetch(`${apiUrl}/api/admin/orders`, {
+                headers: {
+                    'x-admin-passcode': adminPasscode
+                }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setOrders(data);
@@ -56,12 +61,14 @@ export default function OrdersPage() {
 
     const updateStatus = async (id, newStatus) => {
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
             const res = await fetch(`${apiUrl}/api/admin/orders/${id}/status`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
+                    'x-admin-passcode': adminPasscode
                 },
                 body: JSON.stringify({ status: newStatus }),
             });

@@ -34,8 +34,13 @@ export default function ProductsPage() {
 
     const fetchProducts = async () => {
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiUrl}/api/admin/products`);
+            const res = await fetch(`${apiUrl}/api/admin/products`, {
+                headers: {
+                    'x-admin-passcode': adminPasscode
+                }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setProducts(data);

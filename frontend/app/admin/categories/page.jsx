@@ -24,7 +24,12 @@ export default function CategoriesPage() {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch('/api/categories');
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
+            const res = await fetch('/api/categories', {
+                headers: {
+                    'x-admin-passcode': adminPasscode
+                }
+            });
             const data = await res.json();
             setCategories(data);
         } catch (error) {

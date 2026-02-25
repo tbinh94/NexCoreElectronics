@@ -54,7 +54,12 @@ function AddProductContent() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch('/api/categories');
+                const adminPasscode = sessionStorage.getItem("admin_passcode");
+                const res = await fetch('/api/categories', {
+                    headers: {
+                        'x-admin-passcode': adminPasscode
+                    }
+                });
                 const data = await res.json();
                 setCategories(data);
             } catch (error) {
@@ -90,9 +95,13 @@ function AddProductContent() {
 
         setAiLoading(true);
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/ai/generate-description`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    'x-admin-passcode': adminPasscode
+                },
                 body: JSON.stringify({
                     productName: formData.name,
                     productSpecs: formData.specs,
@@ -131,9 +140,13 @@ function AddProductContent() {
                 highlights: formData.highlights.split('\n').filter(line => line.trim() !== '')
             };
 
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/products`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    'x-admin-passcode': adminPasscode
+                },
                 body: JSON.stringify(productData),
             });
 
@@ -223,16 +236,19 @@ function AddProductContent() {
                                                 formData.append('image', file);
                                                 try {
                                                     setLoading(true);
+                                                    const adminPasscode = sessionStorage.getItem("admin_passcode");
                                                     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/upload`, {
                                                         method: 'POST',
+                                                        headers: {
+                                                            'x-admin-passcode': adminPasscode
+                                                        },
                                                         body: formData,
                                                     });
                                                     const data = await res.json();
                                                     if (data.image) {
-                                                        // Fix path if needed (remove 'uploads/' if backend returns relative path from root)
-                                                        // Our backend returns /uploads/filename.ext, which is correct for static serving
-                                                        // But we need full URL for frontend to display if it's on different port
-                                                        const fullUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${data.image}`;
+                                                        const fullUrl = data.image.startsWith('http')
+                                                            ? data.image
+                                                            : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${data.image}`;
                                                         setFormData(prev => ({ ...prev, image: fullUrl }));
                                                         toast.success("Upload ảnh thành công");
                                                     }

@@ -53,14 +53,23 @@ export default function EditProductPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                const adminPasscode = sessionStorage.getItem("admin_passcode");
                 // Fetch categories
-                const catRes = await fetch('/api/categories');
+                const catRes = await fetch('/api/categories', {
+                    headers: {
+                        'x-admin-passcode': adminPasscode
+                    }
+                });
                 const catData = await catRes.json();
                 setCategories(catData);
 
                 // Fetch product data
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-                const productRes = await fetch(`${apiUrl}/api/admin/products/${productId}`);
+                const productRes = await fetch(`${apiUrl}/api/admin/products/${productId}`, {
+                    headers: {
+                        'x-admin-passcode': adminPasscode
+                    }
+                });
                 if (!productRes.ok) throw new Error("Không thể tải thông tin sản phẩm");
 
                 const productData = await productRes.json();
@@ -108,9 +117,13 @@ export default function EditProductPage() {
 
         setAiLoading(true);
         try {
+            const adminPasscode = sessionStorage.getItem("admin_passcode");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/ai/generate-description`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    'x-admin-passcode': adminPasscode
+                },
                 body: JSON.stringify({
                     productName: formData.name,
                     productSpecs: formData.specs,
@@ -255,15 +268,20 @@ export default function EditProductPage() {
                                                 const uploadFormData = new FormData();
                                                 uploadFormData.append('image', file);
                                                 try {
-                                                    setSubmitting(true);
+                                                    const adminPasscode = sessionStorage.getItem("admin_passcode");
                                                     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
                                                     const res = await fetch(`${apiUrl}/api/upload`, {
                                                         method: 'POST',
+                                                        headers: {
+                                                            'x-admin-passcode': adminPasscode
+                                                        },
                                                         body: uploadFormData,
                                                     });
                                                     const data = await res.json();
                                                     if (data.image) {
-                                                        const fullUrl = `${apiUrl}${data.image}`;
+                                                        const fullUrl = data.image.startsWith('http')
+                                                            ? data.image
+                                                            : `${apiUrl}${data.image}`;
                                                         setFormData(prev => ({ ...prev, image: fullUrl }));
                                                         toast.success("Upload ảnh thành công");
                                                     }

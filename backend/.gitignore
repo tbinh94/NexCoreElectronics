@@ -16,3 +16,7 @@ node_modules
 #!.yarn/cache
 .pnp.*
 .env
+
+uploads/
+temp_*
+processed_products_debug.json

@@ -21,7 +21,12 @@ export default function UsersPage() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users`);
+                const adminPasscode = sessionStorage.getItem("admin_passcode");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users`, {
+                    headers: {
+                        'x-admin-passcode': adminPasscode
+                    }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setUsers(data);

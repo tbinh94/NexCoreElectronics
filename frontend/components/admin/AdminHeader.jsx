@@ -18,7 +18,12 @@ export default function AdminHeader() {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/notifications`);
+                const adminPasscode = sessionStorage.getItem("admin_passcode");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/notifications`, {
+                    headers: {
+                        'x-admin-passcode': adminPasscode
+                    }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setNotifications(data);
