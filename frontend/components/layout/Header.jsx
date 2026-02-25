@@ -95,7 +95,7 @@ export default function Header({ categories }) {
                                                 />
                                             </div>
                                             <div className="flex flex-col text-left hidden sm:block">
-                                                <span className="text-xs opacity-80">Xin chào,</span>
+                                                <span className="text-xs opacity-80">Xin chào, </span>
                                                 <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>
                                             </div>
                                         </div>

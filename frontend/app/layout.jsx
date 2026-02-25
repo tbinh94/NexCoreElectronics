@@ -7,6 +7,8 @@ import { CartProvider } from "@/context/CartContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import ChatBot from "@/components/features/ChatBot";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CompareProvider } from "@/context/CompareContext";
+import CompareWidget from "@/components/products/CompareWidget";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -44,13 +46,16 @@ export default async function RootLayout({
                 >
                     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
                         <AuthProvider>
-                            <CartProvider>
-                                <MainLayoutWrapper categories={filters.categories}>
-                                    {children}
-                                </MainLayoutWrapper>
-                                <ChatBot />
-                                <Toaster />
-                            </CartProvider>
+                            <CompareProvider>
+                                <CartProvider>
+                                    <MainLayoutWrapper categories={filters.categories}>
+                                        {children}
+                                    </MainLayoutWrapper>
+                                    <ChatBot />
+                                    <CompareWidget />
+                                    <Toaster />
+                                </CartProvider>
+                            </CompareProvider>
                         </AuthProvider>
                     </GoogleOAuthProvider>
                 </ThemeProvider>

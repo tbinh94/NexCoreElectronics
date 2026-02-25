@@ -10,7 +10,7 @@ dotenv.config();
 
 export const chatWithAI = async (req, res) => {
     try {
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY?.trim();
         if (!apiKey) {
             console.error("GEMINI_API_KEY is missing in .env");
             return res.status(500).json({ message: "Server configuration error: API Key missing" });
@@ -26,146 +26,111 @@ export const chatWithAI = async (req, res) => {
             return res.status(400).json({ message: "Message is required" });
         }
 
-        // --- STEP 1: INTENT ANALYSIS (Hiểu ý định) ---
-        // Ask Gemini to parse the user's natural language into structured search filters
-        const intentPrompt = `
-        You are a search query parser for an electronics e-commerce store.
-        Analyze the user's message and extract search filters into a JSON object.
-        
-        User Message: "${message}"
-        
-        Return ONLY a raw JSON object (no markdown formatting) with the following fields:
-        - keyword: (string) Main product keyword (e.g., "laptop", "iphone", "mouse", "gaming"). If generic, leave null.
-        - category: (string) Product category if mentioned (e.g., "Laptop", "Smartphone", "Tablet", "Accessories").
-        - brand: (string) Brand name if mentioned (e.g., "Apple", "Dell", "Samsung").
-        - minPrice: (number) Minimum price in VND if mentioned. 
-        - maxPrice: (number) Maximum price in VND if mentioned.
-        - sort: (string) "price_asc", "price_desc", or "newest" if implied.
-        
-        CRITICAL RULES FOR PRICE:
-        1. If user says "tầm 15 triệu" or "khoảng 15 triệu" or "15tr":
-           - Set minPrice = 13500000 (15m - 10%)
-           - Set maxPrice = 16500000 (15m + 10%)
-        2. If user says "dưới 15 triệu": set maxPrice = 15000000.
-        3. If user says "trên 15 triệu": set minPrice = 15000000.
-        4. If user says just a number like "17 triệu" in context of price update:
-           - Treat it as "around 17 million" -> min: 15.3m, max: 18.7m.
+        console.log("Chat Request Received:", message.substring(0, 100) + "...");
 
-        Example JSON: {"keyword": "gaming", "category": "Laptop", "minPrice": 13500000, "maxPrice": 16500000, "brand": "Asus"}
-        If no specific criteria are found, return empty object {}.
-        `;
+        // Optimized check: If this is a comparison prompt from CompareWidget, skip some steps
+        const isComparison = message.includes("Tôi đang phân vân giữa 2 sản phẩm") ||
+            message.includes("Cấu hình: {");
 
         let filters = {};
-        try {
-            const intentResult = await model.generateContent(intentPrompt);
-            const intentText = intentResult.response.text();
-            // Clean up any potential markdown code blocks
-            const jsonString = intentText.replace(/```json|```/g, "").trim();
-            filters = JSON.parse(jsonString);
-            console.log("Parsed Filters:", filters);
-        } catch (parseError) {
-            console.warn("Failed to parse intent, falling back to keyword search:", parseError);
-            filters = { keyword: message };
-        }
+        let products = [];
 
-        // --- STEP 2: DATA RETRIEVAL (Truy xuất dữ liệu) ---
-        // Build Mongoose query based on parsed filters
-        const query = { isActive: true };
+        if (!isComparison) {
+            // --- STEP 1: INTENT ANALYSIS ---
+            const intentPrompt = `
+            You are a search query parser for an electronics e-commerce store.
+            Analyze the user's message and extract search filters into a JSON object.
+            
+            User Message: "${message}"
+            
+            Return ONLY a raw JSON object (no markdown formatting) with the following fields:
+            - keyword: (string)
+            - category: (string)
+            - brand: (string)
+            - minPrice: (number)
+            - maxPrice: (number)
+            - sort: (string)
+            `;
 
-        if (filters.category) {
-            query.category = { $regex: filters.category, $options: 'i' };
-        }
-        if (filters.brand) {
-            query.brand = { $regex: filters.brand, $options: 'i' };
-        }
-        if (filters.minPrice || filters.maxPrice) {
-            query.price = {};
-            if (filters.minPrice) query.price.$gte = filters.minPrice;
-            if (filters.maxPrice) query.price.$lte = filters.maxPrice;
-        }
+            try {
+                const intentResult = await model.generateContent(intentPrompt);
+                const intentText = intentResult.response.text();
+                const jsonString = intentText.replace(/```json|```/g, "").trim();
+                filters = JSON.parse(jsonString);
+                console.log("Parsed Filters:", filters);
+            } catch (parseError) {
+                console.warn("Failed to parse intent, falling back to keyword search:", parseError);
+                filters = { keyword: message };
+            }
 
-        // If there's a keyword, search in name, description, or highlights
-        if (filters.keyword) {
-            query.$or = [
-                { name: { $regex: filters.keyword, $options: 'i' } },
-                { description: { $regex: filters.keyword, $options: 'i' } },
-                { highlights: { $regex: filters.keyword, $options: 'i' } },
-                { category: { $regex: filters.keyword, $options: 'i' } } // Also check category
-            ];
+            // --- STEP 2: DATA RETRIEVAL (Truy xuất dữ liệu) ---
+            const query = { isActive: true };
+
+            if (filters.category) query.category = { $regex: filters.category, $options: 'i' };
+            if (filters.brand) query.brand = { $regex: filters.brand, $options: 'i' };
+            if (filters.minPrice || filters.maxPrice) {
+                query.price = {};
+                if (filters.minPrice) query.price.$gte = filters.minPrice;
+                if (filters.maxPrice) query.price.$lte = filters.maxPrice;
+            }
+
+            if (filters.keyword) {
+                const escapedKeyword = filters.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                if (escapedKeyword.length < 200) {
+                    query.$or = [
+                        { name: { $regex: escapedKeyword, $options: 'i' } },
+                        { description: { $regex: escapedKeyword, $options: 'i' } },
+                        { highlights: { $regex: escapedKeyword, $options: 'i' } },
+                        { category: { $regex: escapedKeyword, $options: 'i' } }
+                    ];
+                }
+            }
+
+            let sortOption = {};
+            if (filters.sort === 'price_asc') sortOption.price = 1;
+            else if (filters.sort === 'price_desc') sortOption.price = -1;
+            else if (filters.sort === 'newest') sortOption.createdAt = -1;
+
+            products = await Product.find(query)
+                .sort(sortOption)
+                .limit(5)
+                .select("name price brand category image highlights specs description");
+        } else {
+            console.log("Comparison detected. Using provided data only.");
         }
-
-        let sortOption = {};
-        if (filters.sort === 'price_asc') sortOption.price = 1;
-        else if (filters.sort === 'price_desc') sortOption.price = -1;
-        else if (filters.sort === 'newest') sortOption.createdAt = -1;
-
-        // Fetch products
-        const products = await Product.find(query)
-            .sort(sortOption)
-            .limit(5) // Limit context size
-            .select("name price brand category image highlights specs description");
 
         // --- STEP 3: GENERATE RESPONSE (Tư vấn) ---
-        const productContext = products.length > 0 ? products.map(p => `
-ID: ${p._id}
-Name: ${p.name}
-Price: ${p.price.toLocaleString('vi-VN')} VND
-Brand: ${p.brand}
-Category: ${p.category}
-Image: ${p.image || ""}
-Highlights: ${p.highlights && p.highlights.length > 0 ? p.highlights.join(", ") : "N/A"}
-Specs: ${p.specs ? JSON.stringify(p.specs) : "N/A"}
-Description: ${p.description ? p.description.substring(0, 150) + "..." : "N/A"}
-`).join("\n---\n") : "Không tìm thấy sản phẩm nào khớp với tiêu chí tìm kiếm của bạn trong kho hàng.";
+        const contextStr = products.length > 0 ? products.map(p => {
+            return `Sản phẩm: ${p.name}\nGiá: ${p.price || 0}\nThông số: ${p.specs ? JSON.stringify(p.specs) : "N/A"}`;
+        }).join("\n---\n") : "Không có dữ liệu bổ sung.";
 
-        const prompt = `
-Bạn là trợ lý ảo bán hàng chuyên nghiệp (AI Sales Assistant) của cửa hàng Nexcore Electronics.
-Nhiệm vụ của bạn là tư vấn, giải đáp thắc mắc và hỗ trợ khách hàng chọn mua sản phẩm công nghệ phù hợp nhất.
+        const systemInstruction = `Bạn là trợ lý ảo bán hàng chuyên nghiệp của Nexcore Electronics.
+Mọi câu trả lời phải thân thiện, chuyên nghiệp bằng tiếng Việt.
+${isComparison ? "Dùng thông số chi tiết trong câu hỏi để so sánh." : "Dùng thông tin từ Context để tư vấn."}`;
 
-Dưới đây là danh sách sản phẩm ĐÃ ĐƯỢC LỌC theo yêu cầu của khách (Context):
-${productContext}
+        const finalPrompt = `
+${systemInstruction}
 
-HƯỚNG DẪN TRẢ LỜI:
+CONTEXT SẢN PHẨM:
+${contextStr}
 
-1.  **Phân tích & Tư vấn**:
-    -   Dựa vào Context, hãy giới thiệu các sản phẩm phù hợp nhất với câu hỏi: "${message}".
-    -   Nếu khách hỏi về giá, cấu hình, hãy trả lời chi tiết dựa trên thông tin có sẵn.
-    -   **QUAN TRỌNG:** Nếu Context ghi "Không tìm thấy sản phẩm nào...", BẠN PHẢI TRẢ LỜI THẬT LÒNG là hiện chưa có mẫu khớp chính xác yêu cầu đó. 
-        - ĐỪNG BỊA RA SẢN PHẨM KHÔNG CÓ TRONG CONTEXT.
-        - Thay vào đó, hãy gợi ý khách tìm các dòng khác hoặc mức giá khác hợp lý hơn.
+YÊU CẦU KHÁCH HÀNG:
+${message}
 
-2.  **Phong cách**:
-    -   Thân thiện, chuyên nghiệp, ngắn gọn.
-    -   Xưng hô: "mình" (hoặc "em") và "bạn" (hoặc "anh/chị").
-
-3.  **Định dạng đầu ra (BẮT BUỘC)**:
-    -   Phần trả lời text: Sử dụng Markdown (in đậm **tên sản phẩm**, gạch đầu dòng -).
-    -   **Khối JSON sản phẩm**:
-        -   Nếu có gợi ý sản phẩm từ Context, BẮT BUỘC phải đặt khối JSON ở **CUỐI CÙNG** câu trả lời.
-        -   Tuyệt đối KHÔNG trả về JSON nếu không có sản phẩm nào trong Context.
-        -   Cấu trúc JSON:
-        \`\`\`json
-        [
-          {
-            "id": "ID_LẤY_TỪ_CONTEXT",
-            "name": "TÊN_CHÍNH_XÁC_TỪ_CONTEXT",
-            "price": 12345678, // Số nguyên (Number)
-            "image": "URL_ẢNH_TỪ_CONTEXT"
-          }
-        ]
-        \`\`\`
-
-Câu hỏi của khách hàng: "${message}"
+HÃY TRẢ LỜI NGAY:
 `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        const result = await model.generateContent(finalPrompt);
+        const text = result.response.text();
 
         res.json({ reply: text });
 
     } catch (error) {
-        console.error("Chatbot Error:", error);
-        res.status(500).json({ message: "Failed to generate response", error: error.message });
+        console.error("CRITICAL: Chatbot Controller Error:", error);
+        return res.status(500).json({
+            message: "Rất tiếc, AI đang bận hoặc gặp lỗi kỹ thuật.",
+            error: error.message,
+            success: false
+        });
     }
 };

@@ -12,9 +12,59 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { addToWishlist, removeFromWishlist, getWishlist } from "@/lib/api";
+import { useCompare } from "@/context/CompareContext";
 
 export default function ProductDetailClient({ product }) {
     console.log("ProductDetailClient product:", product);
+    const { user, token } = useAuth();
+    const { compareList, addToCompare } = useCompare();
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [loadingWishlist, setLoadingWishlist] = useState(false);
+
+    const scrollToReviews = () => {
+        document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        const checkWishlist = async () => {
+            if (user && token) {
+                try {
+                    const wishlist = await getWishlist(token);
+                    const isInWishlist = wishlist.some(item => (item._id || item) === product._id);
+                    setIsWishlisted(isInWishlist);
+                } catch (error) {
+                    console.error("Error checking wishlist:", error);
+                }
+            }
+        };
+        checkWishlist();
+    }, [user, token, product._id]);
+
+    const handleWishlistToggle = async () => {
+        if (!user || !token) {
+            toast.warning("Vui lòng đăng nhập để lưu sản phẩm vào yêu thích");
+            router.push('/login');
+            return;
+        }
+
+        setLoadingWishlist(true);
+        try {
+            if (isWishlisted) {
+                await removeFromWishlist(product._id, token);
+                setIsWishlisted(false);
+                toast.success("Đã xóa khỏi danh sách yêu thích");
+            } else {
+                await addToWishlist(product._id, token);
+                setIsWishlisted(true);
+                toast.success("Đã thêm vào danh sách yêu thích");
+            }
+        } catch (error) {
+            toast.error("Có lỗi xảy ra khi xử lý danh sách yêu thích");
+        } finally {
+            setLoadingWishlist(false);
+        }
+    };
     const searchParams = useSearchParams();
     const initialType = searchParams.get('type') === 'used' ? 'used' : 'new';
 
@@ -33,7 +83,6 @@ export default function ProductDetailClient({ product }) {
     const [selectedImage, setSelectedImage] = useState(product.image);
 
     const { addToCart } = useCart();
-    const { user } = useAuth();
     const router = useRouter();
     const [buyingNow, setBuyingNow] = useState(false);
 
@@ -94,8 +143,52 @@ export default function ProductDetailClient({ product }) {
     const tradeInPrice = formatPrice(currentNewPrice * 0.85);
 
     return (
-        <div className="space-y-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="space-y-6 sm:space-y-10">
+            {/* Product Header - Integrated for better mobile response */}
+            <div className="border-b border-gray-100 dark:border-gray-800 pb-4 sm:pb-6">
+                <h1 className="font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
+                    {product.name}
+                </h1>
+                <div className="flex flex-wrap items-center justify-between gap-y-4 gap-x-6">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+                        <div className="flex items-center text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-lg">
+                            <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-500" />
+                            <span className="ml-1.5 font-bold text-sm sm:text-base">{product.rating > 0 ? product.rating : "Chưa có đánh giá"}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span
+                                onClick={scrollToReviews}
+                                className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer font-medium"
+                            >
+                                {product.reviews} Đánh giá
+                            </span>
+                        </div>
+                        <div className="hidden xs:block h-4 w-[1px] bg-gray-200 dark:bg-gray-700"></div>
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleWishlistToggle}
+                                disabled={loadingWishlist}
+                                className={`h-8 px-2 transition-colors ${isWishlisted ? 'text-red-600 bg-red-50 hover:bg-red-100' : 'text-gray-500 hover:text-red-600 hover:bg-gray-100'}`}
+                            >
+                                <Heart className={`w-4 h-4 mr-1.5 ${isWishlisted ? 'fill-red-600' : ''}`} />
+                                {isWishlisted ? 'Đã thích' : 'Yêu thích'}
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => addToCompare(product)}
+                                className="text-gray-500 hover:text-blue-600 hover:bg-gray-100 h-8 px-2"
+                            >
+                                <BarChart2 className="w-4 h-4 mr-1.5" /> So sánh
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
                 {/* Left Column */}
                 <div className="lg:col-span-7 space-y-8">
                     <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2">

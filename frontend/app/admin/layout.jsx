@@ -14,8 +14,8 @@ export default function AdminLayout({ children }) {
                 {/* Main Content */}
                 <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
                     <AdminHeader />
-                    <main className="flex-1 p-6 overflow-y-auto">
-                        <div className="max-w-7xl mx-auto space-y-6">
+                    <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+                        <div className="max-w-7xl mx-auto space-y-6 px-2 sm:px-4">
                             {children}
                         </div>
                     </main>

@@ -170,10 +170,14 @@ export default function AdminDashboard() {
                                     <div key={order._id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0 border-gray-100">
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">
-                                                {order.userId?.name ? order.userId.name.charAt(0).toUpperCase() : 'K'}
+                                                {order.shippingAddress?.name
+                                                    ? order.shippingAddress.name.charAt(0).toUpperCase()
+                                                    : (order.userId?.name ? order.userId.name.charAt(0).toUpperCase() : 'K')}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium text-gray-900">{order.userId?.name || 'Khách lẻ'}</p>
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    {order.shippingAddress?.name || order.userId?.name || 'Khách lẻ'}
+                                                </p>
                                                 <p className="text-xs text-gray-500">vừa đặt đơn hàng</p>
                                             </div>
                                         </div>

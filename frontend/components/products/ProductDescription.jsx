@@ -46,9 +46,9 @@ export default function ProductDescription({ product }) {
                         <dl className="space-y-3">
                             {product.specs && typeof product.specs === 'object' && !Array.isArray(product.specs) ? (
                                 Object.entries(product.specs).map(([key, value]) => (
-                                    <div key={key} className="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
-                                        <dt className="text-sm font-medium text-gray-900 dark:text-gray-200 capitalize">{key}</dt>
-                                        <dd className="text-sm text-gray-600 dark:text-gray-400 text-right">{value}</dd>
+                                    <div key={key} className="flex flex-wrap justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 gap-2">
+                                        <dt className="text-sm font-medium text-gray-900 dark:text-gray-200 capitalize min-w-[100px]">{key}</dt>
+                                        <dd className="text-sm text-gray-600 dark:text-gray-400 text-right flex-1 min-w-[150px]">{value}</dd>
                                     </div>
                                 ))
                             ) : (

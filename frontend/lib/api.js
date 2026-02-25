@@ -83,3 +83,33 @@ export async function fetchReviews(productId) {
         return [];
     }
 }
+
+// Wishlist API
+export async function getWishlist(token) {
+    const res = await fetch(`${API_URL}/users/wishlist`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
+    });
+    if (!res.ok) return [];
+    return res.json();
+}
+
+export async function addToWishlist(productId, token) {
+    const res = await fetch(`${API_URL}/users/wishlist`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId })
+    });
+    return res.json();
+}
+
+export async function removeFromWishlist(productId, token) {
+    const res = await fetch(`${API_URL}/users/wishlist/${productId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.json();
+}

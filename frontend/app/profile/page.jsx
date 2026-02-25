@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import Image from "next/image";
-
+import { getWishlist, removeFromWishlist } from "@/lib/api";
+import { Heart } from "lucide-react";
 export default function ProfilePage() {
     const { user, token, logout, loading, updateUser } = useAuth();
     const router = useRouter();
@@ -20,14 +21,52 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
     const fileInputRef = useRef(null);
 
+    // Wishlist state
+    const [wishlist, setWishlist] = useState([]);
+    const [loadingWishlist, setLoadingWishlist] = useState(true);
+
     useEffect(() => {
         if (!loading && !user) {
             router.push("/login");
         } else if (user) {
             setNewName(user.name);
             setPreviewAvatar(user.avatar);
+
+            // Fetch wishlist
+            if (token) {
+                const fetchWishlist = async () => {
+                    try {
+                        const data = await getWishlist(token);
+                        setWishlist(data);
+                    } catch (error) {
+                        console.error("Failed to fetch wishlist", error);
+                    } finally {
+                        setLoadingWishlist(false);
+                    }
+                };
+                fetchWishlist();
+            }
         }
-    }, [user, loading, router]);
+    }, [user, loading, router, token]);
+
+    const handleRemoveFromWishlist = async (productId) => {
+        try {
+            await removeFromWishlist(productId, token);
+            setWishlist(prev => prev.filter(item => item._id !== productId));
+            toast.success("Đã xóa khỏi danh sách yêu thích");
+
+            // Optionally update user context if needed
+            if (user && user.wishlist) {
+                const updatedUser = {
+                    ...user,
+                    wishlist: user.wishlist.filter(id => (id._id || id) !== productId)
+                };
+                updateUser(updatedUser);
+            }
+        } catch (error) {
+            toast.error("Lỗi khi xóa sản phẩm");
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -256,7 +295,100 @@ export default function ProfilePage() {
                                     <span className="text-gray-400 group-hover:text-blue-500">→</span>
                                 </div>
                             </Link>
+
+                            <Link href="#wishlist" className="block group">
+                                <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-red-200 dark:hover:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
+                                            <Heart className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-gray-900 dark:text-gray-100">Yêu thích của tôi</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">Xem các sản phẩm đã lưu</p>
+                                        </div>
+                                    </div>
+                                    <span className="text-gray-400 group-hover:text-red-500">↓</span>
+                                </div>
+                            </Link>
                         </div>
+                    </div>
+                </div>
+
+                {/* Wishlist Section */}
+                <div id="wishlist" className="bg-white dark:bg-card rounded-2xl shadow-sm border dark:border-border overflow-hidden">
+                    <div className="px-6 py-4 border-b dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10">
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+                            Sản phẩm yêu thích
+                        </h2>
+                        <span className="text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-full">
+                            {user.wishlist?.length || 0} sản phẩm
+                        </span>
+                    </div>
+
+                    <div className="p-6">
+                        {loadingWishlist ? (
+                            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+                                <p className="text-sm text-gray-500">Đang tải danh sách...</p>
+                            </div>
+                        ) : wishlist.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {wishlist.map((item) => (
+                                    <div key={item._id} className="group flex gap-4 p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-red-100 dark:hover:border-red-900/50 hover:bg-red-50/10 transition-all relative">
+                                        <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 shrink-0 border dark:border-gray-700">
+                                            <Image
+                                                src={item.image}
+                                                alt={item.name}
+                                                fill
+                                                className="object-contain p-2 group-hover:scale-110 transition-transform duration-300"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col justify-between py-1 flex-1 min-w-0">
+                                            <div className="space-y-1">
+                                                <Link href={`/products/${item._id}`} className="block">
+                                                    <h3 className="font-bold text-sm text-gray-900 dark:text-white hover:text-red-600 transition-colors truncate">
+                                                        {item.name}
+                                                    </h3>
+                                                </Link>
+                                                <p className="text-red-600 font-bold text-sm">
+                                                    {item.price?.toLocaleString('vi-VN')}đ
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <Link href={`/products/${item._id}`} className="text-[10px] text-blue-600 font-bold uppercase tracking-wider hover:underline">
+                                                    Xem chi tiết
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleRemoveFromWishlist(item._id)}
+                                                    className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                                                    title="Xóa khỏi yêu thích"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 space-y-4">
+                                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-full h-16 w-16 flex items-center justify-center mx-auto">
+                                    <Heart className="w-8 h-8 text-gray-300" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-gray-600 dark:text-gray-300 font-medium">Chưa có sản phẩm nào</p>
+                                    <p className="text-sm text-gray-400">Hãy thêm các sản phẩm bạn yêu thích vào danh sách này.</p>
+                                </div>
+                                <Button
+                                    onClick={() => router.push('/products')}
+                                    variant="outline"
+                                    className="mt-2"
+                                >
+                                    Khám phá sản phẩm
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

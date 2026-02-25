@@ -57,6 +57,20 @@ export default function ChatBot() {
         }
     }, [messages, isOpen]);
 
+    // Event listener for opening chat from other components
+    useEffect(() => {
+        const handleOpenChat = (event) => {
+            const { message, open } = event.detail || {};
+            if (open !== undefined) setIsOpen(open);
+            if (message) {
+                handleSend(message);
+            }
+        };
+
+        window.addEventListener('chat-open', handleOpenChat);
+        return () => window.removeEventListener('chat-open', handleOpenChat);
+    }, []);
+
     const extractProducts = (content) => {
         const jsonRegex = /```json\s*([\s\S]*?)\s*```/;
         const match = content.match(jsonRegex);
@@ -90,16 +104,32 @@ export default function ChatBot() {
                 body: JSON.stringify({ message: userMessage }),
             });
 
-            const data = await response.json();
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (err) {
+                console.error("API non-json error:", responseText);
+                throw new Error(responseText.substring(0, 100) || "Server error");
+            }
 
             if (response.ok) {
                 setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
             } else {
-                setMessages((prev) => [...prev, { role: "assistant", content: "Xin lỗi, tôi đang gặp sự cố kết nối. Vui lòng thử lại sau." }]);
+                setMessages((prev) => [...prev, {
+                    role: "assistant",
+                    content: `**Lỗi hệ thống:** ${data.message || "AI đang gặp sự cố kết nối. Vui lòng thử lại sau."}`
+                }]);
             }
         } catch (error) {
-            console.error("Chat error:", error);
-            setMessages((prev) => [...prev, { role: "assistant", content: "Xin lỗi, đã có lỗi xảy ra. Vui lòng kiểm tra kết nối mạng." }]);
+            console.error("Chat error details:", error);
+            const errorMsg = error.message && error.message.includes("Unexpected token")
+                ? "Lỗi phản hồi từ server (JSON Invalid). "
+                : (error.message || "");
+            setMessages((prev) => [...prev, {
+                role: "assistant",
+                content: `Rất tiếc, đã có lỗi xảy ra: ${errorMsg} Vui lòng thử lại sau hoặc báo với quản trị viên.`
+            }]);
         } finally {
             setIsLoading(false);
         }
