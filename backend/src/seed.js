@@ -10,6 +10,7 @@ dotenv.config();
 import Product from "./models/Product.js";
 import User from "./models/User.js";
 import Faq from "./models/Faq.js";
+import Category from "./models/Category.js";
 import connectDB from "./config/db.js";
 import users from "./data/users.js";
 import faqs from "./data/faqs.js";
@@ -192,6 +193,18 @@ const importData = async () => {
 
         await Product.insertMany(processedProducts);
         log(`Imported ${processedProducts.length} new products.`);
+
+        // 7. Seed Categories
+        const uniqueCategories = [...new Set(processedProducts.map(p => p.category))];
+        const categoryRecords = uniqueCategories.map(cat => ({
+            name: cat,
+            slug: cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
+            description: `Các sản phẩm thuộc dòng ${cat}`
+        }));
+
+        await Category.deleteMany();
+        await Category.insertMany(categoryRecords);
+        log(`Imported ${categoryRecords.length} categories.`);
 
         await User.deleteMany();
         await User.insertMany(users);

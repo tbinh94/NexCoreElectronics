@@ -1,19 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Package, ShoppingCart, Info, AlertTriangle, CheckCircle } from "lucide-react";
+import { Bell, Package, ShoppingCart, Info, AlertTriangle, CheckCircle, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+    Sheet,
+    SheetContent,
+    SheetTrigger,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
+import AdminSidebar from "./AdminSidebar";
 
 export default function AdminHeader() {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -50,9 +59,26 @@ export default function AdminHeader() {
     };
 
     return (
-        <header className="h-16 border-b bg-white sticky top-0 z-30 px-6 flex items-center justify-end">
+        <header className="h-16 border-b bg-white sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between">
+            {/* Mobile Menu Trigger */}
+            <div className="md:hidden">
+                <Sheet open={open} onOpenChange={setOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-gray-500">
+                            <Menu className="h-6 w-6" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0 w-64">
+                        <SheetHeader className="sr-only">
+                            <SheetTitle>Admin Navigation</SheetTitle>
+                        </SheetHeader>
+                        <AdminSidebar className="border-r-0" showLogo={true} onItemClick={() => setOpen(false)} />
+                    </SheetContent>
+                </Sheet>
+            </div>
+
             {/* Notifications Only */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 ml-auto">
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button variant="ghost" size="icon" className="relative text-gray-500 hover:text-blue-600 hover:bg-gray-100">
