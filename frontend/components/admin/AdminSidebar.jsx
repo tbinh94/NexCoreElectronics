@@ -14,12 +14,12 @@ import {
 import { Button } from "../ui/button";
 
 const menuItems = [
-    { icon: LayoutDashboard, label: "Overview", href: '/admin' },
-    { icon: Package, label: "Products", href: '/admin/products' },
-    { icon: LayoutDashboard, label: "Categories", href: '/admin/categories' },
-    { icon: ShoppingCart, label: "Orders", href: '/admin/orders' },
-    { icon: Users, label: "Customers", href: '/admin/users' },
-    { icon: Settings, label: "Settings", href: '/admin/settings' },
+    { icon: LayoutDashboard, label: "Tổng quan", href: '/admin' },
+    { icon: Package, label: "Sản phẩm", href: '/admin/products' },
+    { icon: LayoutDashboard, label: "Danh mục", href: '/admin/categories' },
+    { icon: ShoppingCart, label: "Đơn hàng", href: '/admin/orders' },
+    { icon: Users, label: "Khách hàng", href: '/admin/users' },
+    { icon: Settings, label: "Cài đặt", href: '/admin/settings' },
 ]
 
 export default function AdminSidebar({ className, showLogo = true, onItemClick }) {
@@ -70,7 +70,7 @@ export default function AdminSidebar({ className, showLogo = true, onItemClick }
                     className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors shadow-none justify-start"
                 >
                     <LogOut className="h-5 w-5" />
-                    Logout
+                    Đăng xuất
                 </Button>
             </div>
         </div>

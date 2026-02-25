@@ -48,47 +48,78 @@ export default function UsersPage() {
                 <p className="text-gray-500 text-sm">Danh sách người dùng đã đăng ký</p>
             </div>
 
-            <Card className="border-none shadow-sm">
-                <CardContent className="p-0">
+            <Card className="border-none shadow-sm overflow-hidden">
+                <CardContent className="p-0 sm:p-6">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Khách hàng</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Vai trò</TableHead>
-                                    <TableHead>Ngày tham gia</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
+                        <>
+                            {/* Desktop View - Table */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <Table>
+                                    <TableHeader className="bg-gray-50">
+                                        <TableRow>
+                                            <TableHead className="font-semibold text-gray-900 border-r">Khách hàng</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-r">Email</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-r">Vai trò</TableHead>
+                                            <TableHead className="font-semibold text-gray-900">Ngày tham gia</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-gray-100">
+                                        {users.map((user) => (
+                                            <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
+                                                <TableCell className="flex items-center gap-3 py-4 border-r">
+                                                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                                        {user.name?.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <span className="font-medium text-gray-900">{user.name}</span>
+                                                </TableCell>
+                                                <TableCell className="border-r">
+                                                    <div className="flex items-center gap-2 text-gray-600">
+                                                        <Mail className="h-4 w-4" />
+                                                        {user.email}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="border-r">
+                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
+                                                        {user.isAdmin ? "Admin" : "Khách hàng"}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-gray-500">{new Date(user.createdAt).toLocaleDateString('vi-VN')}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Mobile View - Card List */}
+                            <div className="md:hidden divide-y divide-gray-100 px-4">
                                 {users.map((user) => (
-                                    <TableRow key={user._id}>
-                                        <TableCell className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                                {user.name?.charAt(0).toUpperCase()}
+                                    <div key={user._id} className="py-5 flex items-start gap-4">
+                                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 text-lg">
+                                            {user.name?.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="flex-1 space-y-1.5 min-w-0">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <h3 className="font-bold text-gray-900 truncate">{user.name}</h3>
+                                                <span className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
+                                                    {user.isAdmin ? "Admin" : "Khách"}
+                                                </span>
                                             </div>
-                                            <span className="font-medium">{user.name}</span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2 text-gray-500">
-                                                <Mail className="h-4 w-4" />
-                                                {user.email}
+                                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                <Mail className="h-3.5 w-3.5 shrink-0" />
+                                                <span className="truncate">{user.email}</span>
                                             </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${user.isAdmin ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-800"}`}>
-                                                {user.isAdmin ? "Admin" : "Khách hàng"}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</TableCell>
-                                    </TableRow>
+                                            <div className="flex items-center justify-between pt-1">
+                                                <p className="text-[10px] text-gray-400 font-medium">Tham gia: {new Date(user.createdAt).toLocaleDateString('vi-VN')}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
-                            </TableBody>
-                        </Table>
+                            </div>
+                        </>
                     )}
                 </CardContent>
             </Card>

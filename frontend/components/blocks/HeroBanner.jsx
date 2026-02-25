@@ -63,7 +63,7 @@ export default function HeroBanner() {
             id: 2,
             image: "/banner_green.png",
             title: "Laptop AI - Kỷ Nguyên Mới",
-            subtitle: "Trải nghiệm sức mạnh trí tuệ nhân tạo trên các dòng Laptop mới nhất 2024.",
+            subtitle: "Trải nghiệm sức mạnh trí tuệ nhân tạo trên các dòng Laptop mới nhất 2026.",
             cta: "Khám phá ngay",
             link: "/products?category=Laptop AI",
             bgClass: "bg-gradient-to-r from-emerald-800 to-emerald-500"

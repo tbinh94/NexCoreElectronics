@@ -133,74 +133,131 @@ export default function ProductsPage() {
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0 sm:p-6">
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                         </div>
                     ) : (
-                        <div className="rounded-md border">
-                            <div className="w-full overflow-auto">
-                                <table className="w-full caption-bottom text-sm text-left">
-                                    <thead className="[&_tr]:border-b">
-                                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Tên sản phẩm</th>
-                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Trạng thái</th>
-                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Giá</th>
-                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Tồn kho</th>
-                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground text-right">Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="[&_tr:last-child]:border-0">
-                                        {filteredProducts.map((item) => (
-                                            <tr key={item._id} className="border-b transition-colors hover:bg-muted/50">
-                                                <td className="p-4 align-middle font-medium">{item.name}</td>
-                                                <td className="p-4 align-middle">
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${item.isActive !== false
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-gray-100 text-gray-800"
-                                                        }`}>
-                                                        {item.isActive !== false ? "Đang bán" : "Dừng bán"}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 align-middle">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
-                                                </td>
-                                                <td className="p-4 align-middle">{item.countInStock}</td>
-                                                <td className="p-4 align-middle text-right">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                                                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item._id)}>
-                                                                Copy ID
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <Link href={`/admin/products/${item._id}`}>
-                                                                <DropdownMenuItem className="cursor-pointer">
-                                                                    Chỉnh sửa
-                                                                </DropdownMenuItem>
-                                                            </Link>
-                                                            <DropdownMenuItem onClick={() => toggleStatus(item._id, item.isActive !== false)}>
-                                                                {item.isActive !== false ? "Dừng bán" : "Mở bán lại"}
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem className="text-red-600" onClick={() => setDeleteId(item._id)}>
-                                                                Xoá sản phẩm
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </td>
+                        <>
+                            {/* Desktop View - Table */}
+                            <div className="hidden md:block rounded-md border overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full caption-bottom text-sm text-left">
+                                        <thead className="bg-gray-50 border-b">
+                                            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Tên sản phẩm</th>
+                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Trạng thái</th>
+                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Giá</th>
+                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Tồn kho</th>
+                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 text-right pr-6">Hành động</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody className="[&_tr:last-child]:border-0 divide-y">
+                                            {filteredProducts.map((item) => (
+                                                <tr key={item._id} className="border-b transition-colors hover:bg-gray-50">
+                                                    <td className="p-4 align-middle font-medium text-gray-900">{item.name}</td>
+                                                    <td className="p-4 align-middle">
+                                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${item.isActive !== false
+                                                            ? "bg-green-100 text-green-800"
+                                                            : "bg-gray-100 text-gray-800"
+                                                            }`}>
+                                                            {item.isActive !== false ? "Đang bán" : "Dừng bán"}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
+                                                    </td>
+                                                    <td className="p-4 align-middle text-gray-600">{item.countInStock}</td>
+                                                    <td className="p-4 align-middle text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="hover:bg-gray-100">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="w-48">
+                                                                <DropdownMenuLabel>Hành động</DropdownMenuLabel>
+                                                                <DropdownMenuItem onClick={() => {
+                                                                    navigator.clipboard.writeText(item._id);
+                                                                    toast.success("Đã chép ID");
+                                                                }}>
+                                                                    Sao chép ID
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <Link href={`/admin/products/${item._id}`}>
+                                                                    <DropdownMenuItem className="cursor-pointer">
+                                                                        Chỉnh sửa
+                                                                    </DropdownMenuItem>
+                                                                </Link>
+                                                                <DropdownMenuItem onClick={() => toggleStatus(item._id, item.isActive !== false)}>
+                                                                    {item.isActive !== false ? "Dừng bán" : "Mở bán lại"}
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteId(item._id)}>
+                                                                    Xoá sản phẩm
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+
+                            {/* Mobile View - Cards list */}
+                            <div className="md:hidden space-y-4 px-4 pb-4">
+                                {filteredProducts.map((item) => (
+                                    <div key={item._id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm space-y-3">
+                                        <div className="flex justify-between items-start">
+                                            <div className="space-y-1">
+                                                <h3 className="font-bold text-gray-900 line-clamp-2">{item.name}</h3>
+                                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${item.isActive !== false
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-gray-100 text-gray-700"
+                                                    }`}>
+                                                    {item.isActive !== false ? "Đang bán" : "Dừng bán"}
+                                                </span>
+                                            </div>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48">
+                                                    <Link href={`/admin/products/${item._id}`}>
+                                                        <DropdownMenuItem className="cursor-pointer">Chỉnh sửa</DropdownMenuItem>
+                                                    </Link>
+                                                    <DropdownMenuItem onClick={() => toggleStatus(item._id, item.isActive !== false)}>
+                                                        {item.isActive !== false ? "Dừng bán" : "Mở bán lại"}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem className="text-red-600" onClick={() => setDeleteId(item._id)}>
+                                                        Xoá sản phẩm
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-50">
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Giá bán</p>
+                                                <p className="text-sm font-bold text-blue-600">
+                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Tồn kho</p>
+                                                <p className="text-sm font-bold text-gray-900">{item.countInStock}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
                     )}
                 </CardContent>
             </Card>

@@ -121,8 +121,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Recent Activity Section */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border-none shadow-sm bg-white">
+            <div className="grid gap-6 lg:grid-cols-7">
+                <Card className="lg:col-span-4 border-none shadow-sm bg-white w-full">
                     <CardHeader>
                         <CardTitle className="text-gray-900">Doanh thu 7 ngày qua</CardTitle>
                     </CardHeader>
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="col-span-3 border-none shadow-sm bg-white">
+                <Card className="lg:col-span-3 border-none shadow-sm bg-white w-full">
                     <CardHeader>
                         <CardTitle className="text-gray-900">Đơn hàng gần đây</CardTitle>
                     </CardHeader>
