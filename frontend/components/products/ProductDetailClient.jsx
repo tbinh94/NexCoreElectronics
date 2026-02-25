@@ -16,7 +16,7 @@ import { addToWishlist, removeFromWishlist, getWishlist } from "@/lib/api";
 import { useCompare } from "@/context/CompareContext";
 
 export default function ProductDetailClient({ product }) {
-    console.log("ProductDetailClient product:", product);
+    //console.log("ProductDetailClient product:", product);
     const { user, token } = useAuth();
     const { compareList, addToCompare } = useCompare();
     const [isWishlisted, setIsWishlisted] = useState(false);
