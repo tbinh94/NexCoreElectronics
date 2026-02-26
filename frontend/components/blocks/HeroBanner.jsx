@@ -62,29 +62,29 @@ export default function HeroBanner() {
         },
         {
             id: 2,
-            image: "/banner_green.png",
+            image: "/banner_green_new.png",
             title: "Laptop AI - Kỷ Nguyên Mới",
             subtitle: "Trải nghiệm sức mạnh trí tuệ nhân tạo trên các dòng Laptop mới nhất 2026.",
             cta: "Khám phá ngay",
             link: "/products?category=Laptop AI",
-            bgClass: "bg-gradient-to-r from-emerald-800 to-emerald-500"
+            bgClass: "bg-emerald-950"
         },
         {
             id: 3,
-            image: "/banner_purple.png",
+            image: "/banner_purple_new.png",
             title: "Gaming Gear Đỉnh Cao",
             subtitle: "Nâng tầm trải nghiệm chơi game với các dòng Laptop Gaming mạnh mẽ nhất.",
             cta: "Chiến ngay",
             link: "/products?category=Gaming",
-            bgClass: "bg-gradient-to-r from-violet-900 to-violet-600"
+            bgClass: "bg-indigo-950"
         }
     ];
 
     return (
         <section className="w-full py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-125">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-[450px]">
                 {/* Main Slider (Left - 2/3 width) */}
-                <div className="lg:col-span-2 h-75 lg:h-full rounded-2xl overflow-hidden shadow-lg relative group">
+                <div className="lg:col-span-2 h-[250px] lg:h-full rounded-2xl overflow-hidden shadow-lg relative group">
                     <Carousel
                         plugins={[plugin.current]}
                         className="w-full h-full"
@@ -95,17 +95,17 @@ export default function HeroBanner() {
                             {slides.map((slide) => (
                                 <CarouselItem key={slide.id} className="relative w-full h-full">
                                     <div className={`relative w-full h-full ${slide.bgClass}`}>
-                                        {/* Background Image */}
+                                        {/* Background Image - Enhanced Fit */}
                                         <Image
                                             src={slide.image}
                                             alt={slide.title}
                                             fill
-                                            className="object-cover opacity-60 mix-blend-overlay"
+                                            className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
                                             priority={slide.id === 1}
                                         />
 
-                                        {/* Content Overlay */}
-                                        <div className="absolute inset-0 flex flex-col justify-center items-start p-8 md:p-16 text-white z-10 bg-linear-to-r from-black/60 to-transparent">
+                                        {/* Content Overlay - Better contrast */}
+                                        <div className="absolute inset-0 flex flex-col justify-center items-start p-8 md:p-16 text-white z-10 bg-gradient-to-r from-black/70 via-black/30 to-transparent">
                                             <h2 className="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight animate-in slide-in-from-left duration-500">
                                                 {slide.title}
                                             </h2>
