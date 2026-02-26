@@ -50,15 +50,7 @@ export default function HeroBanner() {
     const brandOfTheWeek = MEGA_MENU_DATA.brands[brandIndex];
 
     const slides = [
-        {
-            id: 0,
-            image: "/banner_trade_in.png",
-            title: "Thu Cũ Đổi Mới - Lên Đời Laptop",
-            subtitle: "Hỗ trợ thu mua máy cũ giá cao, trợ giá lên đến 2 triệu đồng khi nâng cấp máy mới.",
-            cta: "Định giá ngay",
-            link: "/trade-in",
-            bgClass: "bg-gradient-to-r from-green-800 to-emerald-600"
-        },
+
         {
             id: 1,
             image: "/bannerPC.png",

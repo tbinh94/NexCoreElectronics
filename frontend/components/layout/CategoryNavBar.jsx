@@ -233,7 +233,7 @@ export default function CategoryNavBar({ categories = [] }) {
                         </Link>
                     </div>
                 </div>
-            </Container>
-        </div>
+            </Container >
+        </div >
     );
 }
