@@ -1,4 +1,5 @@
-import { Briefcase, Gamepad2, Feather, PenTool, GraduationCap, Monitor, Zap, Laptop } from "lucide-react";
+import { Briefcase, Gamepad2, Feather, PenTool, GraduationCap, Monitor, Zap, Laptop, RotateCcw } from "lucide-react";
+
 
 export const MEGA_MENU_DATA = {
     brands: [
@@ -29,7 +30,9 @@ export const MEGA_MENU_DATA = {
         { name: "Sinh viên, Giá rẻ", icon: GraduationCap, category: "Học tập – Văn phòng" },
         { name: "Cảm ứng, 2 trong 1", icon: Monitor, category: "Ultrabook" },
         { name: "Laptop AI", icon: Zap, category: "Laptop AI", hot: true },
+        { name: "Laptop cũ", icon: RotateCcw, category: "Laptop cũ", hot: true, label: "Tiết kiệm tới 40%" },
         { name: "Mac CTO", icon: Laptop, category: "Macbook", label: "Nâng cấp cấu hình" }
+
     ],
     chips: [
         "Core i3", "Core i5", "Core i7", "Core i9",

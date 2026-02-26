@@ -4,13 +4,15 @@ import { useAuth } from '@/context/AuthContext';
 import { Star, User, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { fetchReviews as getApiReviews } from '@/lib/api';
 
-export default function ReviewSection({ productId }) {
+
+export default function ReviewSection({ productId, initialReviews = [] }) {
     const { user } = useAuth();
-    const [reviews, setReviews] = useState([]);
+    const [reviews, setReviews] = useState(initialReviews);
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(initialReviews.length === 0);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
@@ -19,14 +21,17 @@ export default function ReviewSection({ productId }) {
     const [summarizing, setSummarizing] = useState(false);
 
     useEffect(() => {
-        fetchReviews();
+        // Nếu đã có initialReviews thì không cần fetch lại ngay lập tức
+        if (initialReviews.length === 0) {
+            fetchReviewsData();
+        } else {
+            setLoading(false);
+        }
     }, [productId]);
 
-    const fetchReviews = async () => {
+    const fetchReviewsData = async () => {
         try {
-            const res = await fetch(`/api/reviews/${productId}`);
-            if (!res.ok) throw new Error('Failed to fetch reviews');
-            const data = await res.json();
+            const data = await getApiReviews(productId);
             setReviews(data);
         } catch (err) {
             console.error(err);
@@ -34,6 +39,7 @@ export default function ReviewSection({ productId }) {
             setLoading(false);
         }
     };
+
 
     const handleSummarize = async () => {
         setSummarizing(true);

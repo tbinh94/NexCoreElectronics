@@ -12,10 +12,12 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { addToWishlist, removeFromWishlist, getWishlist } from "@/lib/api";
+import { addToWishlist, removeFromWishlist, getWishlist, getIsProductUsedWeekly } from "@/lib/api";
 import { useCompare } from "@/context/CompareContext";
 
-export default function ProductDetailClient({ product }) {
+
+export default function ProductDetailClient({ product, initialReviews }) {
+
     //console.log("ProductDetailClient product:", product);
     const { user, token } = useAuth();
     const { compareList, addToCompare } = useCompare();
@@ -139,8 +141,16 @@ export default function ProductDetailClient({ product }) {
     const formattedPrice = formatPrice(currentNewPrice);
     const formattedUsedPrice = formatPrice(currentUsedPrice);
 
-    const oldPrice = formatPrice(currentNewPrice * 1.1); // Fake original price
+    // Chỉ sản phẩm nằm trong nhóm 20% mới hỗ trợ bản cũ và hiện "Giá niêm yết"
+    const isUsedSupported = getIsProductUsedWeekly(product._id);
+    const showOldPrice = isUsedSupported || product.oldPrice > 0;
+
+    const oldPrice = showOldPrice
+        ? formatPrice(currentNewPrice * 1.1)
+        : null;
+
     const tradeInPrice = formatPrice(currentNewPrice * 0.85);
+
 
     return (
         <div className="space-y-6 sm:space-y-10">
@@ -258,37 +268,43 @@ export default function ProductDetailClient({ product }) {
                                 <p className="text-xs text-gray-500 mt-1">Nguyên seal, chưa active</p>
                             </div>
 
-                            {/* Used Option */}
-                            <div
-                                onClick={() => setSelectedCondition('used')}
-                                className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedCondition === 'used'
-                                    ? 'bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500'
-                                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-red-300'
-                                    }`}
-                            >
-                                <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
-                                    -40%
-                                </div>
-                                {selectedCondition === 'used' && (
-                                    <div className="absolute top-2 right-2 text-red-500">
-                                        <Check className="w-4 h-4" />
+                            {/* Used Option - Chỉ hiện nếu sản phẩm này hỗ trợ bản cũ tuần này */}
+                            {isUsedSupported && (
+                                <div
+                                    onClick={() => setSelectedCondition('used')}
+                                    className={`relative p-4 rounded-xl border cursor-pointer transition-all ${selectedCondition === 'used'
+                                        ? 'bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500'
+                                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-red-300'
+                                        }`}
+                                >
+                                    <div className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
+                                        -40%
                                     </div>
-                                )}
-                                <p className="text-sm font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
-                                    <Tag className="w-3 h-3" /> Máy Cũ 99%
-                                </p>
-                                <p className="text-lg font-bold text-red-600 dark:text-red-500">{formattedUsedPrice}</p>
-                                <p className="text-xs text-gray-500 mt-1">Bảo hành 6 tháng</p>
-                            </div>
+                                    {selectedCondition === 'used' && (
+                                        <div className="absolute top-2 right-2 text-red-500">
+                                            <Check className="w-4 h-4" />
+                                        </div>
+                                    )}
+                                    <p className="text-sm font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-1">
+                                        <Tag className="w-3 h-3" /> Máy Cũ 99%
+                                    </p>
+                                    <p className="text-lg font-bold text-red-600 dark:text-red-500">{formattedUsedPrice}</p>
+                                    <p className="text-xs text-gray-500 mt-1">Bảo hành 6 tháng</p>
+                                </div>
+                            )}
+
                         </div>
                     </div>
 
                     {/* Price Summary Box */}
                     <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-gray-500">Giá niêm yết:</span>
-                            <span className="text-sm text-gray-400 line-through">{oldPrice}</span>
-                        </div>
+                        {showOldPrice && (
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm text-gray-500">Giá niêm yết:</span>
+                                <span className="text-sm text-gray-400 line-through">{oldPrice}</span>
+                            </div>
+                        )}
+
                         <div className="flex justify-between items-center">
                             <span className="text-base font-bold text-gray-900 dark:text-white">Giá thanh toán:</span>
                             <span className="text-3xl font-bold text-red-600 dark:text-red-500">
@@ -427,7 +443,8 @@ export default function ProductDetailClient({ product }) {
             </div>
 
             <ProductDescription product={product} />
-            <ReviewSection productId={product._id} />
+            <ReviewSection productId={product._id} initialReviews={initialReviews} />
+
         </div>
     );
 }

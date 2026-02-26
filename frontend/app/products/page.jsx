@@ -67,10 +67,11 @@ export default async function ProductsPage({
                 </h1>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar */}
-                    <div className="w-full lg:w-64 shrink-0">
+                    {/* Sidebar - Hidden on mobile */}
+                    <div className="hidden lg:block w-full lg:w-64 shrink-0">
                         <FilterSidebar category={categories} brand={brands} />
                     </div>
+
 
                     {/* Main Content */}
                     <div className="flex-1">

@@ -15,15 +15,20 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Suspense } from "react";
+import RelatedProductsWrapper from "@/components/products/RelatedProductsWrapper";
+
 
 export default async function ProductPage({ params }) {
     const { id } = await params;
-    const product = await fetchProductById(id);
-    const reviews = await fetchReviews(id);
-
+    const [product, reviews] = await Promise.all([
+        fetchProductById(id),
+        fetchReviews(id)
+    ]);
     if (!product) {
         notFound();
     }
+
 
     // Calculate real stats
     const realReviewCount = reviews.length;
@@ -31,11 +36,7 @@ export default async function ProductPage({ params }) {
         ? (reviews.reduce((acc, r) => acc + r.rating, 0) / realReviewCount).toFixed(1)
         : 0;
 
-    const relatedProductsData = await fetchProducts({
-        category: product.category,
-        exclude: product._id,
-        limit: 4
-    });
+
 
     return (
         <Container className="max-w-7xl py-4 sm:py-6 space-y-6 sm:space-y-8 px-4 sm:px-6">
@@ -60,8 +61,25 @@ export default async function ProductPage({ params }) {
                 </Breadcrumb>
             </div>
 
-            <ProductDetailClient product={{ ...product, rating: realRating, reviews: realReviewCount }} />
-            <RelatedProducts products={relatedProductsData.products} />
+            <ProductDetailClient
+                product={{ ...product, rating: realRating, reviews: realReviewCount }}
+                initialReviews={reviews}
+            />
+
+
+            <Suspense fallback={
+                <div className="space-y-4">
+                    <div className="h-8 w-48 bg-gray-200 animate-pulse rounded" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="h-64 bg-gray-100 animate-pulse rounded-xl" />
+                        ))}
+                    </div>
+                </div>
+            }>
+                <RelatedProductsWrapper category={product.category} excludeId={id} />
+            </Suspense>
+
         </Container >
     );
 }

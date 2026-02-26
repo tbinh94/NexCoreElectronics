@@ -26,7 +26,7 @@ export const viewport = {
     userScalable: false,
 };
 
-export const dynamic = 'force-dynamic';
+//export const dynamic = 'force-dynamic';
 
 import { fetchFilters } from "@/lib/api";
 
