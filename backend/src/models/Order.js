@@ -29,17 +29,26 @@ const orderSchema = new mongoose.Schema({
         city: { type: String, required: true },
         phone: { type: String, required: true }
     },
+    cccd: {
+        type: String,
+        validate: {
+            validator: function (v) {
+                return !v || /^\d{10}$/.test(v);
+            },
+            message: props => `${props.value} is not a valid 10-digit CCCD!`
+        }
+    },
     estimatedDeliveryDate: {
         type: Date
     },
     paymentMethod: {
         type: String,
         required: true,
-        enum: ["cash", "card", "transfer"]
+        enum: ["cash", "card", "transfer", "installment"]
     },
     status: {
         type: String,
-        enum: ["pending", "processing", "shipping", "completed", "cancelled"],
+        enum: ["pending", "processing", "shipping", "completed", "cancelled", "đang trả góp"],
         default: "pending"
     }
 }, {

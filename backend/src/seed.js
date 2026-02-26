@@ -132,6 +132,19 @@ const categorizeProduct = (p) => {
 
 const log = (msg) => console.log(msg);
 
+const createSlug = (text) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+};
+
 const importData = async () => {
     try {
         await connectDB();
@@ -143,6 +156,10 @@ const importData = async () => {
             const cpuType = p.cpu_type || inferCpuType(p.specs, p.name);
             const screenSizeLabel = p.screen_size_label || inferScreenSize(p.specs);
             const usage = p.usage || inferUsage(p, category);
+
+            // Generate a stable ObjectId from the integer id
+            // Example: 1 -> 000000000000000000000001
+            const stableId = p.id ? new mongoose.Types.ObjectId(p.id.toString().padStart(24, '0')) : undefined;
 
             // Ensure numeric fields
             let price = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
@@ -162,7 +179,9 @@ const importData = async () => {
             const description = p.description || "Máy tính xách tay cấu hình cao, phù hợp cho nhiều nhu cầu sử dụng.";
 
             return {
+                _id: stableId, // STABLE ID
                 name: p.name || "Sản phẩm Laptop",
+                slug: `${createSlug(p.name || "san-pham")}-${p.id}`,
                 price: price,
                 originalPrice: isNaN(originalPrice) ? undefined : originalPrice,
                 description: description,
@@ -198,7 +217,7 @@ const importData = async () => {
         const uniqueCategories = [...new Set(processedProducts.map(p => p.category))];
         const categoryRecords = uniqueCategories.map(cat => ({
             name: cat,
-            slug: cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
+            slug: createSlug(cat),
             description: `Các sản phẩm thuộc dòng ${cat}`
         }));
 
@@ -206,9 +225,22 @@ const importData = async () => {
         await Category.insertMany(categoryRecords);
         log(`Imported ${categoryRecords.length} categories.`);
 
+        // Transform Users for stable IDs
+        const processedUsers = users.map(user => {
+            // Create a deterministic hash from email to use as ID
+            // Simple approach: Take first 24 chars of a hash, or simple hex padding
+            const hash = user.email.split('').reduce((acc, char) => acc + char.charCodeAt(0).toString(16), "");
+            const stableId = new mongoose.Types.ObjectId(hash.substring(0, 24).padEnd(24, '0'));
+
+            return {
+                ...user,
+                _id: stableId
+            };
+        });
+
         await User.deleteMany();
-        await User.insertMany(users);
-        console.log("Imported Users.");
+        await User.insertMany(processedUsers);
+        console.log("Imported Users with stable IDs.");
 
         await Faq.deleteMany();
         await Faq.insertMany(faqs);

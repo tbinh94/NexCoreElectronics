@@ -9,7 +9,8 @@ import {
     Users,
     Settings,
     LogOut,
-    Store
+    Store,
+    RefreshCw
 } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -18,6 +19,7 @@ const menuItems = [
     { icon: Package, label: "Sản phẩm", href: '/admin/products' },
     { icon: LayoutDashboard, label: "Danh mục", href: '/admin/categories' },
     { icon: ShoppingCart, label: "Đơn hàng", href: '/admin/orders' },
+    { icon: RefreshCw, label: "Thu cũ đổi mới", href: '/admin/trade' },
     { icon: Users, label: "Khách hàng", href: '/admin/users' },
     { icon: Settings, label: "Cài đặt", href: '/admin/settings' },
 ]

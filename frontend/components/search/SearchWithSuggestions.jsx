@@ -174,7 +174,7 @@ export default function SearchWithSuggestions() {
                         {suggestions.map((product) => (
                             <li key={product._id} className="border-b border-gray-50 dark:border-gray-800 last:border-none">
                                 <Link
-                                    href={`/products/${product._id}`}
+                                    href={`/products/${product.slug || product._id}`}
                                     className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                                     onClick={() => setShowSuggestions(false)}
                                 >

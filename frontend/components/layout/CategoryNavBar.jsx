@@ -180,14 +180,20 @@ export default function CategoryNavBar({ categories = [] }) {
                         >
                             <CarouselContent className="-ml-1">
                                 <CarouselItem className="pl-1 basis-auto">
-                                    <Link href="/products?sort=newest" className="relative block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg whitespace-nowrap">
-                                        Hàng mới về
+                                    <Link href="/trade-in" className="relative flex items-center gap-2 px-4 py-2 text-sm font-bold text-green-600 bg-green-50 hover:bg-green-100 rounded-lg whitespace-nowrap border border-green-200">
+                                        <RotateCcw className="w-4 h-4 fill-current" />
+                                        Thu cũ đổi mới
                                     </Link>
                                 </CarouselItem>
                                 <CarouselItem className="pl-1 basis-auto">
                                     <Link href="/products?promotion=true" className="relative flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg whitespace-nowrap">
                                         <Zap className="w-4 h-4 fill-current" />
                                         Flash Sale
+                                    </Link>
+                                </CarouselItem>
+                                <CarouselItem className="pl-1 basis-auto">
+                                    <Link href="/products?sort=newest" className="relative block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg whitespace-nowrap">
+                                        Hàng mới về
                                     </Link>
                                 </CarouselItem>
                                 <CarouselItem className="pl-1 basis-auto">
@@ -220,12 +226,7 @@ export default function CategoryNavBar({ categories = [] }) {
 
                     {/* Right Side - Support Links */}
                     <div className="hidden lg:flex items-center gap-6 shrink-0">
-                        <Link href="/products?category=Laptop cũ" className="flex items-center gap-2 text-sm font-bold text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors duration-200 group">
-                            <div className="p-1.5 rounded-full bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 transition-colors">
-                                <Zap className="w-3 h-3 fill-current" />
-                            </div>
-                            <span>Thu cũ đổi mới</span>
-                        </Link>
+
                         <Link href="/orders" className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 group">
                             <Package className="h-4 w-4 group-hover:text-blue-600 transition-colors duration-200" />
                             <span>Tra cứu đơn hàng</span>

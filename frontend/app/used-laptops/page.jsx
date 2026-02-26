@@ -67,7 +67,7 @@ export default function UsedLaptopsPage() {
 
                             <div className='p-3 flex-1 flex flex-col'>
                                 {/* Image */}
-                                <Link href={`/products/${product._id}?type=used`} className="aspect-4/3 w-full relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-3 block">
+                                <Link href={`/products/${product.slug || product._id}?type=used`} className="aspect-4/3 w-full relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-3 block">
                                     <Image
                                         src={product.image}
                                         alt={product.name}
@@ -79,7 +79,7 @@ export default function UsedLaptopsPage() {
 
                                 {/* Info */}
                                 <div className="flex-1">
-                                    <Link href={`/products/${product._id}?type=used`}>
+                                    <Link href={`/products/${product.slug || product._id}?type=used`}>
                                         <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 mb-1">
                                             {product.name}
                                         </h2>

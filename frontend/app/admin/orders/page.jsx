@@ -29,6 +29,7 @@ const statusMap = {
     shipping: { label: "Đang giao", color: "bg-purple-100 text-purple-800" },
     completed: { label: "Hoàn thành", color: "bg-green-100 text-green-800" },
     cancelled: { label: "Đã huỷ", color: "bg-red-100 text-red-800" },
+    "đang trả góp": { label: "Đang trả góp", color: "bg-amber-100 text-amber-800" },
 };
 
 export default function OrdersPage() {
@@ -124,6 +125,9 @@ export default function OrdersPage() {
                                                     <div className="flex flex-col">
                                                         <span className="font-medium text-gray-900">{order.shippingAddress?.name || "N/A"}</span>
                                                         <span className="text-xs text-gray-500">{order.userId?.email || "Khách vãng lai"}</span>
+                                                        {order.cccd && (
+                                                            <span className="text-xs font-bold text-amber-600 mt-0.5">CCCD: {order.cccd}</span>
+                                                        )}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="text-gray-600">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</TableCell>
@@ -179,6 +183,9 @@ export default function OrdersPage() {
                                                     </span>
                                                 </div>
                                                 <h3 className="font-bold text-gray-900">{order.shippingAddress?.name || "N/A"}</h3>
+                                                {order.cccd && (
+                                                    <p className="text-xs font-bold text-amber-600">CCCD: {order.cccd}</p>
+                                                )}
                                                 <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
                                             </div>
                                             <DropdownMenu>

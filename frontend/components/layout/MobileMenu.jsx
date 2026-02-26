@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
 import { MEGA_MENU_DATA } from "@/data/menuData";
-
+import { RotateCcw } from "lucide-react";
 export default function MobileMenu({ categories = [], user, logout }) {
     const [open, setOpen] = useState(false);
     const { setTheme, theme } = useTheme();
@@ -83,9 +83,9 @@ export default function MobileMenu({ categories = [], user, logout }) {
                             </Button>
 
                             {/* New Links Request */}
-                            <Button variant="ghost" className="w-full justify-start font-medium text-base h-11 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20" asChild onClick={handleLinkClick}>
+                            <Button variant="ghost" className="w-full justify-start font-medium text-base h-11 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/20" asChild onClick={handleLinkClick}>
                                 <Link href="/trade-in">
-                                    <Zap className="mr-3 h-5 w-5" />
+                                    <RotateCcw className="mr-3 h-5 w-5" />
                                     Thu cũ đổi mới
                                 </Link>
                             </Button>

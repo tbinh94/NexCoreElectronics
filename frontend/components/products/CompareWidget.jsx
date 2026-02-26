@@ -152,7 +152,7 @@ Hãy phân tích ưu nhược điểm của từng máy dựa trên nhu cầu **
                                                 <Button
                                                     size="sm"
                                                     className="w-full bg-black text-white hover:bg-gray-800 rounded-lg h-9"
-                                                    onClick={() => window.location.href = `/products/${product._id}`}
+                                                    onClick={() => window.location.href = `/products/${product.slug || product._id}`}
                                                 >
                                                     Xem chi tiết
                                                 </Button>

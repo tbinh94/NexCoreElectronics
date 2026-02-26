@@ -2,6 +2,7 @@ import { Router } from "express";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import TradeInRequest from "../models/TradeInRequest.js";
 
 const router = Router();
 
@@ -65,6 +66,9 @@ router.get("/stats", async (req, res) => {
         // 4. Customers
         const totalCustomers = await User.countDocuments({ isAdmin: false });
 
+        // 4.5 Trade-in Requests
+        const totalTradeIn = await TradeInRequest.countDocuments({});
+
         // Calculate Growths
         // Only calculate revenue growth if there was income yesterday to avoid misleading 100% jumps
         const revenueGrowth = incomeYesterday > 0 ? calculateGrowth(incomeToday, incomeYesterday) : 0;
@@ -118,6 +122,7 @@ router.get("/stats", async (req, res) => {
             orders: totalOrders,
             products: totalProducts,
             customers: totalCustomers,
+            tradeIn: totalTradeIn,
             recentOrders,
             revenueChart
         });
@@ -268,6 +273,39 @@ router.get("/users", async (req, res) => {
     }
 });
 
+// --- TRADE-IN MANAGEMENT ---
+
+// GET /api/admin/trade-ins - List all trade-in requests
+router.get("/trade-ins", async (req, res) => {
+    try {
+        const requests = await TradeInRequest.find({})
+            .populate("userId", "name email")
+            .sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+// PUT /api/admin/trade-ins/:id/status - Update trade-in status
+router.put("/trade-ins/:id/status", async (req, res) => {
+    try {
+        const updatedRequest = await TradeInRequest.findByIdAndUpdate(
+            req.params.id,
+            { status: req.body.status },
+            { new: true }
+        );
+
+        if (updatedRequest) {
+            res.json(updatedRequest);
+        } else {
+            res.status(404).json({ message: "Trade-in request not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 // --- NOTIFICATIONS ---
 router.get("/notifications", async (req, res) => {
     try {
@@ -275,8 +313,19 @@ router.get("/notifications", async (req, res) => {
         // In a real app, you'd query a Notification model
         const lowStockProducts = await Product.find({ countInStock: { $lt: 10 } }).select("name countInStock");
         const pendingOrders = await Order.countDocuments({ status: "pending" });
+        const pendingTradeIn = await TradeInRequest.countDocuments({ status: "pending" });
 
         const notifications = [];
+
+        if (pendingTradeIn > 0) {
+            notifications.push({
+                id: `tradein-${Date.now()}`,
+                title: "Yêu cầu Thu cũ mới",
+                message: `Có ${pendingTradeIn} yêu cầu định giá đang chờ xử lý`,
+                type: "success",
+                time: "Mới nhận"
+            });
+        }
 
         if (pendingOrders > 0) {
             notifications.push({

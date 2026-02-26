@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import fs from "fs";
+import TradeInRequest from "../models/TradeInRequest.js";
 
 dotenv.config();
 
@@ -173,5 +174,25 @@ export const estimateLaptopValue = async (req, res) => {
             });
         }
         res.status(500).json({ message: "Failed to estimate value", error: error.message });
+    }
+};
+
+export const saveTradeInRequest = async (req, res) => {
+    try {
+        const { deviceInfo, valuationResult, contactInfo } = req.body;
+        const userId = req.user._id;
+
+        const newRequest = new TradeInRequest({
+            userId,
+            deviceInfo,
+            valuationResult,
+            contactInfo
+        });
+
+        await newRequest.save();
+        res.status(201).json({ message: "Yêu cầu đã được gửi thành công. Nhân viên sẽ liên hệ với bạn sớm nhất có thể.", request: newRequest });
+    } catch (error) {
+        console.error("Save Trade-In Request Error:", error);
+        res.status(500).json({ message: "Lỗi khi lưu yêu cầu", error: error.message });
     }
 };

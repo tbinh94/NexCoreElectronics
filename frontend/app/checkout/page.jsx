@@ -16,19 +16,21 @@ export default function CheckoutPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [cartItems, setCartItems] = useState([]);
+    const searchParams = useSearchParams();
+    const directProductId = searchParams.get('productId');
+    const directVariant = searchParams.get('variant');
+    const directType = searchParams.get('type');
+    const initialPaymentMethod = searchParams.get('paymentMethod') || "cash";
+
     const [formData, setFormData] = useState({
         name: "",
         address: "",
         city: "",
         phone: "",
-        paymentMethod: "cash"
+        paymentMethod: initialPaymentMethod,
+        cccd: ""
     });
     const [orderSuccess, setOrderSuccess] = useState(false);
-
-    const searchParams = useSearchParams();
-    const directProductId = searchParams.get('productId');
-    const directVariant = searchParams.get('variant');
-    const directType = searchParams.get('type');
 
     // Fetch cart or direct product
     useEffect(() => {
@@ -114,6 +116,13 @@ export default function CheckoutPage() {
             return;
         }
 
+        if (formData.paymentMethod === 'installment') {
+            if (!/^\d{10}$/.test(formData.cccd)) {
+                alert("Số CCCD phải bao gồm 10 chữ số");
+                return;
+            }
+        }
+
         try {
             const res = await fetch("/api/orders", {
                 method: "POST",
@@ -127,6 +136,7 @@ export default function CheckoutPage() {
                         phone: formData.phone
                     },
                     paymentMethod: formData.paymentMethod,
+                    cccd: formData.paymentMethod === 'installment' ? formData.cccd : undefined,
                     items: cartItems.map(item => ({
                         productId: item.productId._id,
                         quantity: item.quantity,
@@ -171,6 +181,21 @@ export default function CheckoutPage() {
                                     <VietQRImage amount={totalPrice} />
                                 </div>
                                 <p className="text-lg font-bold text-blue-600 dark:text-blue-400">Tổng tiền: {formatPrice(totalPrice)}</p>
+                            </div>
+                        </div>
+                    ) : formData.paymentMethod === 'installment' ? (
+                        <div className="p-6 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 mb-8">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-gray-500 dark:text-gray-400">Phương thức:</span>
+                                <span className="font-semibold text-amber-700 dark:text-amber-400">Trả góp (CCCD: {formData.cccd})</span>
+                            </div>
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-gray-500 dark:text-gray-400">Trạng thái:</span>
+                                <span className="font-bold text-amber-600">Đang trả góp</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-500 dark:text-gray-400">Tổng giá trị đơn hàng:</span>
+                                <span className="font-bold text-red-600">{formatPrice(totalPrice)}</span>
                             </div>
                         </div>
                     ) : (
@@ -254,10 +279,27 @@ export default function CheckoutPage() {
                                     <SelectItem value="transfer">
                                         Chuyển khoản ngân hàng (QR)
                                     </SelectItem>
+                                    <SelectItem value="installment">
+                                        Trả góp (CCCD)
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
-
                         </div>
+
+                        {formData.paymentMethod === 'installment' && (
+                            <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <Label htmlFor="cccd">Số CCCD (10 số)</Label>
+                                <Input
+                                    id="cccd"
+                                    value={formData.cccd}
+                                    onChange={handleInputChange}
+                                    required={formData.paymentMethod === 'installment'}
+                                    placeholder="Nhập 10 số CCCD"
+                                    maxLength={10}
+                                />
+                                <p className="text-xs text-gray-500">Vui lòng nhập chính xác 10 chữ số CCCD để làm thủ tục trả góp.</p>
+                            </div>
+                        )}
 
                         <Button type="submit" className="w-full mt-6 text-lg">
                             Xác nhận đặt hàng

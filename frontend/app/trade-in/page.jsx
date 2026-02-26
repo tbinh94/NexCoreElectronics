@@ -27,12 +27,23 @@ export default function TradeInPage() {
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
+    const [showContactForm, setShowContactForm] = useState(false);
+    const [contactInfo, setContactInfo] = useState({
+        phone: "",
+        address: ""
+    });
+    const [submitting, setSubmitting] = useState(false);
 
     const { user, token } = useAuth(); // Get auth context
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleContactInputChange = (e) => {
+        const { name, value } = e.target;
+        setContactInfo(prev => ({ ...prev, [name]: value }));
     };
 
     const handleImageUpload = (e) => {
@@ -101,6 +112,7 @@ export default function TradeInPage() {
 
         setLoading(true);
         setResult(null);
+        setShowContactForm(false);
 
         try {
             // Stitch images into one
@@ -146,9 +158,63 @@ export default function TradeInPage() {
             toast.success("Định giá thành công!");
         } catch (error) {
             console.error(error);
-            toast.error(error.message);
+            if (error.message === "User not found") {
+                toast.error("Phiên đăng nhập hết hạn hoặc người dùng không tồn tại. Vui lòng đăng nhập lại.");
+                // Optionally: logout(); // If we have access to logout from useAuth
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                toast.error(error.message);
+            }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleTradeInSubmit = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/ai/trade-in-submit`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    deviceInfo: formData,
+                    valuationResult: result,
+                    contactInfo: contactInfo
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Lỗi khi gửi yêu cầu");
+            }
+
+            toast.success("Yêu cầu đã được gửi! Nhân viên sẽ liên hệ với bạn sớm.");
+            setResult(null);
+            setShowContactForm(false);
+            setFormData({
+                modelName: "",
+                modelCode: "",
+                specs: "",
+                operationStatus: "Hoạt động bình thường",
+                repairHistory: "Chưa sửa",
+                yearsUsed: "",
+                fanNoise: "",
+                batteryLife: "",
+                overheating: "",
+            });
+            setImages([]);
+            setContactInfo({ phone: "", address: "" });
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -419,7 +485,7 @@ export default function TradeInPage() {
                                     </p>
                                 </div>
 
-                                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
+                                <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-6">
                                     <div className="flex justify-between items-end mb-2">
                                         <span className="text-sm text-gray-500">Giá thị trường ước tính:</span>
                                         <span className="font-medium text-gray-900 dark:text-gray-100">
@@ -429,20 +495,105 @@ export default function TradeInPage() {
                                             }
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-end">
+                                    <div className="flex justify-between items-end mb-6">
                                         <span className="font-bold text-gray-900 dark:text-white">Giá thu mua đề xuất:</span>
-                                        <span className="text-2xl font-bold text-blue-600">
+                                        <span className="text-3xl font-bold text-blue-600">
                                             {typeof result.trade_in_value === 'object' ?
                                                 formatCurrency(result.trade_in_value.recommended) :
                                                 formatCurrency(result.trade_in_value)
                                             }
                                         </span>
                                     </div>
+
+                                    {/* Policies & Next Steps Information (Requested) */}
+                                    <div className="space-y-4 text-sm bg-blue-50/50 dark:bg-blue-900/10 p-5 rounded-xl border border-blue-100/50 dark:border-blue-800/50">
+                                        <div className="space-y-2">
+                                            <h4 className="font-bold text-blue-800 dark:text-blue-400 flex items-center gap-2">
+                                                <span>1️⃣</span> Về mức giá dự kiến
+                                            </h4>
+                                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed pl-7">
+                                                Đây là mức giá dự kiến dựa trên thông tin quý khách cung cấp. Giá thực tế có thể giữ nguyên hoặc điều chỉnh tăng/giảm trong khoảng <strong>300.000 – 2.000.000 đồng</strong>, tùy theo tình trạng thực tế khi nhân viên đến kiểm tra trực tiếp.
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <h4 className="font-bold text-blue-800 dark:text-blue-400 flex items-center gap-2">
+                                                <span>2️⃣</span> Xác nhận thông tin để hẹn lịch
+                                            </h4>
+                                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed pl-7">
+                                                Nếu quý khách cảm thấy mức giá phù hợp, vui lòng để lại số điện thoại và địa chỉ cụ thể để chúng tôi liên hệ xác nhận và sắp xếp lịch đến thu mua trong thời gian sớm nhất.
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <h4 className="font-bold text-blue-800 dark:text-blue-400 flex items-center gap-2">
+                                                <span>3️⃣</span> Phí đến tận nơi
+                                            </h4>
+                                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed pl-7">
+                                                Chúng tôi miễn phí hoàn toàn chi phí đến thu mua trong <strong>bán kính 8km</strong>. Ngoài khu vực này, phí (nếu có) sẽ được thông báo trước để quý khách yên tâm.
+                                            </p>
+                                        </div>
+
+                                        <div className="pt-3 mt-2 border-t border-blue-200 dark:border-blue-800 text-center">
+                                            <p className="text-[12px] font-medium text-gray-600 dark:text-gray-400">
+                                                Mọi thắc mắc cần hỗ trợ xin liên hệ hotline: <span className="font-bold text-red-600">1900 8888</span>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <Button className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white">
-                                    Liên hệ bán ngay
-                                </Button>
+                                {showContactForm ? (
+                                    <form onSubmit={handleTradeInSubmit} className="mt-6 space-y-4 pt-6 border-t border-blue-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <h4 className="font-bold text-blue-800 dark:text-blue-400">Thông tin liên hệ thu mua</h4>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="phone">Số điện thoại</Label>
+                                            <Input
+                                                id="phone"
+                                                name="phone"
+                                                required
+                                                placeholder="Nhập số điện thoại của bạn"
+                                                value={contactInfo.phone}
+                                                onChange={handleContactInputChange}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="address">Địa chỉ thu mua</Label>
+                                            <Textarea
+                                                id="address"
+                                                name="address"
+                                                required
+                                                placeholder="Nhập địa chỉ của bạn để nhân viên đến thu máy"
+                                                value={contactInfo.address}
+                                                onChange={handleContactInputChange}
+                                            />
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="flex-1"
+                                                onClick={() => setShowContactForm(false)}
+                                            >
+                                                Quay lại
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white"
+                                                disabled={submitting}
+                                            >
+                                                {submitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+                                                Gửi yêu cầu nhân viên gọi lại
+                                            </Button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <Button
+                                        className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                                        onClick={() => setShowContactForm(true)}
+                                    >
+                                        Tôi đồng ý với mức giá này - Liên hệ thu mua
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     ) : (

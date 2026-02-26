@@ -21,13 +21,12 @@ import RelatedProductsWrapper from "@/components/products/RelatedProductsWrapper
 
 export default async function ProductPage({ params }) {
     const { id } = await params;
-    const [product, reviews] = await Promise.all([
-        fetchProductById(id),
-        fetchReviews(id)
-    ]);
+    const product = await fetchProductById(id);
     if (!product) {
         notFound();
     }
+
+    const reviews = await fetchReviews(product._id);
 
 
     // Calculate real stats
@@ -77,7 +76,7 @@ export default async function ProductPage({ params }) {
                     </div>
                 </div>
             }>
-                <RelatedProductsWrapper category={product.category} excludeId={id} />
+                <RelatedProductsWrapper category={product.category} excludeId={product._id} />
             </Suspense>
 
         </Container >

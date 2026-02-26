@@ -32,7 +32,7 @@ export default function ProductList({ products }) {
                     >
                         <div className='p-3 md:p-4 flex-1 flex flex-col'>
                             {/* Phần Ảnh Sản Phẩm */}
-                            <Link href={`/products/${product._id}`} className="aspect-4/3 w-full relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-4 block">
+                            <Link href={`/products/${product.slug || product._id}`} className="aspect-4/3 w-full relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-4 block">
                                 <Image
                                     src={product.image}
                                     alt={product.name}
@@ -44,7 +44,7 @@ export default function ProductList({ products }) {
 
                             {/* Phần Thông Tin */}
                             <div className="flex-1">
-                                <Link href={`/products/${product._id}`}>
+                                <Link href={`/products/${product.slug || product._id}`}>
                                     <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 mb-2">
                                         {product.name}
                                     </h2>

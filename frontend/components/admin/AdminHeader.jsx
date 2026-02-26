@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Package, ShoppingCart, Info, AlertTriangle, CheckCircle, Menu } from "lucide-react";
+import { Bell, Package, ShoppingCart, Info, AlertTriangle, CheckCircle, Menu, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Popover,
@@ -58,6 +58,21 @@ export default function AdminHeader() {
         }
     };
 
+    const getNoteIconArea = (note) => {
+        if (note.title.toLowerCase().includes("thu cũ") || note.title.toLowerCase().includes("trade")) {
+            return (
+                <div className="p-2 rounded-full shrink-0 bg-green-50">
+                    <RefreshCw className="h-4 w-4 text-green-500" />
+                </div>
+            );
+        }
+        return (
+            <div className={`p-2 rounded-full shrink-0 ${note.type === 'warning' ? 'bg-orange-50' : note.type === 'success' ? 'bg-green-50' : 'bg-blue-50'}`}>
+                {getIcon(note.type)}
+            </div>
+        );
+    };
+
     return (
         <header className="h-16 border-b bg-white sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between">
             {/* Mobile Menu Trigger */}
@@ -100,17 +115,16 @@ export default function AdminHeader() {
                                         let href = "/admin";
                                         if (note.title.toLowerCase().includes("hàng") || note.title.toLowerCase().includes("stock")) {
                                             href = "/admin/products";
-                                        }
-                                        if (note.title.toLowerCase().includes("đơn") || note.title.toLowerCase().includes("order")) {
+                                        } else if (note.title.toLowerCase().includes("đơn") || note.title.toLowerCase().includes("order")) {
                                             href = "/admin/orders";
+                                        } else if (note.title.toLowerCase().includes("thu cũ") || note.title.toLowerCase().includes("trade")) {
+                                            href = "/admin/trade";
                                         }
 
                                         return (
                                             <Link key={note.id} href={href} className="block group">
                                                 <div className="p-4 hover:bg-gray-50 transition-colors flex gap-3 items-start">
-                                                    <div className={`p-2 rounded-full shrink-0 ${note.type === 'warning' ? 'bg-orange-50' : note.type === 'success' ? 'bg-green-50' : 'bg-blue-50'}`}>
-                                                        {getIcon(note.type)}
-                                                    </div>
+                                                    {getNoteIconArea(note)}
                                                     <div className="space-y-1">
                                                         <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{note.title}</p>
                                                         <p className="text-xs text-gray-500 line-clamp-2">{note.message}</p>

@@ -122,7 +122,7 @@ export async function fetchProducts(params = {}) {
 export async function fetchProductById(id) {
     try {
         const res = await fetch(`${API_URL}/products/${id}`, {
-            next: { revalidate: 60 }
+            cache: 'no-store'
         });
 
         if (!res.ok) {

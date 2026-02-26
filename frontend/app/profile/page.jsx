@@ -346,7 +346,7 @@ export default function ProfilePage() {
                                         </div>
                                         <div className="flex flex-col justify-between py-1 flex-1 min-w-0">
                                             <div className="space-y-1">
-                                                <Link href={`/products/${item._id}`} className="block">
+                                                <Link href={`/products/${item.slug || item._id}`} className="block">
                                                     <h3 className="font-bold text-sm text-gray-900 dark:text-white hover:text-red-600 transition-colors truncate">
                                                         {item.name}
                                                     </h3>
@@ -356,7 +356,7 @@ export default function ProfilePage() {
                                                 </p>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <Link href={`/products/${item._id}`} className="text-[10px] text-blue-600 font-bold uppercase tracking-wider hover:underline">
+                                                <Link href={`/products/${item.slug || item._id}`} className="text-[10px] text-blue-600 font-bold uppercase tracking-wider hover:underline">
                                                     Xem chi tiết
                                                 </Link>
                                                 <button

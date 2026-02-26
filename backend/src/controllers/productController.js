@@ -71,7 +71,7 @@ export const getProducts = async (req, res) => {
         if (promotion === 'true') {
             andConditions.push({ originalPrice: { $exists: true, $ne: null } });
         }
-        if (exclude) {
+        if (exclude && exclude.match(/^[0-9a-fA-F]{24}$/)) {
             andConditions.push({ _id: { $ne: exclude } });
         }
 
@@ -213,13 +213,26 @@ export const getProductFilters = async (req, res) => {
 
 export const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const { id } = req.params;
+        let product;
+
+        // Try finding by ID if it's a valid ObjectId
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            product = await Product.findById(id);
+        }
+
+        // If not found by ID (or ID was not valid), try finding by slug
+        if (!product) {
+            product = await Product.findOne({ slug: id });
+        }
+
         if (product) {
             res.json(product);
         } else {
             res.status(404).json({ message: "Product not found" });
         }
     } catch (error) {
+        console.error("Get Product By ID/Slug Error:", error);
         res.status(500).json({ message: "Server Error" });
     }
 };

@@ -126,6 +126,23 @@ export default function ProductDetailClient({ product, initialReviews }) {
         }
     };
 
+    const handleInstallment = async () => {
+        if (!user) {
+            toast.warning("Bạn cần đăng nhập để mua hàng");
+            router.push('/login');
+            return;
+        }
+
+        const query = new URLSearchParams({
+            productId: product._id,
+            type: selectedCondition,
+            variant: selectedStorage,
+            paymentMethod: 'installment'
+        });
+
+        router.push(`/checkout?${query.toString()}`);
+    };
+
     // Pricing Logic (Rule-based)
     // New: Base + (Index * 1,000,000)
     // Used: (Base * 0.6) + (Index * 500,000)
@@ -313,7 +330,10 @@ export default function ProductDetailClient({ product, initialReviews }) {
                         </div>
                         {selectedCondition === 'new' && (
                             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                <div className="flex justify-between items-center cursor-pointer group">
+                                <div
+                                    onClick={() => router.push('/trade-in')}
+                                    className="flex justify-between items-center cursor-pointer group"
+                                >
                                     <span className="text-sm text-blue-600 dark:text-blue-400 font-medium group-hover:underline">Thu cũ đổi mới</span>
                                     <span className="text-sm font-bold text-blue-600 dark:text-blue-400">Chỉ từ {tradeInPrice}</span>
                                 </div>
@@ -425,7 +445,11 @@ export default function ProductDetailClient({ product, initialReviews }) {
                                 <span className="text-lg font-bold uppercase">Mua ngay</span>
                                 <span className="text-[10px] font-normal opacity-90">Giao hàng tận nơi hoặc nhận tại cửa hàng</span>
                             </Button>
-                            <Button variant="outline" className="w-1/3 h-14 rounded-xl flex flex-col items-center justify-center gap-0.5 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20">
+                            <Button
+                                onClick={handleInstallment}
+                                variant="outline"
+                                className="w-1/3 h-14 rounded-xl flex flex-col items-center justify-center gap-0.5 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                            >
                                 <span className="text-sm font-bold uppercase">Trả góp 0%</span>
                                 <span className="text-[10px] font-normal opacity-90">Duyệt hồ sơ trong 5 phút</span>
                             </Button>

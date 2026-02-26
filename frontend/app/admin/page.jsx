@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Package, ShoppingCart, Users, TrendingUp } from "lucide-react";
+import { DollarSign, Package, ShoppingCart, Users, TrendingUp, RefreshCw } from "lucide-react";
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -12,6 +12,7 @@ export default function AdminDashboard() {
         orders: 0,
         products: 0,
         customers: 0,
+        tradeIn: 0,
         revenueGrowth: 0,
         recentOrders: [],
         revenueChart: []
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
                     orders: 0,
                     products: 0,
                     customers: 0,
+                    tradeIn: 0,
                     revenueGrowth: 0,
                     recentOrders: [],
                     revenueChart: []
@@ -81,6 +83,13 @@ export default function AdminDashboard() {
             icon: Users,
             color: "text-purple-600",
             bg: "bg-purple-100",
+        },
+        {
+            title: "Yêu cầu Thu cũ",
+            value: stats.tradeIn || 0,
+            icon: RefreshCw,
+            color: "text-red-500",
+            bg: "bg-red-50",
         },
     ];
 

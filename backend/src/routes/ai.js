@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import rateLimit from "express-rate-limit";
 import { generateProductDescription, summarizeReviews } from "../controllers/aiContentController.js";
-import { estimateLaptopValue } from "../controllers/valuationController.js";
+import { estimateLaptopValue, saveTradeInRequest } from "../controllers/valuationController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -29,5 +29,6 @@ const upload = multer({ storage });
 router.post("/generate-description", protect, generateProductDescription);
 router.post("/summarize-reviews", summarizeReviews);
 router.post("/valuation", protect, valuationLimiter, upload.array("images", 5), estimateLaptopValue);
+router.post("/trade-in-submit", protect, saveTradeInRequest);
 
 export default router;

@@ -7,7 +7,7 @@ import Product from "../models/Product.js";
 router.post("/", async (req, res) => {
     console.log("Received order request:", req.body);
     try {
-        const { userId, shippingAddress, paymentMethod, items } = req.body;
+        const { userId, shippingAddress, paymentMethod, items, cccd } = req.body;
 
         let orderItemsData = [];
         let isCartOrder = false;
@@ -79,14 +79,21 @@ router.post("/", async (req, res) => {
             deliveryDate.setDate(deliveryDate.getDate() + 5);
         }
 
-        const newOrder = new Order({
+        const orderData = {
             userId,
             products: orderProducts,
             totalAmount,
             shippingAddress,
             paymentMethod,
             estimatedDeliveryDate: deliveryDate
-        });
+        };
+
+        if (paymentMethod === 'installment') {
+            orderData.status = 'đang trả góp';
+            orderData.cccd = cccd;
+        }
+
+        const newOrder = new Order(orderData);
 
         await newOrder.save();
         console.log("Order saved:", newOrder._id);

@@ -14,7 +14,8 @@ const getStatusConfig = (status) => {
         pending: { label: 'Đang xử lý', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
         completed: { label: 'Hoàn thành', color: 'bg-green-100 text-green-800 border-green-300' },
         cancelled: { label: 'Đã hủy', color: 'bg-red-100 text-red-800 border-red-300' },
-        shipping: { label: 'Đang giao', color: 'bg-blue-100 text-blue-800 border-blue-300' }
+        shipping: { label: 'Đang giao', color: 'bg-blue-100 text-blue-800 border-blue-300' },
+        "đang trả góp": { label: 'Đang trả góp', color: 'bg-amber-100 text-amber-800 border-amber-300' }
     };
     return configs[status] || configs.pending;
 };
@@ -193,7 +194,9 @@ export default function Orders() {
                                                             <div className="flex-1 pt-0.5">
                                                                 <span className="text-gray-600">Thanh toán: </span>
                                                                 <span className="font-semibold text-gray-900">
-                                                                    {order.paymentMethod === 'transfer' ? 'Chuyển khoản' : 'Tiền mặt'}
+                                                                    {order.paymentMethod === 'transfer' ? 'Chuyển khoản' :
+                                                                        order.paymentMethod === 'installment' ? `Trả góp${order.cccd ? ` (CCCD: ${order.cccd})` : ''}` :
+                                                                            'Tiền mặt'}
                                                                 </span>
                                                             </div>
                                                         </div>
