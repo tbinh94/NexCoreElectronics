@@ -106,7 +106,7 @@ export default function HeroBanner() {
 
                                         {/* Content Overlay - Better contrast */}
                                         <div className="absolute inset-0 flex flex-col justify-center items-start p-8 md:p-16 text-white z-10 bg-gradient-to-r from-black/70 via-black/30 to-transparent">
-                                            <h2 className="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight animate-in slide-in-from-left duration-500">
+                                            <h2 className="text-xl md:text-5xl font-extrabold mb-4 tracking-tight animate-in slide-in-from-left duration-500">
                                                 {slide.title}
                                             </h2>
                                             <p className="text-lg md:text-xl mb-8 max-w-lg text-gray-100 animate-in slide-in-from-left duration-700 delay-100">

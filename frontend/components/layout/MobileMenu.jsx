@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, Home, Package, ShoppingBag, User, LogOut, LogIn, UserPlus, ChevronRight, Sun, Moon, Laptop, Smartphone, Watch, Headphones, Zap, Search, Briefcase, Monitor, Tag } from "lucide-react";
+import { Menu, Home, Package, ShoppingBag, User, LogOut, LogIn, UserPlus, ChevronRight, Sun, Moon, Laptop, Smartphone, Watch, Headphones, Zap, Search, Briefcase, Monitor, Tag, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -50,8 +50,12 @@ export default function MobileMenu({ categories = [], user, logout }) {
                                         <User className="h-4 w-4" />
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-col overflow-hidden">
-                                    <span className="font-bold text-sm truncate">{user.name}</span>
+                                <div className="flex flex-col overflow-hidden text-left">
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-bold text-sm truncate max-w-[150px]">{user.name}</span>
+                                        {user.isVip && <span className="text-[9px] bg-yellow-400 text-slate-900 px-1 rounded-sm font-black">VIP</span>}
+                                    </div>
+                                    <span className="text-[10px] text-white/70">Thành viên {user.isVip ? 'VIP' : 'thường'}</span>
                                 </div>
                             </div>
                         </Link>
@@ -102,6 +106,15 @@ export default function MobileMenu({ categories = [], user, logout }) {
                                     Tất cả sản phẩm
                                 </Link>
                             </Button>
+
+                            {user && !user.isVip && (
+                                <Button variant="ghost" className="w-full justify-start font-bold text-base h-11 text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-950/20" asChild onClick={handleLinkClick}>
+                                    <Link href="/pricing">
+                                        <Crown className="mr-3 h-5 w-5" />
+                                        Nâng cấp VIP
+                                    </Link>
+                                </Button>
+                            )}
                         </div>
 
                         <Separator className="my-2" />

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -38,10 +39,16 @@ export default function RegisterPage() {
                 body: JSON.stringify({ name, email, password }),
             });
             if (!res.ok) {
-                throw new Error("Failed to register");
+                let errorMessage = "Đăng ký thất bại";
+                try {
+                    const errorData = await res.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {}
+                throw new Error(errorMessage);
             }
             const data = await res.json();
             console.log("Register successful", data);
+            toast.success("Đăng ký thành công!");
             setName("");
             setEmail("");
             setPassword("");
@@ -49,7 +56,8 @@ export default function RegisterPage() {
             router.push("/login");
         } catch (error) {
             console.log(error);
-            setError("Failed to register");
+            setError(error.message);
+            toast.error(error.message);
         }
     }
 

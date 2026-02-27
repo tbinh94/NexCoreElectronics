@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
+import Container from "@/components/ui/container";
 
 export default function ChatBot() {
     const [isOpen, setIsOpen] = useState(false);
@@ -143,12 +144,12 @@ export default function ChatBot() {
     };
 
     return (
-        <div className="fixed inset-x-0 bottom-0 z-50 pointer-events-none">
-            <div className="container mx-auto px-4 relative">
-                <div className="absolute bottom-6 right-4 flex flex-col items-end pointer-events-auto">
+        <div className="fixed inset-x-0 bottom-0 z-50 pointer-events-none pb-4 sm:pb-6">
+            <Container className="relative flex justify-end">
+                <div className="flex flex-col items-end pointer-events-auto max-w-full">
                     {/* Chat Window */}
                     {isOpen && (
-                        <Card className="w-[380px] h-[600px] shadow-2xl border-primary/20 flex flex-col mb-4 animate-in slide-in-from-bottom-10 fade-in duration-300 backdrop-blur-md bg-background/95 supports-[backdrop-filter]:bg-background/80">
+                        <Card className="w-[calc(100vw-2rem)] sm:w-[380px] h-[550px] sm:h-[600px] max-h-[82vh] shadow-2xl border-primary/20 flex flex-col mb-4 animate-in slide-in-from-bottom-10 fade-in duration-300 backdrop-blur-md bg-background/95 supports-[backdrop-filter]:bg-background/80">
                             <CardHeader className="bg-primary/10 backdrop-blur-sm text-primary p-4 rounded-t-xl flex flex-row items-center justify-between shrink-0 border-b border-primary/10">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-primary rounded-lg">
@@ -342,7 +343,7 @@ export default function ChatBot() {
                         </Button>
                     )}
                 </div>
-            </div>
+            </Container>
         </div>
     );
 }
