@@ -16,11 +16,7 @@ import { useRef } from "react";
 import { MEGA_MENU_DATA } from "@/data/menuData";
 import { useState, useEffect } from "react";
 
-export default function HeroBanner() {
-    const plugin = useRef(
-        Autoplay({ delay: 4000, stopOnInteraction: true, loop: true })
-    );
-
+function FlashSaleTimer() {
     const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 59, seconds: 59 });
 
     useEffect(() => {
@@ -43,6 +39,21 @@ export default function HeroBanner() {
 
         return () => clearInterval(timer);
     }, []);
+
+    return (
+        <div className="flex items-center gap-1 text-xs font-mono bg-black/30 px-2 py-1 rounded">
+            <span>{String(timeLeft.hours).padStart(2, '0')}</span>:
+            <span>{String(timeLeft.minutes).padStart(2, '0')}</span>:
+            <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
+        </div>
+    );
+}
+
+export default function HeroBanner() {
+    const plugin = useRef(
+        Autoplay({ delay: 4000, stopOnInteraction: true, loop: true })
+    );
+
 
     // Brand of the week logic
     const currentWeek = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
@@ -145,11 +156,7 @@ export default function HeroBanner() {
                         <div className="absolute inset-0 p-6 flex flex-col justify-center text-white">
                             <div className="flex items-center gap-2 mb-1">
                                 <span className="text-sm font-bold uppercase tracking-wider bg-white/20 w-fit px-2 py-1 rounded">Hot Deal</span>
-                                <div className="flex items-center gap-1 text-xs font-mono bg-black/30 px-2 py-1 rounded">
-                                    <span>{String(timeLeft.hours).padStart(2, '0')}</span>:
-                                    <span>{String(timeLeft.minutes).padStart(2, '0')}</span>:
-                                    <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-                                </div>
+                                <FlashSaleTimer />
                             </div>
                             <h3 className="text-2xl font-bold mb-2">Flash Sale 24h</h3>
                             <p className="text-sm text-white/90 mb-4">Săn deal giá sốc mỗi ngày</p>
