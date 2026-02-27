@@ -48,7 +48,8 @@ export const login = async (req, res) => {
             name: user.name,
             email: user.email,
             avatar: user.avatar,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin,
+            isVip: user.isVip
         }
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
         return res.status(200).json({ token, user: userData });
@@ -79,6 +80,7 @@ export const updateProfile = async (req, res) => {
                 email: updatedUser.email,
                 avatar: updatedUser.avatar,
                 isAdmin: updatedUser.isAdmin,
+                isVip: updatedUser.isVip,
                 token: generateToken(updatedUser._id),
             });
         } else {
@@ -113,7 +115,8 @@ export const googleLogin = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                isVip: user.isVip
             };
             return res.status(200).json({ token, user: userData });
         } else {
@@ -135,7 +138,8 @@ export const googleLogin = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                isVip: user.isVip
             };
             return res.status(201).json({ token, user: userData });
         }

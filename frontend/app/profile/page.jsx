@@ -2,7 +2,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { User, Mail, Calendar, LogOut, ShoppingBag, ShieldCheck, Camera, Edit2, Save, X } from "lucide-react";
+import { User, Mail, Calendar, LogOut, ShoppingBag, ShieldCheck, Camera, Edit2, Save, X, Award } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -227,10 +227,18 @@ export default function ProfilePage() {
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
                             )}
 
-                            <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                <ShieldCheck className="w-4 h-4 text-green-500" />
-                                {user.isAdmin ? 'Quản trị viên' : 'Thành viên'}
-                            </p>
+                            <div className="flex items-center gap-3">
+                                <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                    <ShieldCheck className={`w-4 h-4 ${user.isAdmin ? 'text-blue-500' : 'text-green-500'}`} />
+                                    {user.isAdmin ? 'Quản trị viên' : 'Thành viên'}
+                                </p>
+                                {user.isVip && (
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg border border-yellow-200 animate-in zoom-in">
+                                        <Award className="w-3 h-3" />
+                                        NexCore VIP
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

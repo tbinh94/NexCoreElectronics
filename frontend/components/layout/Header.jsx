@@ -95,15 +95,23 @@ export default function Header({ categories }) {
                                                 />
                                             </div>
                                             <div className="flex flex-col text-left hidden sm:block">
-                                                <span className="text-xs opacity-80">Xin chào, </span>
-                                                <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-sm font-semibold truncate max-w-[100px]">{user.name}</span>
+                                                    {user.isVip && <span className="text-[9px] bg-yellow-400 text-slate-900 px-1 rounded-sm font-black">VIP</span>}
+                                                </div>
+                                                <span className="text-[10px] opacity-70">Thành viên {user.isVip ? 'VIP' : 'thường'}</span>
                                             </div>
                                         </div>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-56">
                                         <DropdownMenuItem asChild>
-                                            <Link href="/profile" className="w-full cursor-pointer">Trang cá nhân</Link>
+                                            <Link href="/profile" className="w-full cursor-pointer font-semibold">Trang cá nhân</Link>
                                         </DropdownMenuItem>
+                                        {!user.isVip && (
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/pricing" className="w-full cursor-pointer text-orange-600 font-bold">✨ Nâng cấp VIP</Link>
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuItem asChild>
                                             <Link href="/orders" className="w-full cursor-pointer">Đơn hàng của tôi</Link>
                                         </DropdownMenuItem>

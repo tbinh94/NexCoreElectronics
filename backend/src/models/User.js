@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
+    isVip: { type: Boolean, default: false },
     avatar: { type: String, default: "" },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
 }, {

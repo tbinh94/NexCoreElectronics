@@ -5,7 +5,7 @@ import Cart from "../models/Cart.js";
 import Product from "../models/Product.js";
 
 router.post("/", async (req, res) => {
-    console.log("Received order request:", req.body);
+    //console.log("Received order request:", req.body);
     try {
         const { userId, shippingAddress, paymentMethod, items, cccd } = req.body;
 

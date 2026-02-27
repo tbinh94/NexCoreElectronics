@@ -120,8 +120,12 @@ export default function ServicesPage() {
                                     </li>
                                 ))}
                             </ul>
-                            <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-10 rounded-full">
-                                Đăng ký ngay
+                            <Button
+                                size="lg"
+                                className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-10 rounded-full"
+                                asChild
+                            >
+                                <Link href="/pricing">Đăng ký ngay</Link>
                             </Button>
                         </div>
                         <div className="lg:w-1/2 h-full min-h-[400px] relative">

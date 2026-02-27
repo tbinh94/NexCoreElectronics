@@ -173,7 +173,7 @@ export default function HeroBanner() {
                             <h3 className="text-2xl font-bold mb-2">Đặc quyền VIP</h3>
                             <p className="text-sm text-white/90 mb-4">Miễn phí vận chuyển & Bảo hành tận nơi</p>
                             <div className="text-sm font-bold underline decoration-2 underline-offset-4 hover:text-white/80">
-                                Tìm hiểu thêm &rarr;
+                                <Link href="/pricing">Tìm hiểu thêm &rarr;</Link>
                             </div>
                         </div>
                     </Link>
