@@ -5,11 +5,14 @@ import { Check, ShieldCheck, Zap, Laptop, Headphones, Gift, Clock } from "lucide
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import VietQRImage from "@/components/checkout/VietQRImage";
 
 export default function PricingPage() {
     const { user, token, updateUser } = useAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const handleRegisterVip = async () => {
         if (!user) {
@@ -22,7 +25,12 @@ export default function PricingPage() {
             return;
         }
 
+        setShowPaymentModal(true);
+    };
+
+    const confirmPayment = async () => {
         setLoading(true);
+        setShowPaymentModal(false);
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
             const res = await fetch(`${apiUrl}/api/users/register-vip`, {
@@ -102,8 +110,8 @@ export default function PricingPage() {
                         <div
                             key={idx}
                             className={`relative bg-white dark:bg-card rounded-[2.5rem] p-8 shadow-xl border-2 transition-all duration-500 hover:-translate-y-2 ${tier.featured
-                                    ? "border-primary scale-105 z-10 ring-4 ring-primary/10"
-                                    : "border-transparent hover:border-gray-200 dark:hover:border-gray-800"
+                                ? "border-primary scale-105 z-10 ring-4 ring-primary/10"
+                                : "border-transparent hover:border-gray-200 dark:hover:border-gray-800"
                                 }`}
                         >
                             {tier.featured && (
@@ -139,8 +147,8 @@ export default function PricingPage() {
                                 onClick={tier.action}
                                 disabled={loading || (tier.featured && user?.isVip)}
                                 className={`w-full py-8 text-lg font-black rounded-2xl transition-all duration-300 shadow-lg hover:shadow-2xl ${tier.featured
-                                        ? "bg-primary hover:bg-primary/90 text-white"
-                                        : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-900 dark:text-white"
+                                    ? "bg-primary hover:bg-primary/90 text-white"
+                                    : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-900 dark:text-white"
                                     }`}
                             >
                                 {loading && tier.featured ? (
@@ -168,6 +176,45 @@ export default function PricingPage() {
                     ))}
                 </div>
             </div>
+
+            {/* Payment Confirmation Modal */}
+            <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+                <DialogContent className="sm:max-w-md rounded-[2rem]">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-black text-center">Thanh toán NexCore VIP</DialogTitle>
+                        <DialogDescription className="text-center">
+                            Vui lòng quét mã QR dưới đây để thanh toán phí duy trì dịch vụ.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex flex-col items-center py-6 space-y-4">
+                        <div className="p-4 bg-white rounded-2xl shadow-inner border">
+                            <VietQRImage amount={50000} />
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm text-gray-500">Số tiền cần thanh toán:</p>
+                            <p className="text-2xl font-black text-primary">50.000đ</p>
+                            <p className="text-[10px] text-gray-400 mt-1 italic">(Nội dung: Đăng ký VIP [Tên tài khoản])</p>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="sm:justify-center gap-2">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setShowPaymentModal(false)}
+                            className="rounded-xl"
+                        >
+                            Hủy
+                        </Button>
+                        <Button
+                            onClick={confirmPayment}
+                            className="bg-primary hover:bg-primary/90 text-white font-bold px-8 rounded-xl"
+                        >
+                            Tôi đã chuyển khoản
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

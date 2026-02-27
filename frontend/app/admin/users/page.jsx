@@ -63,6 +63,7 @@ export default function UsersPage() {
                                         <TableRow>
                                             <TableHead className="font-semibold text-gray-900 border-r">Khách hàng</TableHead>
                                             <TableHead className="font-semibold text-gray-900 border-r">Email</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-r text-center">VIP</TableHead>
                                             <TableHead className="font-semibold text-gray-900 border-r">Vai trò</TableHead>
                                             <TableHead className="font-semibold text-gray-900">Ngày tham gia</TableHead>
                                         </TableRow>
@@ -81,6 +82,15 @@ export default function UsersPage() {
                                                         <Mail className="h-4 w-4" />
                                                         {user.email}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="border-r text-center">
+                                                    {user.isVip ? (
+                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-[10px] font-black text-yellow-700 uppercase tracking-wider border border-yellow-200 shadow-xs">
+                                                            ✨ VIP
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-300">—</span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="border-r">
                                                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
@@ -104,9 +114,16 @@ export default function UsersPage() {
                                         <div className="flex-1 space-y-1.5 min-w-0">
                                             <div className="flex items-center justify-between gap-2">
                                                 <h3 className="font-bold text-gray-900 truncate">{user.name}</h3>
-                                                <span className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
-                                                    {user.isAdmin ? "Admin" : "Khách"}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    {user.isVip && (
+                                                        <span className="shrink-0 inline-flex items-center rounded-full bg-yellow-100 px-1.5 py-0.5 text-[8px] font-black text-yellow-700 uppercase border border-yellow-200">
+                                                            VIP
+                                                        </span>
+                                                    )}
+                                                    <span className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
+                                                        {user.isAdmin ? "Admin" : "Khách"}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-2 text-xs text-gray-500">
                                                 <Mail className="h-3.5 w-3.5 shrink-0" />

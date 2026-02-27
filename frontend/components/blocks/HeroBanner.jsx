@@ -160,7 +160,8 @@ export default function HeroBanner() {
                     </Link>
 
                     {/* Bottom Side Banner */}
-                    <Link href="/services" className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
+                    <div className="flex-1 rounded-2xl overflow-hidden relative shadow-md group cursor-pointer">
+                        <Link href="/pricing" className="absolute inset-0 z-20"></Link>
                         <div className="absolute inset-0 bg-linear-to-br from-slate-800 to-black"></div>
                         <Image
                             src="/banner_vip.png"
@@ -168,15 +169,15 @@ export default function HeroBanner() {
                             fill
                             className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500 mix-blend-overlay"
                         />
-                        <div className="absolute inset-0 p-6 flex flex-col justify-center text-white">
+                        <div className="absolute inset-0 p-6 flex flex-col justify-center text-white relative z-10">
                             <span className="text-sm font-bold uppercase tracking-wider mb-1 bg-yellow-500/20 text-yellow-300 w-fit px-2 py-1 rounded">Premium</span>
                             <h3 className="text-2xl font-bold mb-2">Đặc quyền VIP</h3>
                             <p className="text-sm text-white/90 mb-4">Miễn phí vận chuyển & Bảo hành tận nơi</p>
                             <div className="text-sm font-bold underline decoration-2 underline-offset-4 hover:text-white/80">
-                                <Link href="/pricing">Tìm hiểu thêm &rarr;</Link>
+                                Tìm hiểu thêm &rarr;
                             </div>
                         </div>
-                    </Link>
+                    </div>
                 </div>
             </div>
         </section>

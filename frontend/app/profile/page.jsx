@@ -329,9 +329,6 @@ export default function ProfilePage() {
                             <Heart className="w-5 h-5 text-red-500 fill-red-500" />
                             Sản phẩm yêu thích
                         </h2>
-                        <span className="text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-full">
-                            {user.wishlist?.length || 0} sản phẩm
-                        </span>
                     </div>
 
                     <div className="p-6">
