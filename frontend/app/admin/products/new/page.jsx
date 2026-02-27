@@ -37,6 +37,7 @@ function AddProductContent() {
         category: defaultCategory,
         brand: "",
         countInStock: "",
+        countInStockOld: "",
         specs: {
             screen: "",
             cpu: "",
@@ -189,14 +190,18 @@ function AddProductContent() {
                                 <Input id="name" name="name" required value={formData.name} onChange={handleChange} placeholder="Ví dụ: iPhone 15 Pro Max" />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="price">Giá (VNĐ)</Label>
                                     <Input id="price" name="price" type="number" required value={formData.price} onChange={handleChange} placeholder="30000000" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="countInStock">Số lượng tồn kho</Label>
+                                    <Label htmlFor="countInStock">Tồn kho máy mới</Label>
                                     <Input id="countInStock" name="countInStock" type="number" required value={formData.countInStock} onChange={handleChange} placeholder="100" />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="countInStockOld">Tồn kho máy cũ</Label>
+                                    <Input id="countInStockOld" name="countInStockOld" type="number" value={formData.countInStockOld || ""} onChange={handleChange} placeholder="50" />
                                 </div>
                             </div>
 

@@ -33,9 +33,9 @@ const orderSchema = new mongoose.Schema({
         type: String,
         validate: {
             validator: function (v) {
-                return !v || /^\d{10}$/.test(v);
+                return !v || /^\d{12}$/.test(v);
             },
-            message: props => `${props.value} is not a valid 10-digit CCCD!`
+            message: props => `${props.value} is not a valid 12-digit CCCD!`
         }
     },
     estimatedDeliveryDate: {

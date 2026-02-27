@@ -161,7 +161,7 @@ router.get("/products/:id", async (req, res) => {
 // POST /api/admin/products - Create a new product
 router.post("/products", async (req, res) => {
     try {
-        const { name, price, description, detailedDescription, highlights, image, category, brand, countInStock, specs } = req.body;
+        const { name, price, description, detailedDescription, highlights, image, category, brand, countInStock, countInStockOld, specs } = req.body;
         const product = new Product({
             name,
             price,
@@ -172,6 +172,7 @@ router.post("/products", async (req, res) => {
             category,
             brand,
             countInStock,
+            countInStockOld,
             specs,
             isActive: true
         });
@@ -198,6 +199,7 @@ router.put("/products/:id", async (req, res) => {
             product.category = req.body.category || product.category;
             product.brand = req.body.brand || product.brand;
             product.countInStock = req.body.countInStock !== undefined ? req.body.countInStock : product.countInStock;
+            product.countInStockOld = req.body.countInStockOld !== undefined ? req.body.countInStockOld : product.countInStockOld;
             product.specs = req.body.specs || product.specs;
             product.is_new_product = req.body.is_new_product !== undefined ? req.body.is_new_product : product.is_new_product;
             product.isActive = req.body.isActive !== undefined ? req.body.isActive : product.isActive;

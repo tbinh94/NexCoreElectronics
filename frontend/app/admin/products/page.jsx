@@ -149,7 +149,7 @@ export default function ProductsPage() {
                                                 <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Tên sản phẩm</th>
                                                 <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Trạng thái</th>
                                                 <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Giá</th>
-                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Tồn kho</th>
+                                                <th className="h-12 px-4 align-middle font-medium text-gray-900 border-r last:border-r-0">Tồn kho (Mới/Cũ)</th>
                                                 <th className="h-12 px-4 align-middle font-medium text-gray-900 text-right pr-6">Hành động</th>
                                             </tr>
                                         </thead>
@@ -168,7 +168,9 @@ export default function ProductsPage() {
                                                     <td className="p-4 align-middle">
                                                         {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
                                                     </td>
-                                                    <td className="p-4 align-middle text-gray-600">{item.countInStock}</td>
+                                                    <td className="p-4 align-middle text-gray-600">
+                                                        <span className="font-medium text-green-700">{item.countInStock || 0}</span> / <span className="font-medium text-orange-700">{item.countInStockOld || 0}</span>
+                                                    </td>
                                                     <td className="p-4 align-middle text-right">
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
@@ -250,8 +252,10 @@ export default function ProductsPage() {
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Tồn kho</p>
-                                                <p className="text-sm font-bold text-gray-900">{item.countInStock}</p>
+                                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Tồn kho (Mới/Cũ)</p>
+                                                <p className="text-sm font-bold text-gray-900">
+                                                    <span className="text-green-600">{item.countInStock || 0}</span> / <span className="text-orange-600">{item.countInStockOld || 0}</span>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

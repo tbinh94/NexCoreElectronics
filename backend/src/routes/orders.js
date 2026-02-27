@@ -61,6 +61,13 @@ router.post("/", async (req, res) => {
                 }
             }
 
+            if (item.type === 'used') {
+                product.countInStockOld = Math.max(0, (product.countInStockOld || 0) - item.quantity);
+            } else {
+                product.countInStock = Math.max(0, (product.countInStock || 0) - item.quantity);
+            }
+            await product.save();
+
             orderProducts.push({
                 productId: productId,
                 quantity: item.quantity

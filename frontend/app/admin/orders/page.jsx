@@ -112,6 +112,7 @@ export default function OrdersPage() {
                                             <TableHead className="font-semibold text-gray-900 border-r">Khách hàng</TableHead>
                                             <TableHead className="font-semibold text-gray-900 border-r">Ngày đặt</TableHead>
                                             <TableHead className="font-semibold text-gray-900 border-r">Dự kiến giao</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-r">Thanh toán</TableHead>
                                             <TableHead className="font-semibold text-gray-900 border-r">Tổng tiền</TableHead>
                                             <TableHead className="font-semibold text-gray-900 border-r">Trạng thái</TableHead>
                                             <TableHead className="text-right pr-6 font-semibold text-gray-900">Hành động</TableHead>
@@ -139,6 +140,14 @@ export default function OrdersPage() {
                                                     ) : (
                                                         <span className="text-gray-400 italic">--</span>
                                                     )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="text-gray-600 font-medium">
+                                                        {order.paymentMethod === 'cash' ? 'Tiền mặt' :
+                                                            order.paymentMethod === 'card' ? 'Thẻ' :
+                                                                order.paymentMethod === 'transfer' ? 'Chuyển khoản' :
+                                                                    order.paymentMethod === 'installment' ? 'Trả góp' : order.paymentMethod}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell className="font-medium text-gray-900">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}</TableCell>
                                                 <TableCell>
@@ -209,6 +218,12 @@ export default function OrdersPage() {
                                                 <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Tổng tiền</p>
                                                 <p className="text-base font-bold text-gray-900">
                                                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount)}
+                                                </p>
+                                                <p className="text-xs font-semibold text-gray-600 mt-1">
+                                                    {order.paymentMethod === 'cash' ? 'Tiền mặt' :
+                                                        order.paymentMethod === 'card' ? 'Thẻ' :
+                                                            order.paymentMethod === 'transfer' ? 'CK' :
+                                                                order.paymentMethod === 'installment' ? 'Trả góp' : order.paymentMethod}
                                                 </p>
                                             </div>
                                             <div className="text-right">

@@ -56,7 +56,8 @@ export default function CheckoutPage() {
             } else {
                 const fetchCart = async () => {
                     try {
-                        const res = await fetch(`/api/cart/${user._id}`);
+                        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                        const res = await fetch(`${apiUrl}/api/cart/${user._id}`);
                         const data = await res.json();
                         if (data && data.products) {
                             setCartItems(data.products);
@@ -117,14 +118,15 @@ export default function CheckoutPage() {
         }
 
         if (formData.paymentMethod === 'installment') {
-            if (!/^\d{10}$/.test(formData.cccd)) {
-                alert("Số CCCD phải bao gồm 10 chữ số");
+            if (!/^\d{12}$/.test(formData.cccd)) {
+                alert("Số CCCD phải bao gồm 12 chữ số");
                 return;
             }
         }
 
         try {
-            const res = await fetch("/api/orders", {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const res = await fetch(`${apiUrl}/api/orders`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -288,16 +290,16 @@ export default function CheckoutPage() {
 
                         {formData.paymentMethod === 'installment' && (
                             <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                                <Label htmlFor="cccd">Số CCCD (10 số)</Label>
+                                <Label htmlFor="cccd">Số CCCD (12 số)</Label>
                                 <Input
                                     id="cccd"
                                     value={formData.cccd}
                                     onChange={handleInputChange}
                                     required={formData.paymentMethod === 'installment'}
-                                    placeholder="Nhập 10 số CCCD"
-                                    maxLength={10}
+                                    placeholder="Nhập 12 số CCCD"
+                                    maxLength={12}
                                 />
-                                <p className="text-xs text-gray-500">Vui lòng nhập chính xác 10 chữ số CCCD để làm thủ tục trả góp.</p>
+                                <p className="text-xs text-gray-500">Vui lòng nhập chính xác 12 chữ số CCCD để làm thủ tục trả góp.</p>
                             </div>
                         )}
 
