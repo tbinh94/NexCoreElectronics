@@ -31,15 +31,15 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        console.log("Login attempt:", req.body);
+        //console.log("Login attempt:", req.body);
         let user = await User.findOne({ email });
-        console.log("User found:", user);
+        //console.log("User found:", user);
         if (!user) {
             return res.status(400).json({ message: "Tên đăng nhập hoặc mật khẩu không chính xác" });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log("Password match:", isMatch);
+        //console.log("Password match:", isMatch);
         if (!isMatch) {
             return res.status(400).json({ message: "Tên đăng nhập hoặc mật khẩu không chính xác" });
         }
