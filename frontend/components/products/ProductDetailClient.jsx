@@ -161,11 +161,6 @@ export default function ProductDetailClient({ product, initialReviews }) {
     // Chỉ sản phẩm nằm trong nhóm 20% mới hỗ trợ bản cũ và hiện "Giá niêm yết"
     const isUsedSupported = getIsProductUsedWeekly(product._id);
 
-    // Logic đếm số lượng máy cũ: Nếu hỗ trợ máy cũ mà DB báo 0, hiển thị số lượng mặc định (vd: 5-8) tránh phi logic
-    const displayStockOld = isUsedSupported && (product.countInStockOld || 0) === 0
-        ? (5 + (product._id.charCodeAt(product._id.length - 1) % 5))
-        : (product.countInStockOld || 0);
-
     const showOldPrice = isUsedSupported || product.oldPrice > 0;
 
 
@@ -318,8 +313,9 @@ export default function ProductDetailClient({ product, initialReviews }) {
                                     <p className="text-lg font-bold text-red-600 dark:text-red-500">{formattedUsedPrice}</p>
                                     <p className="text-xs text-gray-500 mt-1 mb-2">Bảo hành 6 tháng <br />(Thường chỉ có 15-20 máy/tuần)</p>
                                     <p className="text-xs font-semibold text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded w-max border border-orange-200">
-                                        Còn {displayStockOld} máy cũ
+                                        Còn {product.countInStockOld || 0} máy cũ
                                     </p>
+
 
                                 </div>
                             )}
