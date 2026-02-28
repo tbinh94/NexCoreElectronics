@@ -4,7 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 import { Star, User, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { fetchReviews as getApiReviews } from '@/lib/api';
+import { fetchReviews as getApiReviews, API_URL } from '@/lib/api';
+
 
 
 export default function ReviewSection({ productId, initialReviews = [] }) {
@@ -44,8 +45,9 @@ export default function ReviewSection({ productId, initialReviews = [] }) {
     const handleSummarize = async () => {
         setSummarizing(true);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/ai/summarize-reviews`, {
+            const res = await fetch(`${API_URL}/ai/summarize-reviews`, {
                 method: "POST",
+
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ productId }),
             });

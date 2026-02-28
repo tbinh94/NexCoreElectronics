@@ -23,6 +23,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { API_URL } from "@/lib/api";
 import { Plus, Search, Filter, MoreHorizontal, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,8 +36,7 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
         try {
             const adminPasscode = sessionStorage.getItem("admin_passcode");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiUrl}/api/admin/products`, {
+            const res = await fetch(`${API_URL}/admin/products`, {
                 headers: {
                     'x-admin-passcode': adminPasscode
                 }
@@ -60,8 +60,7 @@ export default function ProductsPage() {
         if (!deleteId) return;
         try {
             const adminPasscode = sessionStorage.getItem("admin_passcode");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiUrl}/api/admin/products/${deleteId}`, {
+            const res = await fetch(`${API_URL}/admin/products/${deleteId}`, {
                 method: "DELETE",
                 headers: {
                     'x-admin-passcode': adminPasscode
@@ -83,8 +82,7 @@ export default function ProductsPage() {
     const toggleStatus = async (id, currentStatus) => {
         try {
             const adminPasscode = sessionStorage.getItem("admin_passcode");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-            const res = await fetch(`${apiUrl}/api/admin/products/${id}`, {
+            const res = await fetch(`${API_URL}/admin/products/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -100,6 +98,7 @@ export default function ProductsPage() {
             toast.error("Lỗi khi cập nhật trạng thái");
         }
     };
+
 
     const filteredProducts = products.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase())

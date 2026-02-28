@@ -113,7 +113,7 @@ NexCoreElectronics/
 ```
 
 ## 📝 Giấy phép
-Dự án được phát triển bởi NexGen Team.
+Dự án được phát triển bởi Binh Ca.
 
 ---
 *Cảm ơn bạn đã quan tâm đến NexCore Electronics!*

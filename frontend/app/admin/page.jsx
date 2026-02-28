@@ -6,6 +6,8 @@ import { DollarSign, Package, ShoppingCart, Users, TrendingUp, RefreshCw } from 
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
+import { API_URL } from "@/lib/api";
+
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
         revenue: 0,
@@ -23,11 +25,12 @@ export default function AdminDashboard() {
         const fetchStats = async () => {
             try {
                 const adminPasscode = sessionStorage.getItem("admin_passcode");
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/stats`, {
+                const res = await fetch(`${API_URL}/admin/stats`, {
                     headers: {
                         'x-admin-passcode': adminPasscode
                     }
                 });
+
                 if (res.ok) {
                     const data = await res.json();
                     setStats(data);

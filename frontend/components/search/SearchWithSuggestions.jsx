@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Search, X, Loader2, Camera } from "lucide-react";
+import { API_URL } from "@/lib/api";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -45,8 +47,8 @@ export default function SearchWithSuggestions() {
         setLoading(true);
         try {
             // Fetch top 5 matching products
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
-            const res = await fetch(`${apiUrl}/products?search=${encodeURIComponent(searchTerm)}&limit=5`);
+            const res = await fetch(`${API_URL}/products?search=${encodeURIComponent(searchTerm)}&limit=5`);
+
             if (res.ok) {
                 const data = await res.json();
                 setSuggestions(data.products || []);
@@ -82,11 +84,11 @@ export default function SearchWithSuggestions() {
         formData.append("image", file);
 
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
-            const res = await fetch(`${apiUrl}/products/search-image`, {
+            const res = await fetch(`${API_URL}/products/search-image`, {
                 method: "POST",
                 body: formData,
             });
+
 
             if (res.ok) {
                 const data = await res.json();

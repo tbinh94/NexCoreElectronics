@@ -1,4 +1,6 @@
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api`;
+export const BASE_API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000').replace(/\/$/, "");
+export const API_URL = BASE_API_URL.endsWith('/api') ? BASE_API_URL : `${BASE_API_URL}/api`;
+
 
 /**
  * Logic xác định sản phẩm có bản cũ hay không (xoay vòng 20% mỗi tuần)
