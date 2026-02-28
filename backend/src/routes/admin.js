@@ -275,6 +275,26 @@ router.get("/users", async (req, res) => {
     }
 });
 
+// PUT /api/admin/users/:id/vip - Approve/Reject VIP status
+router.put("/users/:id/vip", async (req, res) => {
+    try {
+        const { status } = req.body; // 'active', 'none', 'pending'
+        const user = await User.findById(req.params.id);
+        if (user) {
+            user.vipStatus = status;
+            user.isVip = status === 'active';
+            await user.save();
+            res.json({ message: `Đã cập nhật trạng thái VIP thành ${status}`, user });
+        } else {
+            res.status(404).json({ message: "User not found" });
+        }
+    } catch (error) {
+        console.error("Update VIP Status Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+
 // --- TRADE-IN MANAGEMENT ---
 
 // GET /api/admin/trade-ins - List all trade-in requests

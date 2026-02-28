@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     isVip: { type: Boolean, default: false },
+    vipStatus: { type: String, enum: ['none', 'pending', 'active'], default: 'none' },
     avatar: { type: String, default: "" },
+
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
 }, {
     timestamps: true // Tự động thêm ngày tạo/sửa

@@ -97,11 +97,12 @@ export async function fetchProducts(params = {}) {
         const weekNum = Math.ceil((((now - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
 
         if (isUsedCategory) {
-            // Lọc ra 20% sản phẩm dựa trên ID và tuần
+            // Ưu tiên hiện sản phẩm có hàng cũ trong kho HOẶC nằm trong xoay vòng tuần này
             data.products = data.products.filter(p => {
-                const seed = p._id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                return (seed + weekNum) % 5 === 0; // 20%
+                const isInRotation = getIsProductUsedWeekly(p._id);
+                return (p.countInStockOld > 0) || isInRotation;
             }).map(p => ({
+
                 ...p,
                 name: `[Cũ] ${p.name}`,
                 price: Math.round(p.price * 0.65), // Giảm 35% cho máy cũ

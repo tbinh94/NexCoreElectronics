@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Star, Zap, ShieldCheck } from 'lucide-react';
@@ -76,11 +78,20 @@ export default function ProductList({ products }) {
                                         className="rounded-full w-10 h-10 p-0 shadow-lg translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
                                         showIcon
                                     >
+
                                         <ShoppingCart size={18} />
                                     </AddToCartButton>
-                                    <Link href={`/products/${product.slug || product._id}`} className="bg-white text-slate-900 p-2.5 rounded-full shadow-lg translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 hover:bg-gray-100">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            window.location.href = `/products/${product.slug || product._id}`;
+                                        }}
+                                        className="bg-white text-slate-900 p-2.5 rounded-full shadow-lg translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 hover:bg-gray-100"
+                                    >
                                         <ShieldCheck size={18} />
-                                    </Link>
+                                    </button>
+
                                 </div>
                             </Link>
                         </div>

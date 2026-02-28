@@ -12,10 +12,11 @@ router.post("/register-vip", protect, async (req, res) => {
         const User = (await import("../models/User.js")).default;
         const user = await User.findById(req.user._id);
         if (user) {
-            user.isVip = true;
+            user.vipStatus = 'pending';
             await user.save();
             const { password, ...userData } = user.toObject();
             res.status(200).json(userData);
+
         } else {
             res.status(404).json({ message: "User not found" });
         }

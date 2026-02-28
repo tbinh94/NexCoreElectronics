@@ -17,7 +17,9 @@ export default function AddToCartButton({ productId, className, children, showIc
             return;
         }
         e.preventDefault();
+        e.stopPropagation();
         setLoading(true);
+
         try {
             await addToCart(productId);
             toast.success("Thêm vào giỏ hàng thành công");

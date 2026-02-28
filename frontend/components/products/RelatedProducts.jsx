@@ -1,4 +1,6 @@
+"use client";
 import ProductList from "./ProductList";
+
 
 export default function RelatedProducts({ products }) {
     if (!products || products.length === 0) return null;

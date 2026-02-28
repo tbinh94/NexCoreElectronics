@@ -158,10 +158,11 @@ export default function ProductDetailClient({ product, initialReviews }) {
     const formattedPrice = formatPrice(currentNewPrice);
     const formattedUsedPrice = formatPrice(currentUsedPrice);
 
-    // Chỉ sản phẩm nằm trong nhóm 20% mới hỗ trợ bản cũ và hiện "Giá niêm yết"
-    const isUsedSupported = getIsProductUsedWeekly(product._id);
-
+    // Hỗ trợ mua máy cũ nếu thực tế có hàng trong kho (countInStockOld > 0)
+    // Hoặc sản phẩm nằm trong nhóm xoay vòng tuần này
+    const isUsedSupported = (product.countInStockOld > 0) || getIsProductUsedWeekly(product._id);
     const showOldPrice = isUsedSupported || product.oldPrice > 0;
+
 
 
     const oldPrice = showOldPrice
