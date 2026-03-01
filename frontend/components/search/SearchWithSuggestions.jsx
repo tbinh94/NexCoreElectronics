@@ -114,19 +114,56 @@ export default function SearchWithSuggestions() {
 
     return (
         <div ref={wrapperRef} className="relative w-full max-w-2xl z-50">
-            <form onSubmit={handleSearch} className="relative w-full flex">
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onFocus={() => {
-                        if (suggestions.length > 0) setShowSuggestions(true);
-                    }}
-                    placeholder="Tìm kiếm sản phẩm..."
-                    className="w-full h-10 pl-4 pr-24 rounded-l-md border-none focus:ring-2 focus:ring-primary/50 text-black dark:text-white bg-white dark:bg-gray-800 outline-none shadow-sm"
-                />
+            <form
+                onSubmit={handleSearch}
+                className="group flex items-center w-full h-11 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all overflow-hidden"
+            >
+                {/* Input Area */}
+                <div className="flex-1 flex items-center h-full pl-4">
+                    <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onFocus={() => {
+                            if (suggestions.length > 0) setShowSuggestions(true);
+                        }}
+                        placeholder="Tìm kiếm sản phẩm..."
+                        className="w-full h-full bg-transparent border-none outline-none text-black dark:text-white placeholder:text-gray-400 text-sm"
+                    />
+                </div>
 
-                {/* Image Search Input */}
+                {/* Internal Actions (Clear & Camera) */}
+                <div className="flex items-center gap-0.5 px-2">
+                    {query && (
+                        <button
+                            type="button"
+                            onClick={clearSearch}
+                            className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    )}
+
+                    <button
+                        type="button"
+                        className="p-1.5 text-gray-400 hover:text-primary transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={loading}
+                        title="Tìm kiếm bằng hình ảnh"
+                    >
+                        <Camera className="h-5 w-5" />
+                    </button>
+                </div>
+
+                {/* Main Search Button */}
+                <button
+                    type="submit"
+                    className="h-full px-6 bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all disabled:opacity-70 cursor-pointer"
+                    disabled={loading}
+                >
+                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
+                </button>
+
                 <input
                     type="file"
                     ref={fileInputRef}
@@ -134,36 +171,6 @@ export default function SearchWithSuggestions() {
                     accept="image/*"
                     onChange={handleImageUpload}
                 />
-
-                <div className="absolute right-0 top-0 h-full flex items-center">
-                    {query && (
-                        <button
-                            type="button"
-                            onClick={clearSearch}
-                            className="mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
-                    )}
-
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 mr-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={loading}
-                        title="Tìm kiếm bằng hình ảnh"
-                    >
-                        <Camera className="h-5 w-5" />
-                    </Button>
-
-                    <Button
-                        type="submit"
-                        className="h-10 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 text-primary-foreground px-6 cursor-pointer border-none"
-                    >
-                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
-                    </Button>
-                </div>
             </form>
 
             {/* Suggestions Dropdown */}
