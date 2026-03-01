@@ -3,7 +3,8 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "node --watch src/app.js",
-    "data:import": "node src/seed.js"
+    "data:import": "node src/seed.js",
+    "create-admin": "node create-admin.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

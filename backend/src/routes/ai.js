@@ -12,6 +12,7 @@ const router = Router();
 const valuationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 5, // Limit each IP to 5 valuation requests per hour
+    skip: (req) => req.user && req.user.isAdmin,
     message: { message: "Bạn đã vượt quá giới hạn định giá (5 lần/giờ). Vui lòng thử lại sau." }
 });
 

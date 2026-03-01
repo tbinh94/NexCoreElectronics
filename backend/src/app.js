@@ -24,6 +24,44 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
+// SECRET ROUTE TO SETUP ADMIN - DELETE THIS BLOCK AFTER RUNNING ON LIVE SERVER
+import User from "./models/User.js";
+import bcrypt from "bcryptjs";
+app.get("/api/setup-admin-9981", async (req, res) => {
+  try {
+    const adminEmail = "admin_ai@nexcore.com";
+    const adminPassword = "AdminAIPassword123@";
+    const adminName = "Nexus AI Admin";
+
+    let admin = await User.findOne({ email: adminEmail });
+    if (admin) {
+      admin.isAdmin = true;
+      admin.isVip = true;
+      await admin.save();
+      return res.json({ message: "Admin AI already existed, updated to latest perms." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(adminPassword, salt);
+
+    await User.create({
+      name: adminName,
+      email: adminEmail,
+      password: hashedPassword,
+      isAdmin: true,
+      isVip: true
+    });
+
+    res.json({
+      message: "Admin AI created successfully on Production!",
+      email: adminEmail,
+      password: adminPassword
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use("/api", router);
 
 // Global Error Handler for JSON responses
