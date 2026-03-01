@@ -44,7 +44,7 @@ export default function PricingPage() {
             if (res.ok) {
                 const updatedUserData = await res.json();
                 updateUser(updatedUserData);
-                toast.success("🚀 Chào mừng thành viên VIP mới!");
+                toast.success("Xin vui lòng chờ 1-2 phút để hệ thống cập nhật trạng thái VIP.");
                 router.push("/profile");
             } else {
                 toast.error("Đăng ký thất bại. Vui lòng thử lại sau.");

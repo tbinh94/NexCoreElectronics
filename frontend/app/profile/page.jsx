@@ -88,6 +88,9 @@ export default function ProfilePage() {
 
                 const uploadRes = await fetch(`/api/upload`, {
                     method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: formData,
                 });
 

@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"; // Assuming you might have a Badge component or use standard HTML
 import { MoreHorizontal, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 const statusMap = {
@@ -123,12 +124,27 @@ export default function OrdersPage() {
                                             <TableRow key={order._id} className="hover:bg-gray-50 transition-colors">
                                                 <TableCell className="font-medium text-blue-600">#{order._id.slice(-6).toUpperCase()}</TableCell>
                                                 <TableCell>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-gray-900">{order.shippingAddress?.name || "N/A"}</span>
-                                                        <span className="text-xs text-gray-500">{order.userId?.email || "Khách vãng lai"}</span>
-                                                        {order.cccd && (
-                                                            <span className="text-xs font-bold text-amber-600 mt-0.5">CCCD: {order.cccd}</span>
-                                                        )}
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0 overflow-hidden relative border border-gray-100">
+                                                            {order.userId?.avatar ? (
+                                                                <Image
+                                                                    src={order.userId.avatar}
+                                                                    alt={order.userId.name || "User"}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                    loading="lazy"
+                                                                />
+                                                            ) : (
+                                                                (order.shippingAddress?.name || order.userId?.name || "K").charAt(0).toUpperCase()
+                                                            )}
+                                                        </div>
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="font-medium text-gray-900 truncate">{order.shippingAddress?.name || "N/A"}</span>
+                                                            <span className="text-[10px] text-gray-500 truncate">{order.userId?.email || "Khách vãng lai"}</span>
+                                                            {order.cccd && (
+                                                                <span className="text-[10px] font-bold text-amber-600 mt-0.5">CCCD: {order.cccd}</span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="text-gray-600">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</TableCell>

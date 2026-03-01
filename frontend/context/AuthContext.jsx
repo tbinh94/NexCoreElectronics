@@ -15,35 +15,52 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem("token");
         const storedUser = localStorage.getItem("user");
 
-        if (storedToken && storedUser && storedUser !== "undefined" && storedToken !== "undefined") {
+        if (storedToken && storedToken !== "undefined") {
             try {
-                // Auto-fix: Remove extra quotes if token was double-stringified
                 let cleanToken = storedToken;
                 if (cleanToken.startsWith('"') && cleanToken.endsWith('"')) {
                     cleanToken = cleanToken.slice(1, -1);
                 }
 
-                // Check if token is expired
                 const payload = JSON.parse(atob(cleanToken.split('.')[1]));
                 const isExpired = payload.exp * 1000 < Date.now();
 
                 if (isExpired) {
-                    console.log("Token expired, logging out...");
-                    localStorage.removeItem("user");
-                    localStorage.removeItem("token");
-                    setUser(null);
-                    setToken(null);
+                    logout();
                 } else {
-                    setUser(JSON.parse(storedUser));
                     setToken(cleanToken);
+                    // Fetch latest profile from server to sync isVip/vipStatus
+                    const fetchProfile = async () => {
+                        try {
+                            const res = await fetch("/api/auth/profile", {
+                                headers: { "Authorization": `Bearer ${cleanToken}` }
+                            });
+                            if (res.ok) {
+                                const latestUser = await res.json();
+                                setUser(latestUser);
+                                localStorage.setItem("user", JSON.stringify(latestUser));
+                            } else if (storedUser && storedUser !== "undefined") {
+                                setUser(JSON.parse(storedUser));
+                            }
+                        } catch (err) {
+                            console.error("Profile sync failed:", err);
+                            if (storedUser && storedUser !== "undefined") {
+                                setUser(JSON.parse(storedUser));
+                            }
+                        } finally {
+                            setLoading(false);
+                        }
+                    };
+                    fetchProfile();
+                    return; // Avoid setting loading(false) early
                 }
             } catch (error) {
                 console.error("Error parsing auth data:", error);
-                localStorage.removeItem("user");
-                localStorage.removeItem("token");
+                logout();
             }
         }
         setLoading(false);
+
     }, []);
 
     const login = async (email, password, credential = null) => {

@@ -49,8 +49,10 @@ export const login = async (req, res) => {
             email: user.email,
             avatar: user.avatar,
             isAdmin: user.isAdmin,
-            isVip: user.isVip
+            isVip: user.isVip,
+            vipStatus: user.vipStatus || 'none'
         }
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
         return res.status(200).json({ token, user: userData });
     } catch (error) {
@@ -81,7 +83,32 @@ export const updateProfile = async (req, res) => {
                 avatar: updatedUser.avatar,
                 isAdmin: updatedUser.isAdmin,
                 isVip: updatedUser.isVip,
+                vipStatus: updatedUser.vipStatus || 'none',
                 token: generateToken(updatedUser._id),
+            });
+
+        } else {
+            res.status(404).json({ message: "User not found" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+export const getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("-password");
+        if (user) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                isAdmin: user.isAdmin,
+                isVip: user.isVip,
+                vipStatus: user.vipStatus || 'none',
+                createdAt: user.createdAt
             });
         } else {
             res.status(404).json({ message: "User not found" });
@@ -91,6 +118,7 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+
 
 export const googleLogin = async (req, res) => {
     try {
@@ -139,8 +167,10 @@ export const googleLogin = async (req, res) => {
                 email: user.email,
                 avatar: user.avatar,
                 isAdmin: user.isAdmin,
-                isVip: user.isVip
+                isVip: user.isVip,
+                vipStatus: user.vipStatus || 'none'
             };
+
             return res.status(201).json({ token, user: userData });
         }
     } catch (error) {

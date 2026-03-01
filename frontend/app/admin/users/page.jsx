@@ -12,6 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Loader2, Mail, CheckCircle, XCircle, Clock } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 
 export default function UsersPage() {
@@ -25,7 +26,8 @@ export default function UsersPage() {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/users`, {
                 headers: {
                     'x-admin-passcode': adminPasscode
-                }
+                },
+                cache: 'no-store'
             });
             if (res.ok) {
                 const data = await res.json();
@@ -98,8 +100,18 @@ export default function UsersPage() {
                                     {users.map((user) => (
                                         <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
                                             <TableCell className="flex items-center gap-3 py-4">
-                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                                                    {user.name?.charAt(0).toUpperCase()}
+                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 overflow-hidden relative">
+                                                    {user.avatar ? (
+                                                        <Image
+                                                            src={user.avatar}
+                                                            alt={user.name}
+                                                            fill
+                                                            className="object-cover"
+                                                            loading="lazy"
+                                                        />
+                                                    ) : (
+                                                        user.name?.charAt(0).toUpperCase()
+                                                    )}
                                                 </div>
                                                 <span className="font-medium text-gray-900">{user.name}</span>
                                             </TableCell>
@@ -110,7 +122,8 @@ export default function UsersPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="border-x text-center">
-                                                {user.vipStatus === 'active' ? (
+                                                {(user.vipStatus === 'active' || user.isVip) ? (
+
                                                     <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-[10px] font-black text-yellow-700 border border-yellow-200 uppercase tracking-tighter">
                                                         ✨ VIP
                                                     </span>
@@ -129,38 +142,40 @@ export default function UsersPage() {
                                             </TableCell>
                                             <TableCell className="border-x text-gray-500">{new Date(user.createdAt).toLocaleDateString('vi-VN')}</TableCell>
                                             <TableCell className="text-right">
-                                                {user.vipStatus === 'pending' && (
-                                                    <div className="flex items-center justify-end gap-2">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {user.vipStatus !== 'active' ? (
                                                         <Button
                                                             size="sm"
                                                             onClick={() => handleVipApproval(user._id, 'active')}
                                                             disabled={actionLoading === user._id}
                                                             className="bg-green-600 hover:bg-green-700 h-8 px-3 rounded-lg text-[11px] font-bold"
                                                         >
-                                                            {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : <> <CheckCircle className="w-3 h-3 mr-1" /> Duyệt VIP</>}
+                                                            {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : <> <CheckCircle className="w-3 h-3 mr-1" /> {user.vipStatus === 'pending' ? "Duyệt VIP" : "Cấp VIP"}</>}
                                                         </Button>
+                                                    ) : (
                                                         <Button
                                                             size="sm"
                                                             variant="ghost"
                                                             onClick={() => handleVipApproval(user._id, 'none')}
                                                             disabled={actionLoading === user._id}
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 px-3 rounded-lg text-[11px] font-bold"
+                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 px-3 rounded-lg text-[10px] font-medium"
+                                                        >
+                                                            {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : "Gỡ VIP"}
+                                                        </Button>
+                                                    )}
+
+                                                    {user.vipStatus === 'pending' && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            onClick={() => handleVipApproval(user._id, 'none')}
+                                                            disabled={actionLoading === user._id}
+                                                            className="text-gray-400 hover:text-red-500 hover:bg-gray-50 h-8 px-3 rounded-lg text-[11px] font-bold"
                                                         >
                                                             <XCircle className="w-3 h-3 mr-1" /> Hủy
                                                         </Button>
-                                                    </div>
-                                                )}
-                                                {user.vipStatus === 'active' && (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        onClick={() => handleVipApproval(user._id, 'none')}
-                                                        disabled={actionLoading === user._id}
-                                                        className="text-gray-400 hover:text-red-500 hover:bg-gray-50 h-8 px-3 rounded-lg text-[10px] font-medium"
-                                                    >
-                                                        Gỡ VIP
-                                                    </Button>
-                                                )}
+                                                    )}
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))}

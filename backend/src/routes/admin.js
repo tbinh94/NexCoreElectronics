@@ -77,7 +77,7 @@ router.get("/stats", async (req, res) => {
         const recentOrders = await Order.find()
             .sort({ createdAt: -1 })
             .limit(5)
-            .populate("userId", "name email");
+            .populate("userId", "name email avatar");
 
         // 6. Daily Revenue Chart (Last 7 Days)
         const sevenDaysAgo = new Date();
@@ -235,7 +235,7 @@ router.delete("/products/:id", async (req, res) => {
 router.get("/orders", async (req, res) => {
     try {
         const orders = await Order.find({})
-            .populate("userId", "name email")
+            .populate("userId", "name email avatar")
             .sort({ createdAt: -1 });
         res.json(orders);
     } catch (error) {
@@ -301,7 +301,7 @@ router.put("/users/:id/vip", async (req, res) => {
 router.get("/trade-ins", async (req, res) => {
     try {
         const requests = await TradeInRequest.find({})
-            .populate("userId", "name email")
+            .populate("userId", "name email avatar")
             .sort({ createdAt: -1 });
         res.json(requests);
     } catch (error) {

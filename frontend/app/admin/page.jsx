@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package, ShoppingCart, Users, TrendingUp, RefreshCw } from "lucide-react";
+import Image from "next/image";
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -226,10 +227,20 @@ export default function AdminDashboard() {
                                 stats.recentOrders.map((order) => (
                                     <div key={order._id} className="flex items-center justify-between group cursor-pointer">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center font-black text-gray-500 dark:text-gray-400 shadow-inner group-hover:scale-110 transition-transform">
-                                                {order.shippingAddress?.name
-                                                    ? order.shippingAddress.name.charAt(0).toUpperCase()
-                                                    : (order.userId?.name ? order.userId.name.charAt(0).toUpperCase() : 'K')}
+                                            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center font-black text-gray-500 dark:text-gray-400 shadow-inner group-hover:scale-110 transition-transform overflow-hidden relative">
+                                                {order.userId?.avatar ? (
+                                                    <Image
+                                                        src={order.userId.avatar}
+                                                        alt={order.userId.name}
+                                                        fill
+                                                        className="object-cover"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    order.shippingAddress?.name
+                                                        ? order.shippingAddress.name.charAt(0).toUpperCase()
+                                                        : (order.userId?.name ? order.userId.name.charAt(0).toUpperCase() : 'K')
+                                                )}
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">

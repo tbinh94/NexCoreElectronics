@@ -34,7 +34,7 @@ router.use("/faqs", faqRoutes);
 router.use("/orders", orderRoutes);
 router.use("/reviews", reviewRoutes);
 router.use("/admin", protect, admin, adminRoutes);
-router.use("/upload", protect, admin, uploadRoutes);
+router.use("/upload", protect, uploadRoutes);
 router.use("/chat", chatbotRoutes);
 router.use("/ai", aiRoutes);
 router.use("/categories", categoryRoutes);
