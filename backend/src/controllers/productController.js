@@ -75,87 +75,105 @@ export const getProducts = async (req, res) => {
             andConditions.push({ _id: { $ne: exclude } });
         }
 
-        // 2. Smart Search Logic
+        let sortOrder = sort;
+
+        // 2. Search Logic
         if (search) {
-            console.log(`Processing Smart Search for: "${search}"`);
+            const isSuggestions = req.query.suggestions === 'true';
 
-            // Initialize Gemini Model
-            const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+            if (isSuggestions) {
+                // Fast search for suggestions (no Gemini)
+                andConditions.push({
+                    $or: [
+                        { name: { $regex: search, $options: 'i' } },
+                        { brand: { $regex: search, $options: 'i' } },
+                        { category: { $regex: search, $options: 'i' } }
+                    ]
+                });
 
-            // Prompt for Intent Analysis & Semantic Expansion
-            const prompt = `
-            You are a smart search engine for an e-commerce store.
-            Analyze the user's search query: "${search}"
-            
-            Tasks:
-            1.  **Correct Spelling**: Fix any typos (e.g., "iphoe" -> "iphone").
-            2.  **Extract Filters**: Identify category, brand, price range, or sort order from the query.
-            3.  **Semantic Expansion**: Generate a list of related keywords/synonyms to capture the *meaning* (e.g., "áo đi chơi tết" -> ["áo dài", "đỏ", "thời trang", "lễ hội"]).
-            
-            Return ONLY a raw JSON object:
-            {
-              "corrected": "string (corrected query)",
-              "keywords": ["string", "string"],
-              "filters": {
-                "category": "string or null",
-                "brand": "string or null",
-                "minPrice": number or null,
-                "maxPrice": number or null,
-                "sort": "price_asc" | "price_desc" | "newest" | null
-              }
-            }
-            `;
+                // For suggestions, sort by popularity/rating to show "typical" products
+                sortOrder = 'prominence';
+            } else {
+                console.log(`Processing Smart Search for: "${search}"`);
 
-            try {
-                const result = await model.generateContent(prompt);
-                const responseText = result.response.text();
-                const jsonString = responseText.replace(/```json|```/g, "").trim();
-                const analysis = JSON.parse(jsonString);
+                // Initialize Gemini Model
+                const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-                console.log("Smart Search Analysis:", analysis);
-
-                // Apply Extracted Filters
-                if (analysis.filters.category && !category) {
-                    andConditions.push({
-                        $or: [
-                            { category: { $regex: analysis.filters.category, $options: 'i' } },
-                            { usage: { $regex: analysis.filters.category, $options: 'i' } }
-                        ]
-                    });
+                // Prompt for Intent Analysis & Semantic Expansion
+                const prompt = `
+                You are a smart search engine for an e-commerce store.
+                Analyze the user's search query: "${search}"
+                
+                Tasks:
+                1.  **Correct Spelling**: Fix any typos (e.g., "iphoe" -> "iphone").
+                2.  **Extract Filters**: Identify category, brand, price range, or sort order from the query.
+                3.  **Semantic Expansion**: Generate a list of related keywords/synonyms to capture the *meaning* (e.g., "áo đi chơi tết" -> ["áo dài", "đỏ", "thời trang", "lễ hội"]).
+                
+                Return ONLY a raw JSON object:
+                {
+                  "corrected": "string (corrected query)",
+                  "keywords": ["string", "string"],
+                  "filters": {
+                    "category": "string or null",
+                    "brand": "string or null",
+                    "minPrice": number or null,
+                    "maxPrice": number or null,
+                    "sort": "price_asc" | "price_desc" | "newest" | null
+                  }
                 }
-                if (analysis.filters.brand && !brand) andConditions.push({ brand: { $regex: analysis.filters.brand, $options: 'i' } });
+                `;
 
-                if (analysis.filters.minPrice || analysis.filters.maxPrice) {
-                    const priceFilter = {};
-                    if (analysis.filters.minPrice) priceFilter.$gte = analysis.filters.minPrice;
-                    if (analysis.filters.maxPrice) priceFilter.$lte = analysis.filters.maxPrice;
-                    andConditions.push({ price: priceFilter });
+                try {
+                    const result = await model.generateContent(prompt);
+                    const responseText = result.response.text();
+                    const jsonString = responseText.replace(/```json|```/g, "").trim();
+                    const analysis = JSON.parse(jsonString);
+
+                    console.log("Smart Search Analysis:", analysis);
+
+                    // Apply Extracted Filters
+                    if (analysis.filters.category && !category) {
+                        andConditions.push({
+                            $or: [
+                                { category: { $regex: analysis.filters.category, $options: 'i' } },
+                                { usage: { $regex: analysis.filters.category, $options: 'i' } }
+                            ]
+                        });
+                    }
+                    if (analysis.filters.brand && !brand) andConditions.push({ brand: { $regex: analysis.filters.brand, $options: 'i' } });
+
+                    if (analysis.filters.minPrice || analysis.filters.maxPrice) {
+                        const priceFilter = {};
+                        if (analysis.filters.minPrice) priceFilter.$gte = analysis.filters.minPrice;
+                        if (analysis.filters.maxPrice) priceFilter.$lte = analysis.filters.maxPrice;
+                        andConditions.push({ price: priceFilter });
+                    }
+
+                    // Build Search Query using $or
+                    const searchTerms = [analysis.corrected, ...analysis.keywords].filter(Boolean);
+
+                    if (searchTerms.length > 0) {
+                        const regexConditions = searchTerms.map(term => ({
+                            $or: [
+                                { name: { $regex: term, $options: 'i' } },
+                                { description: { $regex: term, $options: 'i' } },
+                                { category: { $regex: term, $options: 'i' } },
+                                { brand: { $regex: term, $options: 'i' } },
+                                { highlights: { $regex: term, $options: 'i' } },
+                                { cpu_type: { $regex: term, $options: 'i' } },
+                                { screen_size_label: { $regex: term, $options: 'i' } }
+                            ]
+                        }));
+
+                        const searchOr = regexConditions.map(c => c.$or).flat();
+                        andConditions.push({ $or: searchOr });
+                    }
+
+                } catch (error) {
+                    console.error("Smart Search Error (Gemini):", error);
+                    // Fallback to basic regex if AI fails
+                    andConditions.push({ name: { $regex: search, $options: 'i' } });
                 }
-
-                // Build Search Query using $or
-                const searchTerms = [analysis.corrected, ...analysis.keywords].filter(Boolean);
-
-                if (searchTerms.length > 0) {
-                    const regexConditions = searchTerms.map(term => ({
-                        $or: [
-                            { name: { $regex: term, $options: 'i' } },
-                            { description: { $regex: term, $options: 'i' } },
-                            { category: { $regex: term, $options: 'i' } },
-                            { brand: { $regex: term, $options: 'i' } },
-                            { highlights: { $regex: term, $options: 'i' } },
-                            { cpu_type: { $regex: term, $options: 'i' } },
-                            { screen_size_label: { $regex: term, $options: 'i' } }
-                        ]
-                    }));
-
-                    const searchOr = regexConditions.map(c => c.$or).flat();
-                    andConditions.push({ $or: searchOr });
-                }
-
-            } catch (error) {
-                console.error("Smart Search Error (Gemini):", error);
-                // Fallback to basic regex if AI fails
-                andConditions.push({ name: { $regex: search, $options: 'i' } });
             }
         }
 
@@ -167,10 +185,11 @@ export const getProducts = async (req, res) => {
         const productsQuery = Product.find(filter);
 
         // Apply sorting
-        if (sort) {
-            if (sort === 'price_asc') productsQuery.sort({ price: 1 });
-            else if (sort === 'price_desc') productsQuery.sort({ price: -1 });
-            else if (sort === 'newest') productsQuery.sort({ createdAt: -1 });
+        if (sortOrder) {
+            if (sortOrder === 'price_asc') productsQuery.sort({ price: 1 });
+            else if (sortOrder === 'price_desc') productsQuery.sort({ price: -1 });
+            else if (sortOrder === 'newest') productsQuery.sort({ createdAt: -1 });
+            else if (sortOrder === 'prominence') productsQuery.sort({ rating: -1, reviews: -1 });
         }
 
         // Apply pagination

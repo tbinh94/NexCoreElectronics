@@ -46,8 +46,8 @@ export default function SearchWithSuggestions() {
     const fetchSuggestions = async (searchTerm) => {
         setLoading(true);
         try {
-            // Fetch top 5 matching products
-            const res = await fetch(`${API_URL}/products?search=${encodeURIComponent(searchTerm)}&limit=5`);
+            // Fetch top 5 matching products with fast search flag
+            const res = await fetch(`${API_URL}/products?search=${encodeURIComponent(searchTerm)}&limit=5&suggestions=true`);
 
             if (res.ok) {
                 const data = await res.json();
@@ -159,7 +159,7 @@ export default function SearchWithSuggestions() {
 
                     <Button
                         type="submit"
-                        className="h-10 rounded-l-none rounded-r-md bg-white/10 hover:bg-white/20 border-l border-gray-200 dark:border-gray-700 text-white px-6 cursor-pointer"
+                        className="h-10 rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 text-primary-foreground px-6 cursor-pointer border-none"
                     >
                         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
                     </Button>
