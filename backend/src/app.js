@@ -10,6 +10,13 @@ dotenv.config();
 // Connect to Database
 connectDB();
 
+import fs from "fs";
+const uploadDir = "uploads";
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+  console.log("Created uploads directory");
+}
+
 const app = express();
 
 // CORS cho phép frontend gọi API

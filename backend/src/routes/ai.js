@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 import rateLimit from "express-rate-limit";
 import { generateProductDescription, summarizeReviews } from "../controllers/aiContentController.js";
 import { estimateLaptopValue, saveTradeInRequest } from "../controllers/valuationController.js";
@@ -17,9 +18,14 @@ const valuationLimiter = rateLimit({
 });
 
 // Configure Multer for Valuation Images
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
     destination(req, file, cb) {
-        cb(null, "uploads/");
+        cb(null, uploadDir);
     },
     filename(req, file, cb) {
         cb(null, `valuation-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`);
