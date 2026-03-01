@@ -116,49 +116,102 @@ export default function SearchWithSuggestions() {
         <div ref={wrapperRef} className="relative w-full max-w-2xl z-50">
             <form
                 onSubmit={handleSearch}
-                className="group flex items-center w-full h-11 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all overflow-hidden"
+                className="group flex items-center w-full h-11 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all"
             >
-                {/* Input Area */}
-                <div className="flex-1 flex items-center h-full pl-4">
-                    <input
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onFocus={() => {
-                            if (suggestions.length > 0) setShowSuggestions(true);
-                        }}
-                        placeholder="Tìm kiếm sản phẩm..."
-                        className="w-full h-full bg-transparent border-none outline-none text-black dark:text-white placeholder:text-gray-400 text-sm"
-                    />
-                </div>
+                {/* Wrap input and internal actions in a relative div to control suggestion width */}
+                <div className="relative flex-1 flex items-center h-full min-w-0">
+                    {/* Input Area */}
+                    <div className="flex-1 flex items-center h-full pl-4">
+                        <input
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onFocus={() => {
+                                if (suggestions.length > 0) setShowSuggestions(true);
+                            }}
+                            placeholder="Tìm kiếm sản phẩm..."
+                            className="w-full h-full bg-transparent border-none outline-none text-black dark:text-white placeholder:text-gray-400 text-sm"
+                        />
+                    </div>
 
-                {/* Internal Actions (Clear & Camera) */}
-                <div className="flex items-center gap-0.5 px-2">
-                    {query && (
+                    {/* Internal Actions (Clear & Camera) */}
+                    <div className="flex items-center gap-0.5 px-2">
+                        {query && (
+                            <button
+                                type="button"
+                                onClick={clearSearch}
+                                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
+
                         <button
                             type="button"
-                            onClick={clearSearch}
-                            className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-primary transition-colors"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={loading}
+                            title="Tìm kiếm bằng hình ảnh"
                         >
-                            <X className="h-4 w-4" />
+                            <Camera className="h-5 w-5" />
                         </button>
-                    )}
+                    </div>
 
-                    <button
-                        type="button"
-                        className="p-1.5 text-gray-400 hover:text-primary transition-colors"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={loading}
-                        title="Tìm kiếm bằng hình ảnh"
-                    >
-                        <Camera className="h-5 w-5" />
-                    </button>
+                    {/* Suggestions Dropdown - Now inside the relative container */}
+                    {showSuggestions && suggestions.length > 0 && (
+                        <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white dark:bg-gray-950 rounded-md shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            <div className="p-2 text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/50">
+                                Gợi ý sản phẩm
+                            </div>
+                            <ul>
+                                {suggestions.map((product) => (
+                                    <li key={product._id} className="border-b border-gray-50 dark:border-gray-800 last:border-none">
+                                        <Link
+                                            href={`/products/${product.slug || product._id}`}
+                                            className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                                            onClick={() => setShowSuggestions(false)}
+                                        >
+                                            <div className="relative h-10 w-10 shrink-0 rounded-md overflow-hidden border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                                                <Image
+                                                    src={product.image || "https://placehold.co/100x100?text=No+Image"}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-contain p-1"
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                                    {product.name}
+                                                </h4>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <span className="text-xs font-bold text-red-600 dark:text-red-400">
+                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
+                                                    </span>
+                                                    {product.originalPrice && (
+                                                        <span className="text-[10px] text-gray-400 line-through">
+                                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.originalPrice)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                            <div
+                                className="p-3 text-center bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-sm text-primary font-medium transition-colors"
+                                onClick={handleSearch}
+                            >
+                                Xem tất cả cho "{query}"
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Main Search Button */}
                 <button
                     type="submit"
-                    className="h-full px-6 bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all disabled:opacity-70 cursor-pointer"
+                    className="h-full px-6 bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all disabled:opacity-70 cursor-pointer rounded-r-md"
                     disabled={loading}
                 >
                     {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
@@ -172,56 +225,6 @@ export default function SearchWithSuggestions() {
                     onChange={handleImageUpload}
                 />
             </form>
-
-            {/* Suggestions Dropdown */}
-            {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 w-full mt-2 bg-white dark:bg-gray-950 rounded-md shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-2 text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/50">
-                        Gợi ý sản phẩm
-                    </div>
-                    <ul>
-                        {suggestions.map((product) => (
-                            <li key={product._id} className="border-b border-gray-50 dark:border-gray-800 last:border-none">
-                                <Link
-                                    href={`/products/${product.slug || product._id}`}
-                                    className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-                                    onClick={() => setShowSuggestions(false)}
-                                >
-                                    <div className="relative h-10 w-10 shrink-0 rounded-md overflow-hidden border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-                                        <Image
-                                            src={product.image || "https://placehold.co/100x100?text=No+Image"}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain p-1"
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                            {product.name}
-                                        </h4>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="text-xs font-bold text-red-600 dark:text-red-400">
-                                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
-                                            </span>
-                                            {product.originalPrice && (
-                                                <span className="text-[10px] text-gray-400 line-through">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.originalPrice)}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                    <div
-                        className="p-3 text-center bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-sm text-primary font-medium transition-colors"
-                        onClick={handleSearch}
-                    >
-                        Xem tất cả kết quả cho "{query}"
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
