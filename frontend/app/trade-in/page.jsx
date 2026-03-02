@@ -266,7 +266,7 @@ export default function TradeInPage() {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="modelCode">Mã máy (Model Code)</Label>
                                         <Input
@@ -486,18 +486,18 @@ export default function TradeInPage() {
                                 </div>
 
                                 <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-6">
-                                    <div className="flex justify-between items-end mb-2">
+                                    <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-2 mb-4">
                                         <span className="text-sm text-gray-500">Giá thị trường ước tính:</span>
-                                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                                        <span className="font-medium text-gray-900 dark:text-gray-100 text-lg md:text-base">
                                             {typeof result.market_price_estimate === 'object' ?
                                                 `${formatCurrency(result.market_price_estimate.low)} - ${formatCurrency(result.market_price_estimate.high)}` :
                                                 formatCurrency(result.market_price_estimate)
                                             }
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-end mb-6">
+                                    <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-1 mb-6">
                                         <span className="font-bold text-gray-900 dark:text-white">Giá thu mua đề xuất:</span>
-                                        <span className="text-3xl font-bold text-blue-600">
+                                        <span className="text-3xl md:text-4xl font-bold text-blue-600">
                                             {typeof result.trade_in_value === 'object' ?
                                                 formatCurrency(result.trade_in_value.recommended) :
                                                 formatCurrency(result.trade_in_value)
@@ -567,31 +567,33 @@ export default function TradeInPage() {
                                                 onChange={handleContactInputChange}
                                             />
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="flex flex-col sm:flex-row gap-2 mt-4">
                                             <Button
                                                 type="button"
                                                 variant="outline"
-                                                className="flex-1"
+                                                className="w-full sm:flex-1 py-4 h-auto"
                                                 onClick={() => setShowContactForm(false)}
                                             >
                                                 Quay lại
                                             </Button>
                                             <Button
                                                 type="submit"
-                                                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white"
+                                                className="w-full sm:flex-[2] bg-blue-600 hover:bg-blue-700 text-white py-4 h-auto whitespace-normal"
                                                 disabled={submitting}
                                             >
                                                 {submitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
-                                                Gửi yêu cầu nhân viên gọi lại
+                                                <span className="hidden sm:inline">Gửi yêu cầu nhân viên gọi lại</span>
+                                                <span className="sm:hidden font-bold">Gửi yêu cầu hỗ trợ ngay</span>
                                             </Button>
                                         </div>
                                     </form>
                                 ) : (
                                     <Button
-                                        className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                                        className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white h-auto py-3 whitespace-normal"
                                         onClick={() => setShowContactForm(true)}
                                     >
-                                        Tôi đồng ý với mức giá này - Liên hệ thu mua
+                                        <span className="hidden sm:inline">Tôi đồng ý với mức giá này - Liên hệ thu mua</span>
+                                        <span className="sm:hidden font-bold">Chốt giá & Liên hệ thu mua ngay</span>
                                     </Button>
                                 )}
                             </div>
