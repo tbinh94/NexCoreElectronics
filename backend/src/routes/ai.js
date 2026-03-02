@@ -11,10 +11,10 @@ const router = Router();
 
 // Rate Limiter for Valuation (Expensive Operation)
 const valuationLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 5, // Limit each IP to 5 valuation requests per hour
+    windowMs: 30 * 60 * 1000, // 30 minutes
+    max: 10, // Limit each IP to 10 valuation requests per 30 mins
     skip: (req) => req.user && req.user.isAdmin,
-    message: { message: "Bạn đã vượt quá giới hạn định giá (5 lần/giờ). Vui lòng thử lại sau." }
+    message: { message: "Bạn đã vượt quá giới hạn định giá (10 lần/30 phút). Vui lòng thử lại sau." }
 });
 
 // Configure Multer for Valuation Images
