@@ -32,7 +32,8 @@ export const AuthProvider = ({ children }) => {
                     // Fetch latest profile from server to sync isVip/vipStatus
                     const fetchProfile = async () => {
                         try {
-                            const res = await fetch("/api/auth/profile", {
+                            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+                            const res = await fetch(`${apiUrl}/api/auth/profile`, {
                                 headers: { "Authorization": `Bearer ${cleanToken}` }
                             });
                             if (res.ok) {
@@ -65,7 +66,8 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password, credential = null) => {
         try {
-            const url = credential ? "/api/auth/google" : "/api/auth/login";
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+            const url = credential ? `${apiUrl}/api/auth/google` : `${apiUrl}/api/auth/login`;
             const body = credential ? { credential, clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID } : { email, password };
 
             const res = await fetch(url, {

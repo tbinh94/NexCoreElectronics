@@ -20,6 +20,7 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [rePassword, setRePassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const isInvalid = password !== rePassword;
 
@@ -30,8 +31,10 @@ export default function RegisterPage() {
             return;
         }
         setError("");
+        setLoading(true);
         try {
-            const res = await fetch("/api/auth/register", {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+            const res = await fetch(`${apiUrl}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -58,6 +61,8 @@ export default function RegisterPage() {
             console.log(error);
             setError(error.message);
             toast.error(error.message);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -113,8 +118,8 @@ export default function RegisterPage() {
                             </div>
                         </div>
                         {isInvalid && <p className="text-red-500">Mật khẩu không khớp</p>}
-                        <Button disabled={isInvalid} className="w-full cursor-pointer">
-                            Đăng ký
+                        <Button disabled={isInvalid || loading} className="w-full cursor-pointer">
+                            {loading ? "Đang xử lý..." : "Đăng ký"}
                         </Button>
                     </form>
                     <div className="mt-4 text-center text-sm">

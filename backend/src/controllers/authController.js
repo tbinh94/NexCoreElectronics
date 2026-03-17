@@ -23,7 +23,8 @@ export const register = async (req, res) => {
         return res.status(201).json({ token });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        console.error("Register Error: ", error); // print it in backend logs
+        return res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }
 
@@ -56,7 +57,8 @@ export const login = async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
         return res.status(200).json({ token, user: userData });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        console.error("Login Error: ", error);
+        return res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }
 

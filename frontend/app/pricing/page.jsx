@@ -179,7 +179,7 @@ export default function PricingPage() {
 
             {/* Payment Confirmation Modal */}
             <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-                <DialogContent className="sm:max-w-md rounded-[2rem]">
+                <DialogContent className="sm:max-w-md rounded-[2rem] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-black text-center">Thanh toán NexCore VIP</DialogTitle>
                         <DialogDescription className="text-center">
@@ -187,11 +187,11 @@ export default function PricingPage() {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="flex flex-col items-center py-6 space-y-4">
-                        <div className="p-4 bg-white rounded-2xl shadow-inner border">
+                    <div className="flex flex-col items-center py-2 space-y-2">
+                        <div className="p-2 bg-white rounded-2xl shadow-inner border max-w-[90%] md:max-w-full">
                             <VietQRImage amount={50000} />
                         </div>
-                        <div className="text-center">
+                        <div className="text-center mt-2">
                             <p className="text-sm text-gray-500">Số tiền cần thanh toán:</p>
                             <p className="text-2xl font-black text-primary">50.000đ</p>
                             <p className="text-[10px] text-gray-400 mt-1 italic">(Nội dung: Đăng ký VIP [Tên tài khoản])</p>

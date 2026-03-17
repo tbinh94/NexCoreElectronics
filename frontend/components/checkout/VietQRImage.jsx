@@ -14,11 +14,11 @@ export default function VietQRImage({ amount }) {
     const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-${template}.png?amount=${amount}&addInfo=${content}`;
 
     return (
-        <div className="flex flex-col items-center p-4 bg-white rounded-lg border shadow-sm max-w-sm mx-auto">
-            <h3 className="font-bold text-lg mb-2 text-blue-600">Quét mã để thanh toán</h3>
+        <div className="flex flex-col items-center p-2 md:p-4 bg-white rounded-lg border shadow-sm max-w-sm mx-auto">
+            <h3 className="font-bold text-base md:text-lg mb-1 md:mb-2 text-blue-600">Quét mã để thanh toán</h3>
             {/* <p className="text-gray-500 mb-4">Số tiền: <span className="font-bold text-red-600">{formatPrice(amount)}</span></p> */}
 
-            <div className="relative w-64 h-64 bg-gray-100 rounded-md overflow-hidden">
+            <div className="relative w-48 h-48 md:w-56 md:h-56 bg-gray-100 rounded-md overflow-hidden">
                 {isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -32,7 +32,7 @@ export default function VietQRImage({ amount }) {
                     onLoadingComplete={() => setIsLoading(false)}
                 />
             </div>
-            <p className="text-xs text-gray-400 mt-4">Hỗ trợ bởi VietQR</p>
+            <p className="text-[10px] md:text-xs text-gray-400 mt-2">Hỗ trợ bởi VietQR</p>
         </div>
     );
 }
