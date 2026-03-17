@@ -34,8 +34,8 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="w-full lg:min-h-[600px] xl:min-h-[800px]">
-            <div className="flex items-center justify-center py-12">
+        <div className="w-full">
+            <div className="flex items-center justify-center py-12 md:py-24">
                 <div className="mx-auto grid w-[350px] gap-6">
                     <div className="grid gap-2 text-center">
                         <h1 className="text-3xl font-bold">Đăng nhập</h1>
@@ -81,8 +81,9 @@ export default function LoginPage() {
                         <Button type="submit" className="w-full cursor-pointer">
                             Đăng nhập
                         </Button>
-                        <div className="flex justify-center w-full">
+                        <div className="flex justify-center w-full overflow-hidden rounded-md">
                             <GoogleLogin
+                                width="350"
                                 onSuccess={async (credentialResponse) => {
                                     try {
                                         await login(null, null, credentialResponse.credential);
