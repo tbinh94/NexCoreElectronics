@@ -84,22 +84,113 @@ export default function UsersPage() {
                             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableHeader className="bg-gray-50">
-                                    <TableRow>
-                                        <TableHead className="font-semibold text-gray-900">Khách hàng</TableHead>
-                                        <TableHead className="font-semibold text-gray-900 border-x">Email</TableHead>
-                                        <TableHead className="font-semibold text-gray-900 border-x text-center">Trạng thái VIP</TableHead>
-                                        <TableHead className="font-semibold text-gray-900 border-x">Vai trò</TableHead>
-                                        <TableHead className="font-semibold text-gray-900 border-x">Ngày tham gia</TableHead>
-                                        <TableHead className="font-semibold text-gray-900 text-right uppercase text-[10px] tracking-widest">Hành động</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-y divide-gray-100">
-                                    {users.map((user) => (
-                                        <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
-                                            <TableCell className="flex items-center gap-3 py-4">
+                        <>
+                            {/* Desktop View - Table */}
+                            <div className="hidden md:block overflow-x-auto border rounded-md">
+                                <Table>
+                                    <TableHeader className="bg-gray-50">
+                                        <TableRow>
+                                            <TableHead className="font-semibold text-gray-900">Khách hàng</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-x">Email</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-x text-center">Trạng thái VIP</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-x">Vai trò</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 border-x">Ngày tham gia</TableHead>
+                                            <TableHead className="font-semibold text-gray-900 text-right uppercase text-[10px] tracking-widest">Hành động</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-gray-100">
+                                        {users.map((user) => (
+                                            <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
+                                                <TableCell className="flex items-center gap-3 py-4">
+                                                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 overflow-hidden relative">
+                                                        {user.avatar ? (
+                                                            <Image
+                                                                src={user.avatar}
+                                                                alt={user.name}
+                                                                fill
+                                                                className="object-cover"
+                                                                loading="lazy"
+                                                            />
+                                                        ) : (
+                                                            user.name?.charAt(0).toUpperCase()
+                                                        )}
+                                                    </div>
+                                                    <span className="font-medium text-gray-900">{user.name}</span>
+                                                </TableCell>
+                                                <TableCell className="border-x">
+                                                    <div className="flex items-center gap-2 text-gray-600">
+                                                        <Mail className="h-4 w-4" />
+                                                        {user.email}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="border-x text-center">
+                                                    {(user.vipStatus === 'active' || user.isVip) ? (
+
+                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-[10px] font-black text-yellow-700 border border-yellow-200 uppercase tracking-tighter">
+                                                            ✨ VIP
+                                                        </span>
+                                                    ) : user.vipStatus === 'pending' ? (
+                                                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-1 text-[10px] font-black text-orange-700 border border-orange-200 uppercase tracking-tighter animate-pulse">
+                                                            <Clock size={10} /> Chờ phê duyệt
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-300">—</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="border-x">
+                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
+                                                        {user.isAdmin ? "Admin" : "Khách hàng"}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="border-x text-gray-500">{new Date(user.createdAt).toLocaleDateString('vi-VN')}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        {user.vipStatus !== 'active' ? (
+                                                            <Button
+                                                                size="sm"
+                                                                onClick={() => handleVipApproval(user._id, 'active')}
+                                                                disabled={actionLoading === user._id}
+                                                                className="bg-green-600 hover:bg-green-700 h-8 px-3 rounded-lg text-[11px] font-bold"
+                                                            >
+                                                                {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : <> <CheckCircle className="w-3 h-3 mr-1" /> {user.vipStatus === 'pending' ? "Duyệt VIP" : "Cấp VIP"}</>}
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                onClick={() => handleVipApproval(user._id, 'none')}
+                                                                disabled={actionLoading === user._id}
+                                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 px-3 rounded-lg text-[10px] font-medium"
+                                                            >
+                                                                {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : "Gỡ VIP"}
+                                                            </Button>
+                                                        )}
+
+                                                        {user.vipStatus === 'pending' && (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                onClick={() => handleVipApproval(user._id, 'none')}
+                                                                disabled={actionLoading === user._id}
+                                                                className="text-gray-400 hover:text-red-500 hover:bg-gray-50 h-8 px-3 rounded-lg text-[11px] font-bold"
+                                                            >
+                                                                <XCircle className="w-3 h-3 mr-1" /> Hủy
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Mobile View - Cards list */}
+                            <div className="md:hidden space-y-4 px-4 pb-4 mt-4">
+                                {users.map((user) => (
+                                    <div key={user._id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm space-y-3">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-3">
                                                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 overflow-hidden relative">
                                                     {user.avatar ? (
                                                         <Image
@@ -113,75 +204,80 @@ export default function UsersPage() {
                                                         user.name?.charAt(0).toUpperCase()
                                                     )}
                                                 </div>
-                                                <span className="font-medium text-gray-900">{user.name}</span>
-                                            </TableCell>
-                                            <TableCell className="border-x">
-                                                <div className="flex items-center gap-2 text-gray-600">
-                                                    <Mail className="h-4 w-4" />
-                                                    {user.email}
+                                                <div className="space-y-1">
+                                                    <h3 className="font-bold text-gray-900">{user.name}</h3>
+                                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                        <Mail className="h-3 w-3" />
+                                                        <span className="truncate max-w-[150px]">{user.email}</span>
+                                                    </div>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="border-x text-center">
-                                                {(user.vipStatus === 'active' || user.isVip) ? (
+                                            </div>
+                                            <span className={`inline-flex flex-shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
+                                                {user.isAdmin ? "Admin" : "Khách hàng"}
+                                            </span>
+                                        </div>
 
+                                        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-50">
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-1">Trạng thái VIP</p>
+                                                {(user.vipStatus === 'active' || user.isVip) ? (
                                                     <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-[10px] font-black text-yellow-700 border border-yellow-200 uppercase tracking-tighter">
                                                         ✨ VIP
                                                     </span>
                                                 ) : user.vipStatus === 'pending' ? (
                                                     <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-1 text-[10px] font-black text-orange-700 border border-orange-200 uppercase tracking-tighter animate-pulse">
-                                                        <Clock size={10} /> Chờ phê duyệt
+                                                        <Clock size={10} /> Chờ duyệt
                                                     </span>
                                                 ) : (
-                                                    <span className="text-gray-300">—</span>
+                                                    <span className="text-xs text-gray-500">Thường</span>
                                                 )}
-                                            </TableCell>
-                                            <TableCell className="border-x">
-                                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${user.isAdmin ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
-                                                    {user.isAdmin ? "Admin" : "Khách hàng"}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="border-x text-gray-500">{new Date(user.createdAt).toLocaleDateString('vi-VN')}</TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    {user.vipStatus !== 'active' ? (
-                                                        <Button
-                                                            size="sm"
-                                                            onClick={() => handleVipApproval(user._id, 'active')}
-                                                            disabled={actionLoading === user._id}
-                                                            className="bg-green-600 hover:bg-green-700 h-8 px-3 rounded-lg text-[11px] font-bold"
-                                                        >
-                                                            {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : <> <CheckCircle className="w-3 h-3 mr-1" /> {user.vipStatus === 'pending' ? "Duyệt VIP" : "Cấp VIP"}</>}
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            onClick={() => handleVipApproval(user._id, 'none')}
-                                                            disabled={actionLoading === user._id}
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 px-3 rounded-lg text-[10px] font-medium"
-                                                        >
-                                                            {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : "Gỡ VIP"}
-                                                        </Button>
-                                                    )}
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-1">Ngày tham gia</p>
+                                                <p className="text-xs font-medium text-gray-900">
+                                                    {new Date(user.createdAt).toLocaleDateString('vi-VN')}
+                                                </p>
+                                            </div>
+                                        </div>
 
-                                                    {user.vipStatus === 'pending' && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            onClick={() => handleVipApproval(user._id, 'none')}
-                                                            disabled={actionLoading === user._id}
-                                                            className="text-gray-400 hover:text-red-500 hover:bg-gray-50 h-8 px-3 rounded-lg text-[11px] font-bold"
-                                                        >
-                                                            <XCircle className="w-3 h-3 mr-1" /> Hủy
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                        <div className="pt-3 border-t border-gray-50 flex justify-end gap-2">
+                                            {user.vipStatus !== 'active' ? (
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => handleVipApproval(user._id, 'active')}
+                                                    disabled={actionLoading === user._id}
+                                                    className="bg-green-600 hover:bg-green-700 h-8 px-3 rounded-lg text-[11px] font-bold"
+                                                >
+                                                    {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : <> <CheckCircle className="w-3 h-3 mr-1" /> {user.vipStatus === 'pending' ? "Duyệt VIP" : "Cấp VIP"}</>}
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleVipApproval(user._id, 'none')}
+                                                    disabled={actionLoading === user._id}
+                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 px-3 rounded-lg text-[10px] font-medium"
+                                                >
+                                                    {actionLoading === user._id ? <Loader2 className="animate-spin h-3 w-3" /> : "Gỡ VIP"}
+                                                </Button>
+                                            )}
+
+                                            {user.vipStatus === 'pending' && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleVipApproval(user._id, 'none')}
+                                                    disabled={actionLoading === user._id}
+                                                    className="text-gray-400 hover:text-red-500 hover:bg-gray-50 h-8 px-3 rounded-lg text-[11px] font-bold"
+                                                >
+                                                    <XCircle className="w-3 h-3 mr-1" /> Hủy
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
                     )}
                 </CardContent>
             </Card>
