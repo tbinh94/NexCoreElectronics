@@ -190,7 +190,7 @@ function AddProductContent() {
                                 <Input id="name" name="name" required value={formData.name} onChange={handleChange} placeholder="Ví dụ: iPhone 15 Pro Max" />
                             </div>
 
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="price">Giá (VNĐ)</Label>
                                     <Input id="price" name="price" type="number" required value={formData.price} onChange={handleChange} placeholder="30000000" />
@@ -205,7 +205,7 @@ function AddProductContent() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="category">Danh mục</Label>
                                     <Select value={formData.category} onValueChange={(val) => handleSelectChange("category", val)}>
@@ -282,12 +282,12 @@ function AddProductContent() {
                             </div>
 
                             {/* AI Content Generation Section */}
-                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 space-y-3">
-                                <div className="flex items-center justify-between">
+                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 space-y-3 md:col-span-2">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                     <h3 className="text-sm font-semibold text-blue-800 flex items-center gap-2">
                                         ✨ AI Content Generator
                                     </h3>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                                         <Select value={aiTone} onValueChange={setAiTone}>
                                             <SelectTrigger className="w-[140px] h-8 text-xs bg-white">
                                                 <SelectValue placeholder="Tone" />
