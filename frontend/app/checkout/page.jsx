@@ -170,50 +170,39 @@ export default function CheckoutPage() {
 
     if (orderSuccess) {
         return (
-            <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
-                <div className="bg-white dark:bg-card p-8 rounded-2xl shadow-xl border border-green-100 dark:border-green-900/30 animate-in zoom-in duration-300">
-                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="container mx-auto px-4 py-8 max-w-xl text-center">
+                <div className="bg-white dark:bg-card p-6 rounded-2xl shadow-xl border border-green-100 dark:border-green-900/30 animate-in zoom-in duration-300">
+                    <div className="w-14 h-14 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Đặt hàng thành công!</h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8">
-                        Cảm ơn bạn đã tin tưởng NexCore Electronics. Mã đơn hàng của bạn đã được hệ thống ghi nhận.
-                    </p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Đặt hàng thành công!</h2>
 
                     {formData.paymentMethod === 'transfer' ? (
-                        <div className="space-y-6">
-                            <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
-                                <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-4">Vui lòng quét mã QR để hoàn tất thanh toán</p>
-                                <div className="flex justify-center mb-4">
-                                    <VietQRImage amount={totalPrice} />
-                                </div>
-                                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">Tổng tiền: {formatPrice(totalPrice)}</p>
+                        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30 mb-6">
+                            <div className="flex justify-center mb-1 transform scale-90 sm:scale-75 origin-top -mt-2">
+                                <VietQRImage amount={totalPrice} />
                             </div>
+                            <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-1 -mt-4 sm:-mt-10">Scan QR để hoàn tất thanh toán</p>
+                            <p className="text-lg font-bold text-blue-600 dark:text-blue-400">Tổng tiền: {formatPrice(totalPrice)}</p>
                         </div>
                     ) : formData.paymentMethod === 'installment' ? (
-                        <div className="space-y-6">
-                            <div className="p-4 sm:p-6 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 text-left sm:text-center">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-3 sm:mb-4">
-                                    <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Phương thức:</span>
-                                    <span className="font-semibold text-amber-700 dark:text-amber-400 text-sm sm:text-base sm:text-right">Trả góp (CCCD: {formData.cccd})</span>
+                        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 text-left sm:text-center mb-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-2">
+                                <span className="text-gray-500 dark:text-gray-400 text-sm">Phương thức:</span>
+                                <span className="font-semibold text-amber-700 dark:text-amber-400 text-sm sm:text-right">Trả góp</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-3">
+                                <span className="text-gray-500 dark:text-gray-400 text-sm">Tổng đơn hàng:</span>
+                                <span className="font-bold text-red-600 text-sm sm:text-right">{formatPrice(totalPrice)}</span>
+                            </div>
+                            <div className="border-t border-amber-200 dark:border-amber-800/50 pt-2 flex flex-col items-center">
+                                <div className="flex justify-center transform scale-[0.80] sm:scale-75 origin-top -mt-2 -mb-8 sm:-mb-14">
+                                    <VietQRImage amount={Math.round(totalPrice * 0.025)} />
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-3 sm:mb-4">
-                                    <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Trạng thái:</span>
-                                    <span className="font-bold text-amber-600 text-sm sm:text-base sm:text-right">Đang trả góp</span>
-                                </div>
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-4 sm:mb-6">
-                                    <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Tổng giá trị đơn hàng:</span>
-                                    <span className="font-bold text-red-600 text-sm sm:text-base sm:text-right">{formatPrice(totalPrice)}</span>
-                                </div>
-                                <div className="border-t border-amber-200 dark:border-amber-800/50 pt-4 sm:pt-6">
-                                    <p className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-300 mb-4 text-center">Vui lòng quét mã QR để thanh toán (2.5% giá trị đơn hàng)</p>
-                                    <div className="flex justify-center mb-4">
-                                        <VietQRImage amount={Math.round(totalPrice * 0.025)} />
-                                    </div>
-                                    <p className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 text-center">Số tiền trả góp tháng này: <br className="sm:hidden" /> {formatPrice(Math.round(totalPrice * 0.025))}</p>
-                                </div>
+                                <p className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">Vui lòng quét QR để thanh toán tháng đầu (2.5%)</p>
+                                <p className="text-base font-bold text-amber-600 dark:text-amber-400">Số tiền: {formatPrice(Math.round(totalPrice * 0.025))}</p>
                             </div>
                         </div>
                     ) : (
@@ -229,7 +218,7 @@ export default function CheckoutPage() {
                         </div>
                     )}
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button onClick={() => router.push("/orders")} className="bg-primary hover:bg-primary/90 px-8">
                             Xem đơn hàng
                         </Button>
