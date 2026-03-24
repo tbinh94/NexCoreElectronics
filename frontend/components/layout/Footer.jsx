@@ -12,28 +12,58 @@ export default function Footer() {
         "Mỏng nhẹ – Di động"
     ];
 
+    const [settings, setSettings] = useState({
+        storeName: "NexCore Electronics",
+        email: "support@nexcore.com",
+        phone: "1900 123 456",
+        address: "123 Hàm Nghi, Q.1, TP.HCM",
+    });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+                const res = await fetch(`${apiUrl}/api/settings`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.general) {
+                        setSettings({
+                            storeName: data.general.storeName || "NexCore Electronics",
+                            email: data.general.email || "support@nexcore.com",
+                            phone: data.general.phone || "1900 123 456",
+                            address: data.general.address || "123 Hàm Nghi, Q.1, TP.HCM",
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching settings:", error);
+            }
+        };
+        fetchSettings();
+    }, []);
+
     return (
         <footer className="border-t bg-gray-50 dark:bg-gray-950 dark:border-gray-800 pt-16 pb-8">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12">
                     {/* Brand & Contact */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">NexCore Electronics</h3>
+                        <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">{settings.storeName}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                             Trải nghiệm mua sắm công nghệ đỉnh cao với những sản phẩm mới nhất, chính hãng và giá tốt nhất thị trường.
                         </p>
                         <div className="space-y-2 pt-2">
                             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <MapPin className="h-4 w-4 text-blue-500" />
-                                <span>123 Hàm Nghi, Q.1, TP.HCM</span>
+                                <span>{settings.address}</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <Phone className="h-4 w-4 text-blue-500" />
-                                <span>1900 123 456</span>
+                                <span>{settings.phone}</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                                 <Mail className="h-4 w-4 text-blue-500" />
-                                <span>support@nexcore.com</span>
+                                <span>{settings.email}</span>
                             </div>
                         </div>
                     </div>
@@ -108,7 +138,7 @@ export default function Footer() {
                 <div className="border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
-                            © {new Date().getFullYear()} NexCore Electronics. Bảo lưu mọi quyền.
+                            © {new Date().getFullYear()} {settings.storeName}. Bảo lưu mọi quyền.
                         </div>
 
                         {/* Security Badges */}

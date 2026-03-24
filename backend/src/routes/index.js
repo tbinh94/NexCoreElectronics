@@ -12,6 +12,7 @@ import chatbotRoutes from "./chatbot.js";
 import aiRoutes from "./ai.js";
 import categoryRoutes from "./categoryRoutes.js";
 import userRoutes from "./userRoutes.js";
+import settingsRoutes from "./settings.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 import { getProducts, getProductFilters, getProductById, searchByImage, getDailyUsedProducts } from "../controllers/productController.js";
 
@@ -39,6 +40,7 @@ router.use("/chat", chatbotRoutes);
 router.use("/ai", aiRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/users", userRoutes);
+router.use("/settings", settingsRoutes);
 
 router.get("/products/daily-used", getDailyUsedProducts); // New route
 router.get("/products", getProducts);
