@@ -31,6 +31,7 @@ const statusMap = {
     completed: { label: "Hoàn thành", color: "bg-green-100 text-green-800" },
     cancelled: { label: "Đã huỷ", color: "bg-red-100 text-red-800" },
     "đang trả góp": { label: "Đang trả góp", color: "bg-amber-100 text-amber-800" },
+    "đã trả góp xong": { label: "Đã trả góp xong", color: "bg-emerald-100 text-emerald-800" },
 };
 
 export default function OrdersPage() {
@@ -182,8 +183,17 @@ export default function OrdersPage() {
                                                             <DropdownMenuLabel>Cập nhật trạng thái</DropdownMenuLabel>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem onClick={() => updateStatus(order._id, 'processing')}>Đang xử lý</DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => updateStatus(order._id, 'shipping')}>Đang giao</DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => updateStatus(order._id, 'completed')}>Hoàn thành</DropdownMenuItem>
+                                                            {order.paymentMethod === 'installment' ? (
+                                                                <>
+                                                                    <DropdownMenuItem onClick={() => updateStatus(order._id, 'đang trả góp')}>Đang trả góp</DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={() => updateStatus(order._id, 'đã trả góp xong')}>Đã trả góp xong</DropdownMenuItem>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <DropdownMenuItem onClick={() => updateStatus(order._id, 'shipping')}>Đang giao</DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={() => updateStatus(order._id, 'completed')}>Hoàn thành</DropdownMenuItem>
+                                                                </>
+                                                            )}
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem onClick={() => updateStatus(order._id, 'cancelled')} className="text-red-600 focus:text-red-600 focus:bg-red-50">Huỷ đơn</DropdownMenuItem>
                                                         </DropdownMenuContent>
@@ -221,8 +231,17 @@ export default function OrdersPage() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56">
                                                     <DropdownMenuItem onClick={() => updateStatus(order._id, 'processing')}>Đang xử lý</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => updateStatus(order._id, 'shipping')}>Đang giao</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => updateStatus(order._id, 'completed')}>Hoàn thành</DropdownMenuItem>
+                                                    {order.paymentMethod === 'installment' ? (
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => updateStatus(order._id, 'đang trả góp')}>Đang trả góp</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => updateStatus(order._id, 'đã trả góp xong')}>Đã trả góp xong</DropdownMenuItem>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => updateStatus(order._id, 'shipping')}>Đang giao</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => updateStatus(order._id, 'completed')}>Hoàn thành</DropdownMenuItem>
+                                                        </>
+                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem onClick={() => updateStatus(order._id, 'cancelled')} className="text-red-600">Huỷ đơn</DropdownMenuItem>
                                                 </DropdownMenuContent>

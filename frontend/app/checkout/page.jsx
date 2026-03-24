@@ -26,6 +26,7 @@ export default function CheckoutPage() {
         name: "",
         address: "",
         city: "",
+        customCity: "",
         phone: "",
         paymentMethod: initialPaymentMethod,
         cccd: ""
@@ -112,8 +113,9 @@ export default function CheckoutPage() {
         e.preventDefault();
         if (!user) return;
 
-        if (!formData.city) {
-            alert("Vui lòng chọn Tỉnh/Thành phố");
+        const finalCity = formData.city === "Khác" ? formData.customCity : formData.city;
+        if (!finalCity) {
+            alert("Vui lòng chọn hoặc nhập Tỉnh/Thành phố");
             return;
         }
 
@@ -134,7 +136,7 @@ export default function CheckoutPage() {
                     shippingAddress: {
                         name: formData.name,
                         address: formData.address,
-                        city: formData.city,
+                        city: finalCity,
                         phone: formData.phone
                     },
                     paymentMethod: formData.paymentMethod,
@@ -149,6 +151,11 @@ export default function CheckoutPage() {
             });
 
             if (res.ok) {
+                if (!directProductId) {
+                    await fetch(`${apiUrl}/api/cart/${user._id}`, {
+                        method: "DELETE"
+                    }).catch(console.error);
+                }
                 setOrderSuccess(true);
             } else {
                 alert("Đặt hàng thất bại");
@@ -186,18 +193,27 @@ export default function CheckoutPage() {
                             </div>
                         </div>
                     ) : formData.paymentMethod === 'installment' ? (
-                        <div className="p-6 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 mb-8">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-500 dark:text-gray-400">Phương thức:</span>
-                                <span className="font-semibold text-amber-700 dark:text-amber-400">Trả góp (CCCD: {formData.cccd})</span>
-                            </div>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-500 dark:text-gray-400">Trạng thái:</span>
-                                <span className="font-bold text-amber-600">Đang trả góp</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-500 dark:text-gray-400">Tổng giá trị đơn hàng:</span>
-                                <span className="font-bold text-red-600">{formatPrice(totalPrice)}</span>
+                        <div className="space-y-6">
+                            <div className="p-4 sm:p-6 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30 text-left sm:text-center">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-3 sm:mb-4">
+                                    <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Phương thức:</span>
+                                    <span className="font-semibold text-amber-700 dark:text-amber-400 text-sm sm:text-base sm:text-right">Trả góp (CCCD: {formData.cccd})</span>
+                                </div>
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-3 sm:mb-4">
+                                    <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Trạng thái:</span>
+                                    <span className="font-bold text-amber-600 text-sm sm:text-base sm:text-right">Đang trả góp</span>
+                                </div>
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-4 sm:mb-6">
+                                    <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Tổng giá trị đơn hàng:</span>
+                                    <span className="font-bold text-red-600 text-sm sm:text-base sm:text-right">{formatPrice(totalPrice)}</span>
+                                </div>
+                                <div className="border-t border-amber-200 dark:border-amber-800/50 pt-4 sm:pt-6">
+                                    <p className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-300 mb-4 text-center">Vui lòng quét mã QR để thanh toán (2.5% giá trị đơn hàng)</p>
+                                    <div className="flex justify-center mb-4">
+                                        <VietQRImage amount={Math.round(totalPrice * 0.025)} />
+                                    </div>
+                                    <p className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 text-center">Số tiền trả góp tháng này: <br className="sm:hidden" /> {formatPrice(Math.round(totalPrice * 0.025))}</p>
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -259,6 +275,16 @@ export default function CheckoutPage() {
                                     <SelectItem value="Khác">Khác</SelectItem>
                                 </SelectContent>
                             </Select>
+                            {formData.city === "Khác" && (
+                                <Input 
+                                    id="customCity" 
+                                    value={formData.customCity || ""} 
+                                    onChange={handleInputChange} 
+                                    required 
+                                    placeholder="Nhập Tỉnh/Thành phố của bạn" 
+                                    className="mt-2"
+                                />
+                            )}
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="address">Địa chỉ nhận hàng</Label>

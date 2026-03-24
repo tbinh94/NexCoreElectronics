@@ -110,41 +110,44 @@ export const estimateLaptopValue = async (req, res) => {
         - Mỗi khoản trừ PHẢI được giải thích.
 
         -------------------------
-        BƯỚC 0: KIỂM TRA ĐỐI TƯỢNG (QUAN TRỌNG NHẤT)
-        - Quan sát kỹ hình ảnh.
-        - Nếu hình ảnh KHÔNG PHẢI LÀ LAPTOP (ví dụ: điện thoại, xe cộ, động vật, người, hoặc vật dụng khác...), 
-          HÃY DỪNG NGAY VÀ TRẢ VỀ JSON SAU:
+        BƯỚC 1: KIỂM TRA ĐỐI TƯỢNG VÀ MỨC ĐỘ RÕ RÀNG
+        1. Nếu hình ảnh KHÔNG PHẢI LÀ LAPTOP, trả về ngay:
           {
             "error": "NOT_A_LAPTOP",
             "message": "Hình ảnh bạn cung cấp có vẻ không phải là laptop. Vui lòng kiểm tra lại."
+          }
+        2. Nếu thông tin người dùng cung cấp (tên máy, mã máy) quá mơ hồ, ví dụ: thiếu đời máy (2024 hay 2025), thiếu thông tin CPU/GPU quan trọng, dẫn đến định giá có thể bị sai lệch rất lớn, HÃY TRẢ VỀ YÊU CẦU LÀM RÕ:
+          {
+            "needs_clarification": true,
+            "clarification_question": "Câu hỏi làm rõ ngằn gọn và lịch sự (Ví dụ: Máy bạn mã APH10 là phiên bản sản xuất năm 2024 hay 2025 vậy ạ? Bản i5 hay i7?)"
           }
         -------------------------
 
         -------------------------
         YÊU CẦU ĐẦU RA (JSON ONLY – KHÔNG THÊM CHỮ)
         -------------------------
-        Nếu là laptop, trả về:
+        Nếu thông tin ĐÃ ĐỦ ĐỂ ĐỊNH GIÁ (hoặc có thể tự suy luận an toàn), trả về:
         {
-        "condition_grade": "A | B | C | D",
-        "condition_details": "Mô tả ngắn gọn nhưng cụ thể về ngoại hình và tình trạng máy dựa trên ảnh",
-        "market_price_estimate": {
-            "low": số_nguyên_vnđ,
-            "high": số_nguyên_vnđ
-        },
-        "trade_in_value": {
-            "recommended": số_nguyên_vnđ,
-            "safe_min": số_nguyên_vnđ
-        },
-        "risk_assessment": "Thấp | Trung bình | Cao",
-        "confidence_level": "Cao | Trung bình | Thấp",
-        "reasoning": "Giải thích rõ ràng, có logic từng bước vì sao ra mức giá này"
+          "needs_clarification": false,
+          "condition_grade": "A | B | C | D",
+          "condition_details": "Mô tả ngắn gọn nhưng cụ thể về ngoại hình và tình trạng máy dựa trên ảnh",
+          "market_price_estimate": {
+              "low": số_nguyên_vnđ,
+              "high": số_nguyên_vnđ
+          },
+          "trade_in_value": {
+              "recommended": số_nguyên_vnđ,
+              "safe_min": số_nguyên_vnđ
+          },
+          "risk_assessment": "Thấp | Trung bình | Cao",
+          "confidence_level": "Cao | Trung bình | Thấp",
+          "reasoning": "Giải thích rõ ràng, có logic từng bước vì sao ra mức giá này"
         }
 
         QUY TẮC CUỐI:
-        - Không chắc → hạ confidence.
-        - Không đủ ảnh → phản ánh trong giá.
-        - Thà định giá thấp an toàn còn hơn cao nhưng sai.
-
+        - Không chắc chắn thông tin cơ bản → hãy dùng `needs_clarification: true`.
+        - Không đủ ảnh → phản ánh trong giá hoặc confidence.
+        - Thà định giá thấp an toàn hoặc hỏi lại còn hơn cao nhưng sai.
         `;
 
         const result = await model.generateContent([prompt, ...imageParts]);

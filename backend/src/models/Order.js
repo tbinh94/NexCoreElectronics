@@ -48,7 +48,7 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "processing", "shipping", "completed", "cancelled", "đang trả góp"],
+        enum: ["pending", "processing", "shipping", "completed", "cancelled", "đang trả góp", "đã trả góp xong"],
         default: "pending"
     }
 }, {

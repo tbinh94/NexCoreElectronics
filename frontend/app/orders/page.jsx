@@ -15,7 +15,8 @@ const getStatusConfig = (status) => {
         completed: { label: 'Hoàn thành', color: 'bg-green-100 text-green-800 border-green-300' },
         cancelled: { label: 'Đã hủy', color: 'bg-red-100 text-red-800 border-red-300' },
         shipping: { label: 'Đang giao', color: 'bg-blue-100 text-blue-800 border-blue-300' },
-        "đang trả góp": { label: 'Đang trả góp', color: 'bg-amber-100 text-amber-800 border-amber-300' }
+        "đang trả góp": { label: 'Đang trả góp', color: 'bg-amber-100 text-amber-800 border-amber-300' },
+        "đã trả góp xong": { label: 'Đã trả góp xong', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' }
     };
     return configs[status] || configs.pending;
 };

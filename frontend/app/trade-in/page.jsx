@@ -33,6 +33,7 @@ export default function TradeInPage() {
         address: ""
     });
     const [submitting, setSubmitting] = useState(false);
+    const [clarifyAnswer, setClarifyAnswer] = useState("");
 
     const { user, token } = useAuth(); // Get auth context
 
@@ -151,6 +152,15 @@ export default function TradeInPage() {
             if (valuationResult.error === 'NOT_A_LAPTOP') {
                 toast.error(valuationResult.message);
                 setResult(null); // Clear any previous result
+                return;
+            }
+
+            if (valuationResult.needs_clarification) {
+                setResult({
+                    isClarifying: true,
+                    question: valuationResult.clarification_question
+                });
+                toast.info("AI cần bạn cung cấp thêm thông tin để định giá chính xác.");
                 return;
             }
 
@@ -447,7 +457,52 @@ export default function TradeInPage() {
 
                 {/* Result Section */}
                 <div className="space-y-6">
-                    {result ? (
+                    {result?.isClarifying ? (
+                        <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-blue-200 dark:border-blue-900 shadow-lg shadow-blue-100 dark:shadow-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+                                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                    <AlertCircle className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg">AI Câu Hỏi Làm Rõ</h3>
+                                    <p className="text-sm text-gray-500">Cần thêm thông tin để định giá</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <p className="text-gray-700 dark:text-gray-300 font-medium whitespace-pre-line">
+                                    {result.question}
+                                </p>
+                                <div className="space-y-2">
+                                    <Label htmlFor="clarifyAnswer">Phản hồi của bạn:</Label>
+                                    <Textarea
+                                        id="clarifyAnswer"
+                                        placeholder="Ví dụ: Máy mình mua năm 2024, bản card RTX 4060..."
+                                        className="h-24"
+                                        value={clarifyAnswer}
+                                        onChange={(e) => setClarifyAnswer(e.target.value)}
+                                        disabled={!user}
+                                    />
+                                </div>
+                                <Button 
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-2"
+                                    onClick={() => {
+                                        if(!clarifyAnswer.trim()) {
+                                            toast.error("Vui lòng nhập câu trả lời"); return;
+                                        }
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            specs: prev.specs ? prev.specs + `\n(Bổ sung: ${clarifyAnswer})` : `(Bổ sung: ${clarifyAnswer})`
+                                        }));
+                                        toast.success("Đã cập nhật thông tin. Vui lòng bấm 'Định giá ngay' lần nữa!");
+                                        setResult(null);
+                                        setClarifyAnswer("");
+                                    }}
+                                >
+                                    Cập nhật & Yêu cầu định giá lại
+                                </Button>
+                            </div>
+                        </div>
+                    ) : result ? (
                         <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-green-200 dark:border-green-900 shadow-lg shadow-green-100 dark:shadow-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
                                 <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
