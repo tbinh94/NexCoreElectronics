@@ -145,7 +145,7 @@ export const estimateLaptopValue = async (req, res) => {
         }
 
         QUY TẮC CUỐI:
-        - Không chắc chắn thông tin cơ bản → hãy dùng `needs_clarification: true`.
+        - Không chắc chắn thông tin cơ bản → hãy dùng "needs_clarification": true.
         - Không đủ ảnh → phản ánh trong giá hoặc confidence.
         - Thà định giá thấp an toàn hoặc hỏi lại còn hơn cao nhưng sai.
         `;
